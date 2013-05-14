@@ -163,7 +163,7 @@ module.exports = Backbone.View.extend({
             templateFunc: (typeof this.template === 'string') ? templates[opts.templateKey] : this.template,
             context: false
         });
-        newEl = $(opts.templateFunc(opts.context || this.addViewMixins(this.model.toTemplate)));
+        newEl = $(opts.templateFunc(opts.contex));
         $(this.el).replaceWith(newEl);
         this.setElement(newEl);
         this.handleBindings();
@@ -184,7 +184,7 @@ module.exports = Backbone.View.extend({
             templateFunc: (typeof this.template === 'string') ? templates[opts.templateKey] : this.template
         });
         var data = _.isFunction(this.model.toTemplate) ? this.model.toTemplate() : this.model.toTemplate,
-            newEl = $(opts.templateFunc(opts.context || this.addViewMixins(data)))[0];
+            newEl = $(opts.templateFunc(opts.context))[0];
         if (!this.el.parentNode) {
             $(this.containerEl)[opts.placement](newEl);
         } else {
