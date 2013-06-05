@@ -163,7 +163,7 @@ module.exports = Backbone.View.extend({
             templateFunc: (typeof this.template === 'string') ? templates[opts.templateKey] : this.template,
             context: false
         });
-        newEl = $(opts.templateFunc(opts.contex));
+        newEl = $(opts.templateFunc(opts.context));
         $(this.el).replaceWith(newEl);
         this.setElement(newEl);
         this.handleBindings();
