@@ -27,6 +27,16 @@ module.exports = Backbone.View.extend({
     //         });
     handleBindings: function () {
         var self = this;
+        if (this.textBindings) {
+            _.each(this.textBindings, function (selector, key) {
+                var func = function () {
+                    var el = (selector.length > 0) ? self.$(selector) : $(self.el);
+                    el.text(self.model[key]);
+                };
+                self.listenTo(self.model, 'change:' + key, func);
+                func();
+            });
+        }
         if (this.contentBindings) {
             _.each(this.contentBindings, function (selector, key) {
                 var func = function () {
