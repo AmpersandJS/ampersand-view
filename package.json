@@ -2,12 +2,18 @@
   "author": "Henrik Joreteg <henrik@andyet.net>",
   "name": "strictview",
   "description": "Some handy helpers for a base backbone view when also using strictmodel",
-  "version": "0.0.3",
+  "version": "0.1.0",
   "repository": {
     "type": "git",
     "url": "git://github.com/henrikjoreteg/strictview.js.git"
   },
   "main": "./strictview.js",
+  "contributors": [
+    {
+      "name": "Michael Garvin",
+      "email": "gar@comrade.us"
+    } 
+  ],
   "devDependencies": {
     "precommit-hook": "",
     "backbone": "1.0.0"
