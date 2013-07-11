@@ -47,8 +47,8 @@ module.exports = Backbone.View.extend({
                 func();
             });
         }
-        if (this.imageBindings) {
-            _.each(this.imageBindings, function (selector, key) {
+        if (this.srcBindings) {
+            _.each(this.srcBindings, function (selector, key) {
                 var func = function () {
                     var el = (selector.length > 0) ? self.$(selector) : $(self.el);
                     el.attr('src', self.model[key]);

@@ -2,7 +2,7 @@
   "author": "Henrik Joreteg <henrik@andyet.net>",
   "name": "strictview",
   "description": "Some handy helpers for a base backbone view when also using strictmodel",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "repository": {
     "type": "git",
     "url": "git://github.com/henrikjoreteg/strictview.js.git"
