@@ -68,7 +68,7 @@ Binding types:
 
 `attributeBindings`: Lets you create other arbitrary attributes bindings. For examlpe:
     
-    this would bind the model's `id` attribute to the `data-id` attribute of the span element.
+this would bind the model's `id` attribute to the `data-id` attribute of the span element.
     ```js
     var View = StrictView.extend({
         template: '<li><span></span></li>',
