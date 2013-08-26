@@ -1,8 +1,8 @@
 {
   "author": "Henrik Joreteg <henrik@andyet.net>",
   "name": "strictview",
-  "description": "Some handy helpers for a base backbone view when also using strictmodel",
-  "version": "0.2.0",
+  "description": "A smart base view for Backbone apps, to make it easy to bind collections and properties to the DOM.",
+  "version": "1.0.0",
   "repository": {
     "type": "git",
     "url": "git://github.com/henrikjoreteg/strictview.js.git"

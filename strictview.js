@@ -10,26 +10,23 @@ if (typeof require !== 'undefined') {
 }
 
 var StrictView = Backbone.View.extend({
-    // ###registerBindings
-    // This makes it simple to bind model attributes to the view.
-    // To use it, add a `classBindings` and/or a `contentBindings` attribute
-    // to your view and call `this.registerBindings()` at the end of your view's
-    // `render` function. It's also used by `basicRender` which lets you do
-    // a complete attribute-bound views with just this:
+    // ## registerBindings
+    // This makes it simple to bind model attributes to the DOM.
+    // To use it, add a declarative bindings to your view like this:
     //
-    //         var ProfileView = BaseView.extend({
-    //             template: 'profile',
-    //             contentBindings: {
-    //                 'name': '.name'
-    //             },
-    //             classBindings: {
-    //                 'active': ''
-    //             },
-    //             render: function () {
-    //                 this.basicRender();
-    //                 return this;
-    //             }
-    //         });
+    //     var ProfileView = StrictView.extend({
+    //         template: 'profile',
+    //         textBindings: {
+    //             'name': '.name'
+    //         },
+    //         classBindings: {
+    //             'active': ''
+    //         },
+    //         render: function () {
+    //             this.renderAndBind();
+    //             return this;
+    //         }
+    //     });
     registerBindings: function (specificModel, bindings) {
         var self = this;
         var types = {
@@ -95,29 +92,33 @@ var StrictView = Backbone.View.extend({
         return this;
     },
 
-    // ###basicRender
-    // All the usual stuff when I render a view. It assumes that the view has a `template` property
-    // that contains a function that can be called to return HTML.
-    // You can optionally pass in a template function as the second argument.
-    basicRender: function (context, templateArgument) {
+    // ## renderAndBind
+    // Shortcut for doing everything we need to do to
+    // render and fully replace current root element.
+    // Either define a `template` property of your view
+    // or pass in a template directly.
+    // The template can either be a string or a function.
+    // If it's a function it will be passed the `context`
+    // argument.
+    renderAndBind: function (context, templateArgument) {
         var template = templateArgument || this.template;
         var newEl = $(_.isString(template) ? template : template(context || {}))[0];
         $(this.el).replaceWith(newEl);
         this.setElement(newEl);
         this.registerBindings();
-        this.delegateEvents();
         return this;
     },
 
-    // ### listenToAndRun
-    // Shortcut for listening and triggering
+    // ## listenToAndRun
+    // Shortcut for registering a listener for a model
+    // and also triggering it right away.
     listenToAndRun: function (object, events, handler) {
         var bound = _.bind(handler, this);
         this.listenTo(object, events, bound);
         bound();
     },
 
-    // ### animateRemove
+    // ## animateRemove
     // Placeholder for if you want to do something special when they're removed.
     // For example fade it out, etc.
     // Any override here should call `.remove()` when done.
@@ -125,7 +126,7 @@ var StrictView = Backbone.View.extend({
         this.remove();
     },
 
-    // ###renderCollection
+    // ## renderCollection
     // Method for rendering a collections with individual views.
     // Just pass it the collection, and the view to use for the items in the
     // collection.
@@ -180,9 +181,9 @@ var StrictView = Backbone.View.extend({
         reRender();
     },
 
-    // version of remove that also ensures any handlers registered by
-    // views rendered by `renderCollection` also get cleaned up.
-    // renderCollection
+    // ## remove
+    // Overwrites Backbone's `remove` to also unbinds handlers
+    // for models in any views rendered by `renderCollection`.
     remove: function () {
         _.each(this.collectionViews, function (something) {
             _.each(something, function (view) {
@@ -194,6 +195,7 @@ var StrictView = Backbone.View.extend({
         return Backbone.View.prototype.remove.call(this);
     }
 });
+
 
 if (!_.isUndefined(module) && !_.isUndefined(module.exports)) {
     module.exports = StrictView;

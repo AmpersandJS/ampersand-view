@@ -34,7 +34,7 @@ var ItemView = StrictView.extend({
         this.listenTo(this.model, 'change:something', function () {});
     },
     render: function () {
-        this.basicRender();
+        this.renderAndBind();
         this.el.id = '_' + this.model.id;
         return this;
     }
@@ -108,7 +108,6 @@ test('reset', function () {
 test('sort', function () {
     window.view.render();
     collection.comparator = function (model) {
-        console.log('get', model.get);
         return model.get('name');
     }
     collection.sort();
@@ -196,7 +195,7 @@ function getView(bindings, model) {
     var view = new View({
         model: model || new Model()
     });
-    return view.basicRender();
+    return view.renderAndBind();
 }
 
 test('textBindings', function () {
@@ -290,12 +289,3 @@ test('classBindings', function () {
     ok(!view.$el.hasClass('active'));
     ok(view.$el.hasClass('low'));
 });
-
-
-
-/*
-    classBindings: {
-        active: ''
-    },
-
-*/
