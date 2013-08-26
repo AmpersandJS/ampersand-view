@@ -54,8 +54,8 @@ Binding types:
 
 `classBindings`: Maintains a class on the element according to the following rules:
     
-    1. **If the bound property is a boolean**: the name of the property will be used as the name of the class. The class will be on the element when true, and removed when the propety is false.
-    2. **If the property is a string**: the current value of the property will be used as the class name. When the property value changes the previous class will be removed and be replaced by the current value. No other classes on that element will be disturbed.
+1. **If the bound property is a boolean**: the name of the property will be used as the name of the class. The class will be on the element when true, and removed when the propety is false.
+2. **If the property is a string**: the current value of the property will be used as the class name. When the property value changes the previous class will be removed and be replaced by the current value. No other classes on that element will be disturbed.
 
 `textBindings`: Maintains the current value of the property as the text content of the element specified by the selector.
 
@@ -127,6 +127,10 @@ Why yes! So glad you asked :)
 
 Open `test/test.html` in a browser to run the QUnit tests.
 
+
+## Like this?
+
+Follow [@HenrikJoreteg](http://twitter.com/henrikjoreteg) on twitter and checkout my soon-to-be-released book: [human javascript](http://humanjavascript.com) which includes a full explanation of this as well as a whole bunch of other stuff for building awesome single page apps. 
 
 ## license
 
