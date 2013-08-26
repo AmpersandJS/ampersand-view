@@ -1,14 +1,19 @@
-var Backbone = require('backbone'),
-    _ = require('underscore'),
-    templates = require('templates');
+;(function () {
+var Backbone, _;
 
+if (typeof require !== 'undefined') {
+    Backbone = require('backbone');
+    _ = require('underscore');
+} else {
+    Backbone = window.Backbone;
+    _ = window._;
+}
 
-// the base view we use to build all our other views
-module.exports = Backbone.View.extend({
-    // ###handleBindings
+var StrictView = Backbone.View.extend({
+    // ###registerBindings
     // This makes it simple to bind model attributes to the view.
     // To use it, add a `classBindings` and/or a `contentBindings` attribute
-    // to your view and call `this.handleBindings()` at the end of your view's
+    // to your view and call `this.registerBindings()` at the end of your view's
     // `render` function. It's also used by `basicRender` which lets you do
     // a complete attribute-bound views with just this:
     //
@@ -25,231 +30,175 @@ module.exports = Backbone.View.extend({
     //                 return this;
     //             }
     //         });
-    handleBindings: function () {
+    registerBindings: function (specificModel, bindings) {
         var self = this;
-        if (this.textBindings) {
-            _.each(this.textBindings, function (selector, key) {
-                var func = function () {
+        var types = {
+            textBindings: 'text',
+            htmlBindings: 'html',
+            srcBindings: 'src',
+            hrefBindings: 'href',
+            attributeBindings: '',
+            inputBindings: 'val'
+        };
+        var model = specificModel || this.model;
+        var bindingObject = bindings || this;
+
+        _.each(types, function (methodName, bindingType) {
+            _.each(bindingObject[bindingType], function (selector, key) {
+                var func;
+                var attrName = function () {
+                    var res;
+                    if (bindingType === 'attributeBindings') {
+                        res = selector[1];
+                        selector = selector[0];
+                        return res;
+                    } else if (methodName === 'href' || methodName === 'src') {
+                        return methodName;
+                    }
+                }();
+                func = function () {
                     var el = (selector.length > 0) ? self.$(selector) : $(self.el);
-                    el.text(self.model[key]);
-                };
-                self.listenTo(self.model, 'change:' + key, func);
-                func();
-            });
-        }
-        if (this.contentBindings) {
-            _.each(this.contentBindings, function (selector, key) {
-                var func = function () {
-                    var el = (selector.length > 0) ? self.$(selector) : $(self.el);
-                    el.html(self.model[key]);
-                };
-                self.listenTo(self.model, 'change:' + key, func);
-                func();
-            });
-        }
-        if (this.srcBindings) {
-            _.each(this.srcBindings, function (selector, key) {
-                var func = function () {
-                    var el = (selector.length > 0) ? self.$(selector) : $(self.el);
-                    el.attr('src', self.model[key]);
-                };
-                self.listenTo(self.model, 'change:' + key, func);
-                func();
-            });
-        }
-        if (this.hrefBindings) {
-            _.each(this.hrefBindings, function (selector, key) {
-                var func = function () {
-                    var el = (selector.length > 0) ? self.$(selector) : $(self.el);
-                    el.attr('href', self.model[key]);
-                };
-                self.listenTo(self.model, 'change:' + key, func);
-                func();
-            });
-        }
-        if (this.classBindings) {
-            _.each(this.classBindings, function (selector, key) {
-                var func = function () {
-                    var newValue = self.model[key],
-                        prevHash = self.model.previous(),
-                        prev = _.isFunction(prevHash) ? prevHash(key) : prevHash[key],
-                        el = (selector.length > 0) ? self.$(selector) : $(self.el);
-                    if (_.isBoolean(newValue)) {
-                        if (newValue) {
-                            el.addClass(key);
-                        } else {
-                            el.removeClass(key);
-                        }
+                    if (attrName) {
+                        el.attr(attrName, model.get(key));
                     } else {
-                        if (prev) el.removeClass(prev);
-                        el.addClass(newValue);
+                        el[methodName](model.get(key));
                     }
                 };
-                self.listenTo(self.model, 'change:' + key, func);
+                self.listenTo(model, 'change:' + key, func);
                 func();
             });
-        }
-        if (this.inputBindings) {
-            _.each(this.inputBindings, function (selector, key) {
-                var func = function () {
-                    var el = (selector.length > 0) ? self.$(selector) : $(self.el);
-                    el.val(self.model[key]);
-                };
-                self.listenTo(self.model, 'change:' + key, func);
-                func();
-            });
-        }
-        return this;
-    },
-
-    // ###desist
-    // This is method we used to remove/unbind/destroy the view.
-    // By default we fade it out this seemed like a reasonable default for realtime apps.
-    // So things to just magically disappear and to give some visual indication that
-    // it's going away. You can also pass an options hash `{quick: true}` to remove immediately.
-    desist: function (opts) {
-        opts || (opts = {});
-        _.defaults(opts, {
-            quick: false,
-            animate: true,
-            speed: 300,
-            animationProps: {
-                height: 0,
-                opacity: 0
-            }
         });
-        var el = $(this.el),
-            kill = _.bind(this.remove, this);
-        if (this.interval) {
-            clearInterval(this.interval);
-            delete this.interval;
-        }
-        if (opts.quick) {
-            kill();
-        } else if (opts.animate) {
-            el.animate(opts.animationProps, {
-                speed: opts.speed,
-                complete: kill
-            });
-        } else {
-            setTimeout(kill, opts.speed);
-        }
-    },
 
-    // ###addReferences
-    // This is a shortcut for adding reference to specific elements within your view for
-    // access later. This is avoids excessive DOM queries and gives makes it easier to update
-    // your view if your template changes. You could argue whether this is worth doing or not,
-    // but I like it.
-    // In your `render` method. Use it like so:
-    //
-    //         render: function () {
-    //             this.basicRender();
-    //             this.addReferences({
-    //                 pages: '#pages',
-    //                 chat: '#teamChat',
-    //                 nav: 'nav#views ul',
-    //                 me: '#me',
-    //                 cheatSheet: '#cheatSheet',
-    //                 omniBox: '#awesomeSauce'
-    //             });
-    //         }
-    //
-    // Then later you can access elements by reference like so: `this.$pages`, or `this.$chat`.
-    addReferences: function (hash) {
-        for (var item in hash) {
-            this['$' + item] = $(hash[item], this.el);
-        }
+        // Class bindings are a bit special. We have to
+        // remove previous, etc.
+        _.each(bindingObject.classBindings, function (selector, key) {
+            var func = function () {
+                var newVal = model.get(key);
+                var prevVal = model.previous(key);
+                var el = (selector.length > 0) ? self.$(selector) : $(self.el);
+
+                if (_.isBoolean(newVal)) {
+                    if (newVal) {
+                        el.addClass(key);
+                    } else {
+                        el.removeClass(key);
+                    }
+                } else {
+                    if (prevVal) el.removeClass(prevVal);
+                    el.addClass(newVal);
+                }
+            };
+            self.listenTo(model, 'change:' + key, func);
+            func();
+        });
+
+        return this;
     },
 
     // ###basicRender
     // All the usual stuff when I render a view. It assumes that the view has a `template` property
-    // that is the name of the ICanHaz template. You can also specify the template name by passing
-    // it an options hash like so: `{templateKey: 'profile'}`.
-    basicRender: function (opts) {
-        var newEl;
-        opts || (opts = {});
-        _.defaults(opts, {
-            templateFunc: (typeof this.template === 'string') ? templates[opts.templateKey] : this.template,
-            context: false
-        });
-        newEl = $(opts.templateFunc(opts.context));
+    // that contains a function that can be called to return HTML.
+    // You can optionally pass in a template function as the second argument.
+    basicRender: function (context, templateArgument) {
+        var template = templateArgument || this.template;
+        var newEl = $(_.isString(template) ? template : template(context || {}))[0];
         $(this.el).replaceWith(newEl);
         this.setElement(newEl);
-        this.handleBindings();
+        this.registerBindings();
         this.delegateEvents();
+        return this;
     },
 
-    // ###subViewRender
-    // This is handy for views within collections when you use `collectomatic`. Just like `basicRender` it assumes
-    // that the view either has a `template` property or that you pass it an options object with the name of the
-    // `templateKey` name of the ICanHaz template.
-    // Additionally, it handles appending or prepending the view to its parent container.
-    // It takes an options arg where you can optionally specify the `templateKey` and `placement` of the element.
-    // If your collections is stacked newest first, just use `{plaement: 'prepend'}`.
-    subViewRender: function (opts) {
-        opts || (opts = {});
-        _.defaults(opts, {
-            placement: 'append',
-            templateFunc: (typeof this.template === 'string') ? templates[opts.templateKey] : this.template
-        });
-        var data = _.isFunction(this.model.toTemplate) ? this.model.toTemplate() : this.model.toTemplate,
-            newEl = $(opts.templateFunc(opts.context))[0];
-        if (!this.el.parentNode) {
-            $(this.containerEl)[opts.placement](newEl);
-        } else {
-            $(this.el).replaceWith(newEl);
-        }
-        this.setElement(newEl);
-        this.handleBindings();
-    },
-
-    // ### bindomatic
+    // ### listenToAndRun
     // Shortcut for listening and triggering
-    bindomatic: function (object, events, handler, opts) {
+    listenToAndRun: function (object, events, handler) {
         var bound = _.bind(handler, this);
         this.listenTo(object, events, bound);
-        if (opts && opts.trigger || opts === true) bound();
+        bound();
     },
 
-    // ###collectomatic
-    // Shorthand for rendering collections and their invividual views.
+    // ### animateRemove
+    // Placeholder for if you want to do something special when they're removed.
+    // For example fade it out, etc.
+    // Any override here should call `.remove()` when done.
+    animateRemove: function () {
+        this.remove();
+    },
+
+    // ###renderCollection
+    // Method for rendering a collections with individual views.
     // Just pass it the collection, and the view to use for the items in the
-    // collection. (anything in the `options` arg just gets passed through to
-    // view. Again, props to @natevw for this.
-    collectomatic: function (collection, ViewClass, options, desistOptions) {
-        var views = {},
-            self = this,
-            refreshResetHandler;
+    // collection.
+    renderCollection: function (collection, ViewClass, container, opts) {
+        var self = this;
+        var views = {};
+        var options = _.defaults(opts || {}, {
+            filter: null,
+            viewOptions: {},
+            reverse: false
+        });
+        var containerEl = $(container);
+
+        // store a reference on the view to it's collection views
+        // so we can clean up memory references when we're done
+        if (!this.collectionViews) this.collectionViews = [];
+        this.collectionViews.push(views);
+
         function addView(model, collection, opts) {
-            var matches = self.matchesFilters ? self.matchesFilters(model) : true;
+            var matches = options.filter ? options.filter(model) : true;
+            var view;
             if (matches) {
-                views[model.cid] = new ViewClass(_({model: model}).extend(options));
-                views[model.cid].parent = self;
+                view = views[model.cid];
+                if (!view) {
+                    view = views[model.cid] = new ViewClass(_({model: model, collection: collection}).extend(options.viewOptions));
+                    view.parent = self;
+                    view.render();
+                }
+                containerEl[options.reverse ? 'prepend' : 'append'](view.el);
             }
+        }
+        function reRender() {
+            containerEl.empty();
+            collection.each(addView);
         }
         this.listenTo(collection, 'add', addView);
         this.listenTo(collection, 'remove', function (model) {
-            if (views[model.cid]) {
-                views[model.cid].desist(desistOptions);
+            var view = views[model.cid];
+            if (view) {
                 delete views[model.cid];
+                view.animateRemove();
             }
         });
-        this.listenTo(collection, 'move', function () {
-            _(views).each(function (view) {
-                view.desist({quick: true});
+        this.listenTo(collection, 'move sort', reRender);
+        this.listenTo(collection, 'refresh reset', function () {
+            _.each(views, function (view) {
+                view.remove();
             });
             views = {};
-            collection.each(addView);
+            reRender();
         });
-        refreshResetHandler = function (opts) {
-            _(views).each(function (view) {
-                view.desist({quick: true});
+        reRender();
+    },
+
+    // version of remove that also ensures any handlers registered by
+    // views rendered by `renderCollection` also get cleaned up.
+    // renderCollection
+    remove: function () {
+        _.each(this.collectionViews, function (something) {
+            _.each(something, function (view) {
+                view.$el.remove();
+                view.stopListening();
             });
-            views = {};
-            collection.each(addView);
-        };
-        this.listenTo(collection, 'refresh reset sort', refreshResetHandler);
-        refreshResetHandler();
+        });
+        // call super
+        return Backbone.View.prototype.remove.call(this);
     }
 });
+
+if (!_.isUndefined(module) && !_.isUndefined(module.exports)) {
+    module.exports = StrictView;
+} else {
+    window.StrictView = StrictView;
+}
+
+})();
