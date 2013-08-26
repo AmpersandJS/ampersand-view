@@ -53,6 +53,7 @@ var MyView = StrictView.extend({
 Binding types:
 
 `classBindings`: Maintains a class on the element according to the following rules:
+    
     1. **If the bound property is a boolean**: the name of the property will be used as the name of the class. The class will be on the element when true, and removed when the propety is false.
     2. **If the property is a string**: the current value of the property will be used as the class name. When the property value changes the previous class will be removed and be replaced by the current value. No other classes on that element will be disturbed.
 
