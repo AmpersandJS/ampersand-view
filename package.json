@@ -2,7 +2,7 @@
   "author": "Henrik Joreteg <henrik@andyet.net>",
   "name": "strictview",
   "description": "A smart base view for Backbone apps, to make it easy to bind collections and properties to the DOM.",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "repository": {
     "type": "git",
     "url": "git://github.com/henrikjoreteg/strictview.js.git"

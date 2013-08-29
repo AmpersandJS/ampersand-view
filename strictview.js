@@ -102,8 +102,17 @@ var StrictView = Backbone.View.extend({
     // argument.
     renderAndBind: function (context, templateArgument) {
         var template = templateArgument || this.template;
-        var newEl = $(_.isString(template) ? template : template(context || {}))[0];
-        $(this.el).replaceWith(newEl);
+        var html = _.isString(template) ? template : template(context || {});
+        var newEl = $(html)[0];
+        // this is needed because jQuery and others
+        // do weird things if you try to replace the body.
+        // Also doing $(newEl)[0] will give you first child if
+        // it's a <body> element for some reason.
+        if (this.el.tagName === 'BODY') {
+            document.body.appendChild(newEl);
+        } else {
+            $(this.el).replaceWith(newEl);
+        }
         this.setElement(newEl);
         this.registerBindings();
         return this;
