@@ -100,8 +100,9 @@ var StrictView = Backbone.View.extend({
     // The template can either be a string or a function.
     // If it's a function it will be passed the `context`
     // argument.
-    renderAndBind: function (context, templateArgument) {
-        var template = templateArgument || this.template;
+    renderAndBind: function (context, templateArg) {
+        var template = templateArg || this.template;
+        if (!template) throw new Error('Template string or function needed.');
         var html = _.isString(template) ? template : template(context || {});
         var newEl = $(html)[0];
         // this is needed because jQuery and others
@@ -113,7 +114,11 @@ var StrictView = Backbone.View.extend({
         } else {
             $(this.el).replaceWith(newEl);
         }
-        this.setElement(newEl);
+        // We don't call delegate events if rendered by parent
+        // this solves a stupid bug in jQuery where you can't
+        // attach event handlers to a detached element
+        // ref: http://api.jquery.com/on/#direct-and-delegated-events
+        this.setElement(newEl, !this.renderedByParentView);
         this.registerBindings();
         return this;
     },
@@ -162,9 +167,11 @@ var StrictView = Backbone.View.extend({
                 if (!view) {
                     view = views[model.cid] = new ViewClass(_({model: model, collection: collection}).extend(options.viewOptions));
                     view.parent = self;
+                    view.renderedByParentView = true;
                     view.render();
                 }
                 containerEl[options.reverse ? 'prepend' : 'append'](view.el);
+                view.delegateEvents();
             }
         }
         function reRender() {
