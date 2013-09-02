@@ -1,4 +1,4 @@
-# strictview
+# human-view
 
 A set of common helpers and conventions for using as a base view for backbone applications.
 
@@ -12,7 +12,7 @@ It adds:
 ## Install
 
 ```
-npm install strictview
+npm install human-view
 ```
 
 ## Usage
@@ -31,7 +31,7 @@ var MyView = StrictView.extend({
 ### Declarative Bindings
 
 ```js
-var MyView = StrictView.extend({
+var MyView = HumanView.extend({
     // set a `template` property of your view. This can either be
     // a function that returns an HTML string or just a string if 
     // no logic is required.
@@ -44,7 +44,7 @@ var MyView = StrictView.extend({
         // method for rendering the view's template and binding all
         // the model properties as described by `textBindings` above.
         // You can also bind other attributes, and if you're using
-        // strictmodel, you can bind derived properties too.
+        // human-model, you can bind derived properties too.
         this.renderAndBind({what: 'some context object for the template'});
     }
 });
