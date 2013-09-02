@@ -18,7 +18,7 @@ var modelData = names.map(function (name) {
     };
 });
 // our main view definition
-var MainView = StrictView.extend({
+var MainView = HumanView.extend({
     render: function (opts) {
         this.$el.empty();
         this.$el.append('<ul></ul>');
@@ -27,7 +27,7 @@ var MainView = StrictView.extend({
     }
 });
 // our Item View
-var ItemView = StrictView.extend({
+var ItemView = HumanView.extend({
     template: '<li><a href=""></a><span></span><input/></li>',
     initialize: function () {
         // register a misc handler so we can test release
@@ -40,8 +40,9 @@ var ItemView = StrictView.extend({
     }
 });
 
-var Model = ((window.Strict && window.Strict.Model) || Backbone.Model).extend({
+var Model = (window.HumanModel || Backbone.Model).extend({
     props: {
+        id: 'number',
         name: 'string',
         html: 'string',
         url: 'string',
@@ -171,7 +172,7 @@ asyncTest('basic', 1, function () {
             name: 'string'
         }
     });
-    var View = StrictView.extend({
+    var View = HumanView.extend({
         initialize: function () {
             this.model = model;
             this.listenToAndRun(this.model, 'change', this.handler);
@@ -191,7 +192,7 @@ function getView(bindings, model) {
     if (!bindings.template) {
         bindings.template = '<li><span></span><img/></li>';
     }
-    var View = StrictView.extend(bindings);
+    var View = HumanView.extend(bindings);
     var view = new View({
         model: model || new Model()
     });

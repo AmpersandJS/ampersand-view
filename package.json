@@ -1,13 +1,20 @@
 {
   "author": "Henrik Joreteg <henrik@andyet.net>",
-  "name": "strictview",
+  "name": "human-view",
   "description": "A smart base view for Backbone apps, to make it easy to bind collections and properties to the DOM.",
-  "version": "1.0.2",
+  "version": "1.1.0",
+  "keywords": [
+    "backbone",
+    "view",
+    "browser",
+    "browserify"
+  ],
   "repository": {
     "type": "git",
-    "url": "git://github.com/henrikjoreteg/strictview.js.git"
+    "url": "git://github.com/henrikjoreteg/human-view.git"
   },
-  "main": "./strictview.js",
+  "main": "./human-view.js",
+  "browser": "./human-view.js",
   "contributors": [
     {
       "name": "Michael Garvin",
