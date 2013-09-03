@@ -112,7 +112,7 @@
       // Also doing $(newEl)[0] will give you first child if
       // it's a <body> element for some reason.
       if (this.el.tagName === 'BODY') {
-        document.body.appendChild(newEl);
+        document.body.innerHTML = html;
       } else {
         $(this.el).replaceWith(newEl);
       }
