@@ -111,16 +111,17 @@
       // do weird things if you try to replace the body.
       // Also doing $(newEl)[0] will give you first child if
       // it's a <body> element for some reason.
-      if (this.el.tagName === 'BODY') {
+      if (this.el === document.body) {
         document.body.innerHTML = html;
+        this.delegateEvents();
       } else {
         $(this.el).replaceWith(newEl);
+        // We don't call delegate events if rendered by parent
+        // this solves a stupid bug in jQuery where you can't
+        // attach event handlers to a detached element
+        // ref: http://api.jquery.com/on/#direct-and-delegated-events
+        this.setElement(newEl, !this.renderedByParentView);
       }
-      // We don't call delegate events if rendered by parent
-      // this solves a stupid bug in jQuery where you can't
-      // attach event handlers to a detached element
-      // ref: http://api.jquery.com/on/#direct-and-delegated-events
-      this.setElement(newEl, !this.renderedByParentView);
       this.registerBindings();
       return this;
     },
