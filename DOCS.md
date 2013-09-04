@@ -7,39 +7,42 @@ Bindings are view-level objects that map model attributes to specific DOM select
 ### textBindings
 Text bindings are used to directly bind the inner text of an element to the model. For instance:
 
-    textBindings: {
-    	'liveStreamCount': '.live-stream-count'
-    } 
-    
-    ...
-
-    <div class='.live-stream-count'>0</div>
+```js
+textBindings: {
+	'liveStreamCount': '.live-stream-count'
+} 
+```
+```html
+<div class='.live-stream-count'>0</div>
+```
 
 Here, the contents of all the `.liveStreamCount` elements will be replaced with and bound to the value of `this.liveStreamCount`.
 
 ### srcBindings
 Source bindings are used to bind the `src` attribute of a DOM element to the model. For example:
 
-	srcBindings: {
-		'userProfilePic': 'img .profile-pic'
-	}
-
-	...
-
-	<img class='profile-pic' src='' alt='Profile Picture' />
+```js
+srcBindings: {
+	'userProfilePic': 'img .profile-pic'
+}
+```
+```html
+<img class='profile-pic' src='' alt='Profile Picture' />
+```
 
 Here, the `src` tag of the `.profile-pic` image element will be bound to `this.userProfilePic`.
 
 ### hrefBindings
 href bindings are used to bind the `href` attribute of a DOM element to the model. For example:
 
-	hrefBindings: {
-		'logoutURL': 'a .logout'
-	}
-
-	...
-
-	<a class='logout' href=''>Logout</a>
+```js
+hrefBindings: {
+	'logoutURL': 'a .logout'
+}
+```
+```html
+<a class='logout' href=''>Logout</a>
+```
 
 Here, the `href` tag of the `.logout` anchor element will be bound to `this.logoutURL`.
 
@@ -51,13 +54,14 @@ Class bindings maintain a class on the element according to the following rules:
 
 For example, assuming that `this.active` is a boolean: 
 
-	hrefBindings: {
-		'active': 'a .options-page'
-	}
-
-	...
-
-	<a class='options-page' href=''>Options</a>
+```js
+hrefBindings: {
+	'active': 'a .options-page'
+}
+```
+```html
+<a class='options-page' href=''>Options</a>
+```
 
 When `active` is set to `true`, a class named `active` will be added to the `.options-page` element.
 
