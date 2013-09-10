@@ -95,6 +95,13 @@
     },
 
     // ## renderAndBind
+    // Commbo for renderWithTemplate and registering bindings
+    renderAndBind: function (context, templateArg) {
+      this.renderWithTemplate(context, templateArg);
+      this.registerBindings();
+      return this;
+    },
+
     // Shortcut for doing everything we need to do to
     // render and fully replace current root element.
     // Either define a `template` property of your view
@@ -102,7 +109,7 @@
     // The template can either be a string or a function.
     // If it's a function it will be passed the `context`
     // argument.
-    renderAndBind: function (context, templateArg) {
+    renderWithTemplate: function (context, templateArg) {
       var template = templateArg || this.template;
       if (!template) throw new Error('Template string or function needed.');
       var html = _.isString(template) ? template : template(context || {});
@@ -122,8 +129,6 @@
         // ref: http://api.jquery.com/on/#direct-and-delegated-events
         this.setElement(newEl, !this.renderedByParentView);
       }
-      this.registerBindings();
-      return this;
     },
 
     // ## addReferences
