@@ -19,10 +19,10 @@ npm install human-view
 
 ### Basics
 
-Nothing special is required, just use `StrictView` in the same way as you would Backbone.View:
+Nothing special is required, just use `HumanView` in the same way as you would Backbone.View:
 
 ```js
-var MyView = StrictView.extend({
+var MyView = HumanView.extend({
     initialize: function () { ... }, 
     render: function () { ... }
 });
@@ -71,7 +71,7 @@ Binding types:
     
 this would bind the model's `id` attribute to the `data-id` attribute of the span element.
     ```js
-    var View = StrictView.extend({
+    var View = HumanView.extend({
         template: '<li><span></span></li>',
         attributeBindings: {
             // model property name : [ 'css selctor', 'attribute name']
@@ -82,14 +82,14 @@ this would bind the model's `id` attribute to the `data-id` attribute of the spa
 
 ### rendering collections
 
-StrictView includes a `renderCollection` method that works as follows:
+HumanView includes a `renderCollection` method that works as follows:
 
 ```js
 // some view for individual items in the collection
-var ItemView = StrictView.extend({ ... });
+var ItemView = HumanView.extend({ ... });
 
 // the main view
-var MainView = StrictView.extend({
+var MainView = HumanView.extend({
     template: '<section class="page"><ul class="itemContainer"></ul></section>',
     render: function (opts) {
         // render our template as usual
