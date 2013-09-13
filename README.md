@@ -50,37 +50,29 @@ var MyView = HumanView.extend({
 });
 ```
 
-Binding types:
+#### Binding types:
 
-`classBindings`: Maintains a class on the element according to the following rules:
-    
-1. **If the bound property is a boolean**: the name of the property will be used as the name of the class. The class will be on the element when true, and removed when the propety is false.
-2. **If the property is a string**: the current value of the property will be used as the class name. When the property value changes the previous class will be removed and be replaced by the current value. No other classes on that element will be disturbed.
+* `classBindings`: Maintains a class on the element according to the following rules:
+    1. **If the bound property is a boolean**: the name of the property will be used as the name of the class. The class will be on the element when true, and removed when the propety is false.
+    2. **If the property is a string**: the current value of the property will be used as the class name. When the property value changes the previous class will be removed and be replaced by the current value. No other classes on that element will be disturbed.
+* `textBindings`: Maintains the current value of the property as the text content of the element specified by the selector.
+* `htmlBindings`: Just like `textBindings` except html is not escaped.
+* `srcBindings`: Binds to the `src` attribute (useful for avatars, etc).
+* `hrefBindings`: Binds to the `href` attribute.
+* `inputBindings`: Binds to the `input` value.
+* `attributeBindings`: Lets you create other arbitrary attributes bindings. For example, this would bind the model's `id` attribute to the `data-id` attribute of the span element:
 
-`textBindings`: Maintains the current value of the property as the text content of the element specified by the selector.
-
-`htmlBindings`: Just like `textBindings` except html is not escaped.
-
-`srcBindings`: Binds to the `src` attribute (useful for avatars, etc).
-
-`hrefBindings`: Binds to the `href` attribute.
-
-`inputBindings`: Binds to the `input` value.
-
-`attributeBindings`: Lets you create other arbitrary attributes bindings. For examlpe:
-    
-this would bind the model's `id` attribute to the `data-id` attribute of the span element.
     ```js
     var View = HumanView.extend({
         template: '<li><span></span></li>',
         attributeBindings: {
-            // model property name : [ 'css selctor', 'attribute name']
+            // <model_property>: [ '<css-selector>', '<attribute-name>']
             id: ['span', 'data-thing']
         }
     });
     ```
 
-### rendering collections
+### Rendering collections
 
 HumanView includes a `renderCollection` method that works as follows:
 
@@ -121,7 +113,7 @@ Also, when the parent view gets `.remove()`'ed any event handlers registered by 
 Each item view will only be `.render()`'ed once (unless you change that within the item view itself).
 
 
-## test coverage?
+## Test coverage?
 
 Why yes! So glad you asked :)  
 
