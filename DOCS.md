@@ -6,9 +6,11 @@ human-view is a
 
 ## Bindings
 
-Bindings are view-level objects that map model properties to specific DOM selectors in the view's template. human-view will automatically update the appropriate DOM elements or attributes when the applicable model property changes.
+Bindings are view-level objects that map model properties to specific DOM selectors in the view's template. Once bindings are declared, human-view will automatically update the appropriate DOM elements or attributes when the bound model property changes.
+
 
 ### textBindings
+
 Text bindings are used to directly bind the inner text of an element to the model.
 
 ```js
@@ -20,9 +22,11 @@ textBindings: {
 <div class='.live-stream-count'>0</div>
 ```
 
-Here, the contents of all the `.liveStreamCount` elements will be replaced with and bound to the value of `view.liveStreamCount`.
+Here, the contents of the `.liveStreamCount` element (or elements) within the view will be replaced with and bound to the value retrived by `model.get('liveStreamCount')`.
+
 
 ### srcBindings
+
 Source bindings are used to bind the `src` attribute of a DOM element to the model.
 
 ```js
@@ -34,10 +38,12 @@ srcBindings: {
 <img class='profile-pic' src='' alt='Profile Picture' />
 ```
 
-Here, the `src` tag of the `.profile-pic` image element will be bound to `view.userProfilePic`.
+Here, the `src` tag of the `.profile-pic` image element will be bound to `model.get('userProfilePic')`.
+
 
 ### hrefBindings
-href bindings are just like the src bindings, but for the `href` attribute.
+
+You're probably getting the idea by now, but href bindings are just like the src bindings, but for the `href` attribute.
 
 ```js
 hrefBindings: {
@@ -48,26 +54,54 @@ hrefBindings: {
 <a class='logout' href=''>Logout</a>
 ```
 
-Here, the `href` tag of the `.logout` anchor element will be bound to `view.logoutURL`.
+Here, the `href` tag of the `.logout` anchor element will be bound to `model.get('logoutURL')`.
+
 
 ### classBindings
-Class bindings maintain a class on the element according to the following rules:
-    
-1. **If the bound property is a boolean**: the name of the property will be used as the name of the class. The class will be on the element when true, and removed when the propety is false.
-2. **If the property is a string**: the current value of the property will be used as the class name. When the property value changes the previous class will be removed and be replaced by the current value. No other classes on that element will be disturbed.
 
-Assuming that `view.active` is a boolean: 
+Class bindings are a bit special. They maintain a class on the element according to the following rules:
+    
+1. **If the bound property is a boolean**: the name of the property will be used as the name of the class. The class will be present on the element when the boolean is `true`, and removed when the propety is `false`.
 
 ```js
-hrefBindings: {
-	'active': 'a .options-page'
+// within your view definition
+classBindings: {
+    'active': 'a .options-page'
 }
 ```
 ```html
 <a class='options-page' href=''>Options</a>
 ```
 
-When `active` is set to `true`, a class named `active` will be added to the `.options-page` element.
+```js
+// some other code
+model.set('active', true); // element with have `active` class
+
+model.set('active', false); // `active` class will be removed (if present)
+```
+
+
+2. **If the property is a string**: the current value of the property will be used as the class name. When the property value changes the previous class will be removed and be replaced by the current value. No other classes on that element will be disturbed.
+
+
+```js
+// within your view definition
+classBindings: {
+    'status': 'a .options-page'
+}
+```
+```html
+<a class='options-page' href=''>Options</a>
+```
+
+```js
+// some other code
+model.set('status', 'available'); // element with have an `available` class
+
+// when setting to something else 
+model.set('status', 'away'); // `available` class will be removed and `away` class added.
+```
+
 
 ## Methods
 
