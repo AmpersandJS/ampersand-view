@@ -26,12 +26,12 @@
     // to render it in. It's `remove` method will be called
     // when theh parent view is destroyed.
     renderSubview: function (view, container) {
-      this.registerSubview(view);
       if (typeof container === 'string') {
         container = this.$(container);
       }
       view.render();
       $(container).append(view.el);
+      return this.registerSubview(view);
     },
 
     // ## registerBindings
