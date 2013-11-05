@@ -19,10 +19,10 @@ npm install human-view
 
 ### Basics
 
-Nothing special is required, just use `StrictView` in the same way as you would Backbone.View:
+Nothing special is required, just use `HumanView` in the same way as you would Backbone.View:
 
 ```js
-var MyView = StrictView.extend({
+var MyView = HumanView.extend({
     initialize: function () { ... }, 
     render: function () { ... }
 });
@@ -71,7 +71,7 @@ Binding types:
     
 this would bind the model's `id` attribute to the `data-id` attribute of the span element.
     ```js
-    var View = StrictView.extend({
+    var View = HumanView.extend({
         template: '<li><span></span></li>',
         attributeBindings: {
             // model property name : [ 'css selctor', 'attribute name']
@@ -80,16 +80,48 @@ this would bind the model's `id` attribute to the `data-id` attribute of the spa
     });
     ```
 
+### handling subviews
+
+Often you want to render some other subview within a view. The trouble is that when you remove the parent view, you also want to remove all the subviews.
+
+HumanView has two convenience method for handling this that's also used by `renderCollection` to do cleanup.
+
+It looks like this:
+
+```js
+var HumanView = require('human-view');
+
+// This can be *anything* with a `remove` method
+// and an `el` property... such as another human-view
+// instance.
+// But you could very easily write other little custom views
+// that followed the same conventions. Such as custom dialogs, etc.
+var SubView = require('./my-sub-view');
+
+module.exports = HumanView.extend({
+    render: function () {
+        // this takes a view instance and either an element, or element selector 
+        // to draw the view into.
+        this.renderSubview(new Subview(), '.someElementSelector');
+
+        // There's an even lower level api that `renderSubview` usees
+        // that will do nothing other than call `remove` on it when
+        // the parent view is removed.
+        this.registerSubview(new Subview());
+    }
+})
+```
+
 ### rendering collections
 
-StrictView includes a `renderCollection` method that works as follows:
+HumanView includes a `renderCollection` method that works as follows:
 
 ```js
 // some view for individual items in the collection
-var ItemView = StrictView.extend({ ... });
+var ItemView = HumanView.extend({ ... });
 
 // the main view
-var MainView = StrictView.extend({
+var MainView = HumanView.extend({
     template: '<section class="page"><ul class="itemContainer"></ul></section>',
     render: function (opts) {
         // render our template as usual

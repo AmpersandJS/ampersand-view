@@ -12,6 +12,28 @@
   }
 
   var HumanView = Backbone.View.extend({
+    // ## registerSubview
+    // Pass it a view. This can be anything with a `remove` method
+    registerSubview: function (view) {
+      // Storage for our subviews.
+      this._subviews || (this._subviews = []);
+      this._subviews.push(view);
+      return view;
+    },
+
+    // ## renderSubview
+    // Pass it a view instance and a container element
+    // to render it in. It's `remove` method will be called
+    // when theh parent view is destroyed.
+    renderSubview: function (view, container) {
+      this.registerSubview(view);
+      if (typeof container === 'string') {
+        container = this.$(container);
+      }
+      view.render();
+      $(container).append(view.el);
+    },
+
     // ## registerBindings
     // This makes it simple to bind model attributes to the DOM.
     // To use it, add a declarative bindings to your view like this:
@@ -175,7 +197,7 @@
     // collection.
     renderCollection: function (collection, ViewClass, container, opts) {
       var self = this;
-      var views = {};
+      var views = [];
       var options = _.defaults(opts || {}, {
         filter: null,
         viewOptions: {},
@@ -185,16 +207,22 @@
 
       // store a reference on the view to it's collection views
       // so we can clean up memory references when we're done
-      if (!this.collectionViews) this.collectionViews = [];
-      this.collectionViews.push(views);
+      this.registerSubview(views);
+
+      function getViewBy(model) {
+        return _.find(views, function (view) {
+          return model === view.model;
+        });
+      }
 
       function addView(model, collection, opts) {
         var matches = options.filter ? options.filter(model) : true;
         var view;
         if (matches) {
-          view = views[model.cid];
+          view = getViewBy(model);
           if (!view) {
-            view = views[model.cid] = new ViewClass(_({model: model, collection: collection}).extend(options.viewOptions));
+            view = new ViewClass(_({model: model, collection: collection}).extend(options.viewOptions));
+            views.push(view);
             view.parent = self;
             view.renderedByParentView = true;
             view.render();
@@ -209,18 +237,20 @@
       }
       this.listenTo(collection, 'add', addView);
       this.listenTo(collection, 'remove', function (model) {
-        var view = views[model.cid];
-        if (view) {
-          delete views[model.cid];
-          view.animateRemove();
+        var index = views.indexOf(getViewBy(model));
+        if (index !== -1) {
+          // remove it if we found it calling animateRemove
+          // to give user option of gracefully destroying.
+          views.splice(index, 1)[0].animateRemove();
         }
       });
       this.listenTo(collection, 'move sort', reRender);
       this.listenTo(collection, 'refresh reset', function () {
-        _.each(views, function (view) {
-          view.remove();
-        });
-        views = {};
+        // empty array calling `remove` on each
+        // without re-defining `views`
+        while (views.length) {
+          views.pop().remove();
+        }
         reRender();
       });
       reRender();
@@ -230,12 +260,7 @@
     // Overwrites Backbone's `remove` to also unbinds handlers
     // for models in any views rendered by `renderCollection`.
     remove: function () {
-      _.each(this.collectionViews, function (something) {
-        _.each(something, function (view) {
-          view.$el.remove();
-          view.stopListening();
-        });
-      });
+      _.chain(this._subviews).flatten().invoke('remove');
       // call super
       return Backbone.View.prototype.remove.call(this);
     }
