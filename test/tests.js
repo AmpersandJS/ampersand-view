@@ -165,6 +165,46 @@ test('cleanup', function () {
     ok(!collection.first()._events['change:something']);
 });
 
+
+module('method: subview methods');
+
+test('registerSubview', function () {
+    var removeCalled = 0;
+    var SubView = HumanView.extend({
+        render: function () {
+            this.$el.addClass('subview');
+        },
+        remove: function () {
+            removeCalled++;
+        }
+    });
+    var View = HumanView.extend({
+        render: function () {
+            this.$el.empty();
+            this.$el.html('<div id="parent"></div>');
+            // all of these should work
+            this.renderSubview(new SubView(), this.$('#parent'));
+            this.renderSubview(new SubView(), this.$('#parent')[0]);
+            this.renderSubview(new SubView(), '#parent');
+
+            // some other thing with a remove method
+            this.registerSubview({remove: function () {
+                removeCalled++;
+            }});
+        }
+    });
+
+    var main = new View({
+        el: container[0]
+    });
+
+    main.render();
+    equal(main.$('.subview').length, 3);
+    main.remove();
+    equal(removeCalled, 4);
+});
+
+
 module('method: listenToAndRun');
 asyncTest('basic', 1, function () {
     var model = new Model({
