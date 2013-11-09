@@ -272,7 +272,7 @@
   });
 
 
-  if (!_.isUndefined(module) && !_.isUndefined(module.exports)) {
+  if (typeof module !== "undefined" && module !== null && !_.isUndefined(module.exports)) {
     module.exports = HumanView;
   } else {
     window.HumanView = HumanView;
