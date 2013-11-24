@@ -154,7 +154,7 @@ Open `test/test.html` in a browser to run the QUnit tests.
 
 ## Like this?
 
-Follow [@HenrikJoreteg](http://twitter.com/henrikjoreteg) on twitter and checkout my soon-to-be-released book: [human javascript](http://humanjavascript.com) which includes a full explanation of this as well as a whole bunch of other stuff for building awesome single page apps. 
+Follow [@HenrikJoreteg](http://twitter.com/henrikjoreteg) on twitter and check out my recently released book: [human javascript](http://humanjavascript.com) which includes a full explanation of this as well as a whole bunch of other stuff for building awesome single page apps. 
 
 ## license
 
