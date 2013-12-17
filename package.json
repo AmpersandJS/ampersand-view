@@ -2,7 +2,7 @@
   "author": "Henrik Joreteg <henrik@andyet.net>",
   "name": "human-view",
   "description": "A smart base view for Backbone apps, to make it easy to bind collections and properties to the DOM.",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "keywords": [
     "backbone",
     "view",
@@ -15,12 +15,6 @@
   },
   "main": "./human-view.js",
   "browser": "./human-view.js",
-  "contributors": [
-    {
-      "name": "Michael Garvin",
-      "email": "gar@comrade.us"
-    } 
-  ],
   "devDependencies": {
     "precommit-hook": "",
     "backbone": "1.0.0"

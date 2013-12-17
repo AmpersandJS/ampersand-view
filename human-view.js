@@ -18,6 +18,10 @@
       // Storage for our subviews.
       this._subviews || (this._subviews = []);
       this._subviews.push(view);
+      // If view has an 'el' it's a single view not
+      // an array of views registered by renderCollection
+      // so we store a reference to the parent view.
+      if (view.el) view.parent = self;
       return view;
     },
 
@@ -230,9 +234,10 @@
             views.push(view);
             view.parent = self;
             view.renderedByParentView = true;
-            view.render();
+            view.render({containerEl: container});
           }
-          containerEl[options.reverse ? 'prepend' : 'append'](view.el);
+          // give the option for the view to choose where it's inserted if you so choose
+          if (!view.insertSelf) containerEl[options.reverse ? 'prepend' : 'append'](view.el);
           view.delegateEvents();
         }
       }
@@ -272,7 +277,7 @@
   });
 
 
-  if (typeof module !== "undefined" && module !== null && !_.isUndefined(module.exports)) {
+  if (typeof module !== "undefined" && module && module.exports) {
     module.exports = HumanView;
   } else {
     window.HumanView = HumanView;

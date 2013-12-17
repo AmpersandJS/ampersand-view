@@ -17,28 +17,9 @@ var modelData = names.map(function (name) {
         active: count === 2
     };
 });
-// our main view definition
-var MainView = HumanView.extend({
-    render: function (opts) {
-        this.$el.empty();
-        this.$el.append('<ul></ul>');
-        this.renderCollection(this.collection, ItemView, this.$('ul')[0], opts);
-        return this;
-    }
-});
-// our Item View
-var ItemView = HumanView.extend({
-    template: '<li><a href=""></a><span></span><input/></li>',
-    initialize: function () {
-        // register a misc handler so we can test release
-        this.listenTo(this.model, 'change:something', function () {});
-    },
-    render: function () {
-        this.renderAndBind();
-        this.el.id = '_' + this.model.id;
-        return this;
-    }
-});
+
+var MainView
+var ItemView;
 
 var Model = (window.HumanModel || Backbone.Model).extend({
     props: {
@@ -74,6 +55,29 @@ QUnit.testStart(function () {
     });
 
     container = $('#qunit-fixture');
+
+    // our item view
+    ItemView = HumanView.extend({
+        template: '<li><a href=""></a><span></span><input/></li>',
+        initialize: function () {
+            // register a misc handler so we can test release
+            this.listenTo(this.model, 'change:something', function () {});
+        },
+        render: function () {
+            this.renderAndBind();
+            this.el.id = '_' + this.model.id;
+            return this;
+        }
+    });
+
+    MainView = HumanView.extend({
+        render: function (opts) {
+            this.$el.empty();
+            this.$el.append('<ul></ul>');
+            this.renderCollection(this.collection, ItemView, this.$('ul')[0], opts);
+            return this;
+        }
+    });
 
     window.view = new MainView({
         el: container[0],
@@ -163,6 +167,16 @@ test('cleanup', function () {
     // when main view is removed so should registered event handler
     // from subview
     ok(!collection.first()._events['change:something']);
+});
+test('child view can chose to insert self', 6, function () {
+    ItemView.prototype.insertSelf = true;
+    ItemView.prototype.render = function (extraInfo) {
+        ok(extraInfo.containerEl);
+    };
+
+    window.view.render();
+    equal(numberRendered(), 0, 'Parent should not have rendered anything');
+    window.view.remove();
 });
 
 

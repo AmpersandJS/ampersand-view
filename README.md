@@ -104,6 +104,8 @@ module.exports = HumanView.extend({
 })
 ```
 
+**registerSubview also, stores a reference to the parent view on the subview as `.parent`**
+
 ### rendering collections
 
 HumanView includes a `renderCollection` method that works as follows:
@@ -151,6 +153,10 @@ Why yes! So glad you asked :)
 
 Open `test/test.html` in a browser to run the QUnit tests.
 
+
+## Changelog
+
+1.4.0 - Adding `parent` reference to subviews registered via registerSubview
 
 ## Like this?
 
