@@ -2,7 +2,7 @@
   "author": "Henrik Joreteg <henrik@andyet.net>",
   "name": "human-view",
   "description": "A smart base view for Backbone apps, to make it easy to bind collections and properties to the DOM.",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "keywords": [
     "backbone",
     "view",

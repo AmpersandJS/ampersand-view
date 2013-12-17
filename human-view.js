@@ -242,7 +242,8 @@
         }
       }
       function reRender() {
-        containerEl.empty();
+        // empty without using jQuery's empty (which removes jQuery handlers)
+        containerEl[0].innerHTML = '';
         collection.each(addView);
       }
       this.listenTo(collection, 'add', addView);
