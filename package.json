@@ -16,7 +16,7 @@
   "main": "./human-view.js",
   "browser": "./human-view.js",
   "devDependencies": {
-    "precommit-hook": "",
+    "precommit-hook": "~0.3.8",
     "browserify": "~3.14.1",
     "uglify-js": "~2.4.8"
   },
