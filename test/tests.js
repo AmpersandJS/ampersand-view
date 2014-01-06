@@ -347,14 +347,14 @@ test('classBindings', function () {
 
 module('error case: no model');
 
-//test('renderAndBind with no model', function () {
-    //var View = HumanView.extend({
-        //template: '<li><span></span><img/></li>',
-        //textBindings: { name: 'span' }
-    //});
-    //var view = new View();
-    //ok(view.renderAndBind()); //Should not throw error
-//});
+test('renderAndBind with no model', function () {
+    var View = HumanView.extend({
+        template: '<li><span></span><img/></li>',
+        textBindings: { name: 'span' }
+    });
+    var view = new View();
+    ok(view.renderAndBind()); //Should not throw error
+});
 
 test('registerBindings with no model', function () {
     var View = HumanView.extend({
