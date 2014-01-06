@@ -11,6 +11,5 @@
     "node": true,
     "indent": 2,
     "strict": true,
-    "es5": true,
     "eqnull": true
 }

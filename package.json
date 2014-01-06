@@ -17,9 +17,11 @@
   "browser": "./human-view.js",
   "devDependencies": {
     "precommit-hook": "",
-    "backbone": "1.0.0"
+    "backbone": "1.0.0",
+    "browserify": "3.19.0",
+    "uglify-js": "2.4.8",
+    "underscore": "~1.5.2"
   },
   "scripts": {
-    "validate": "jshint ."
   }
 }
