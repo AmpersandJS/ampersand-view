@@ -344,3 +344,23 @@ test('classBindings', function () {
     ok(!view.$el.hasClass('active'));
     ok(view.$el.hasClass('low'));
 });
+
+module('error case: no model');
+
+test('renderAndBind with no model', function () {
+    var View = HumanView.extend({
+        template: '<li><span></span><img/></li>',
+        textBindings: { name: 'span' }
+    });
+    var view = new View();
+    ok(view.renderAndBind()); //Should not throw error
+});
+
+test('registerBindings with no model', function () {
+    var View = HumanView.extend({
+        template: '<li><span></span><img/></li>',
+        textBindings: { name: 'span' }
+    });
+    var view = new View();
+    throws(view.registerBindings, Error, 'Throws error on no model');
+});

@@ -156,6 +156,7 @@ Open `test/test.html` in a browser to run the QUnit tests.
 
 ## Changelog
 
+1.5.0 - Adding bower.json, adding missing dev dependencies, other small bugfixes.
 1.4.1 - Removing elements without using jQuery's `.empty()` in renderCollection. (fixes: https://github.com/HenrikJoreteg/human-view/issues/13)
 1.4.0 - Adding `parent` reference to subviews registered via registerSubview
 

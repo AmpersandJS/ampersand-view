@@ -21,7 +21,7 @@
       // If view has an 'el' it's a single view not
       // an array of views registered by renderCollection
       // so we store a reference to the parent view.
-      if (view.el) view.parent = self;
+      if (view.el) view.parent = this;
       return view;
     },
 
@@ -68,6 +68,7 @@
       var model = specificModel || this.model;
       var bindingObject = bindings || this;
 
+      if (!model) throw new Error('Cannot register bindings without a model');
       _.each(types, function (methodName, bindingType) {
         _.each(bindingObject[bindingType], function (selector, key) {
           var func;
@@ -124,7 +125,7 @@
     // Commbo for renderWithTemplate and registering bindings
     renderAndBind: function (context, templateArg) {
       this.renderWithTemplate(context, templateArg);
-      this.registerBindings();
+      if (this.model) this.registerBindings();
       return this;
     },
 

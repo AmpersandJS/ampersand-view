@@ -2,7 +2,7 @@
   "author": "Henrik Joreteg <henrik@andyet.net>",
   "name": "human-view",
   "description": "A smart base view for Backbone apps, to make it easy to bind collections and properties to the DOM.",
-  "version": "1.4.1",
+  "version": "1.5.0",
   "keywords": [
     "backbone",
     "view",
@@ -21,10 +21,12 @@
     "uglify-js": "~2.4.8"
   },
   "scripts": {
-    "validate": "jshint ."
+    "validate": "jshint .",
+    "build": "node build.js",
+    "test": "open ./test/test.html"
   },
   "dependencies": {
-    "underscore": "~1.5.0",
-    "backbone": "~1.0.0"
+    "backbone": "~1.0.0",
+    "underscore": "~1.5.2"
   }
 }
