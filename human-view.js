@@ -129,6 +129,12 @@
       return this;
     },
 
+    // ## getByRole
+    // Gets an element within a view by its role
+    getByRole: function (role) {
+      return this.$('[role="' + role + '"]')[0];
+    },
+
     // Shortcut for doing everything we need to do to
     // render and fully replace current root element.
     // Either define a `template` property of your view

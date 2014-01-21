@@ -364,3 +364,15 @@ test('registerBindings with no model', function () {
     var view = new View();
     throws(view.registerBindings, Error, 'Throws error on no model');
 });
+
+test('getByRole', 3, function () {
+    var View = HumanView.extend({
+        template: '<li><span role="username"></span><img role="user-avatar"/></li>'
+    });
+    var view = new View();
+    view.renderAndBind();
+    var usenameEl = view.getByRole('username');
+    ok(view.getByRole('username') instanceof Element, 'should find username element');
+    ok(view.getByRole('user-avatar') instanceof Element, 'should find username');
+    ok(view.getByRole('nothing') === undefined, 'should find username');
+});
