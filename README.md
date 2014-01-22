@@ -2,6 +2,10 @@
 
 A set of common helpers and conventions for using as a base view for backbone applications.
 
+<!---starthide-->
+<p class="docLink">Part of the <a href="http://docs.humanjavascript.com/#all_human_view">Human JavaScript toolkit</a></p>
+<!---endhide-->
+
 It adds: 
 
 1. Simple declarative property/template bindings without needing to include a template engine that does it for you. Which keeps your code with your code, you template as a simple function that returns an HTML string and your payload light.
@@ -21,7 +25,7 @@ npm install human-view
 
 Nothing special is required, just use `HumanView` in the same way as you would Backbone.View:
 
-```js
+```javascript
 var MyView = HumanView.extend({
     initialize: function () { ... }, 
     render: function () { ... }
@@ -30,7 +34,7 @@ var MyView = HumanView.extend({
 
 ### Declarative Bindings
 
-```js
+```javascript
 var MyView = HumanView.extend({
     // set a `template` property of your view. This can either be
     // a function that returns an HTML string or just a string if 
@@ -62,15 +66,15 @@ var MyView = HumanView.extend({
 * `inputBindings`: Binds to the `input` value.
 * `attributeBindings`: Lets you create other arbitrary attributes bindings. For example, this would bind the model's `id` attribute to the `data-id` attribute of the span element:
 
-    ```js
-    var View = HumanView.extend({
-        template: '<li><span></span></li>',
-        attributeBindings: {
-            // <model_property>: [ '<css-selector>', '<attribute-name>']
-            id: ['span', 'data-thing']
-        }
-    });
-    ```
+```javascript
+var View = HumanView.extend({
+    template: '<li><span></span></li>',
+    attributeBindings: {
+        // <model_property>: [ '<css-selector>', '<attribute-name>']
+        id: ['span', 'data-thing']
+    }
+});
+```
 
 ### handling subviews
 
@@ -80,7 +84,7 @@ HumanView has two convenience method for handling this that's also used by `rend
 
 It looks like this:
 
-```js
+```javascript
 var HumanView = require('human-view');
 
 // This can be *anything* with a `remove` method
@@ -110,7 +114,7 @@ module.exports = HumanView.extend({
 
 HumanView includes a `renderCollection` method that works as follows:
 
-```js
+```javascript
 // some view for individual items in the collection
 var ItemView = HumanView.extend({ ... });
 
@@ -150,19 +154,20 @@ Each item view will only be `.render()`'ed once (unless you change that within t
 
 `getByRole` - Shortcut for fetching elements by their "role" attribute. This is for convenience and also to encourage the use of the `role` attribute for grabbing elements from the view. Using roles to select elements in your view makes it much less likely that designers and JS devs accidentally break eachother's code. For example doing stuff like `<nav role="people-list">` makes it very clear what that element will be populated with while also making your app more accessible.
 
+## Changelog
+
+- 1.6.0 [diff](https://github.com/HenrikJoreteg/human-view/compare/v1.5.0...v1.6.0) - Adding `getByRole` method
+- 1.5.0 - Adding bower.json, adding missing dev dependencies, other small bugfixes.
+- 1.4.1 - Removing elements without using jQuery's `.empty()` in renderCollection. (fixes: https://github.com/HenrikJoreteg/human-view/issues/13)
+- 1.4.0 - Adding `parent` reference to subviews registered via registerSubview
+
+<!---starthide-->
+
 ## Test coverage?
 
 Why yes! So glad you asked :)  
 
 Open `test/test.html` in a browser to run the QUnit tests.
-
-
-## Changelog
-
-1.6.0 [diff](https://github.com/HenrikJoreteg/human-view/compare/v1.5.0...v1.6.0) - Adding `getByRole` method
-1.5.0 - Adding bower.json, adding missing dev dependencies, other small bugfixes.
-1.4.1 - Removing elements without using jQuery's `.empty()` in renderCollection. (fixes: https://github.com/HenrikJoreteg/human-view/issues/13)
-1.4.0 - Adding `parent` reference to subviews registered via registerSubview
 
 ## Like this?
 
@@ -171,3 +176,5 @@ Follow [@HenrikJoreteg](http://twitter.com/henrikjoreteg) on twitter and check o
 ## license
 
 MIT
+
+<!---endhide-->
