@@ -33,9 +33,9 @@
       if (typeof container === 'string') {
         container = this.$(container);
       }
-      view.render();
       $(container).append(view.el);
-      return this.registerSubview(view);
+      this.registerSubview(view);
+      return view.render();
     },
 
     // ## registerBindings
