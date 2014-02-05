@@ -31,11 +31,15 @@
     // when theh parent view is destroyed.
     renderSubview: function (view, container) {
       if (typeof container === 'string') {
-        container = this.$(container);
+        container = this.$(container)[0];
+      } else {
+        // de-jquerify
+        container = container[0] || container;
       }
-      $(container).append(view.el);
       this.registerSubview(view);
-      return view.render();
+      view.render();
+      container.appendChild(view.el);
+      return view;
     },
 
     // ## registerBindings

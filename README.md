@@ -171,9 +171,17 @@ var MainView = HumanView.extend({
 ### .renderSubview(viewInstance, containerEl)
 
 * viewInstance {Object} Any object with a `.remove()`, `.render()` and an `.el` property that is the DOM element for that view. Typically this is just an instantiated view. 
-* containerEl {Element | String} This can either be an actual DOM element or a CSS selector string such as `.container`. If a string is passed human view runs `this.$("YOUR STRING")` to try to grab the element that should contain the sub view.
+* containerEl {Element | String | jQueryElement} This can either be an actual DOM element or a CSS selector string such as `.container`. If a string is passed human view runs `this.$("YOUR STRING")` to try to grab the element that should contain the sub view.
 
 This method is just sugar for the common use case of instantiating a view and putting in an element within the parent.
+
+It will:
+
+1. fetch your container (if you gave it a selector string)
+2. register your subview so it gets cleaned up if parent is removed and so `view.parent` will be available when your subview's `render` method gets called
+3. call the subview's `render()` method
+4. append it to the container
+5. return the subview
 
 #### Example:
 
@@ -256,6 +264,7 @@ var view = HumanView.extend({
 
 ## Changelog
 
+- 1.6.1 [diff](https://github.com/HenrikJoreteg/human-view/compare/v1.6.0...v1.6.1) - Make sure renderSubview registers the subview first, so it has a `.parent` before it calls `.render()` on the subview.
 - 1.6.0 [diff](https://github.com/HenrikJoreteg/human-view/compare/v1.5.0...v1.6.0) - Adding `getByRole` method
 - 1.5.0 - Adding bower.json, adding missing dev dependencies, other small bugfixes.
 - 1.4.1 - Removing elements without using jQuery's `.empty()` in renderCollection. (fixes: https://github.com/HenrikJoreteg/human-view/issues/13)
