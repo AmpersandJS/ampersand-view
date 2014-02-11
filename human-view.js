@@ -155,10 +155,6 @@
       var wrappedEl = $(html);
       var newEl = wrappedEl[0];
 
-      // safeguard check to help developers debug situation where
-      // they have more than one root element in the template.
-      if (wrappedEl[1]) throw new Error('Views can only have one root element.');
-
       // this is needed because jQuery and others
       // do weird things if you try to replace the body.
       // Also doing $(newEl)[0] will give you first child if
@@ -167,6 +163,10 @@
         document.body.innerHTML = html;
         this.delegateEvents();
       } else {
+        // safeguard check to help developers debug situation where
+        // they have more than one root element in the template.
+        if (wrappedEl[1]) throw new Error('Views can only have one root element.');
+
         $(this.el).replaceWith(newEl);
         // We don't call delegate events if rendered by parent
         // this solves a stupid bug in jQuery where you can't
