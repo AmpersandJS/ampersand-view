@@ -1,6 +1,6 @@
 {
   "name": "human-view",
-  "version": "1.6.1",
+  "version": "1.6.2",
   "main": "./human-view.js",
   "dependencies": {
     "backbone": "~1.0.0",

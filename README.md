@@ -116,6 +116,12 @@ module.exports = HumanView.extend({
 
 Note that we're simply extending Backbone.View here, so all the methods/properties here still exist: http://backbonejs.org/#View
 
+### .template
+
+The `.template` is a property for the view prototype. It should either be a string of HTML or a function that returns a string of HTML. It isn't required, but it is used as a default for calling `renderAndBind` and `renderWithTemplate`.
+
+The important thing to note is that the *HTML should not have more than one root element*. This is because the vieww code assumes that it has one and only one root element that becomes the `.el` property of the instantiated view.
+
 ### .renderCollection(collection, ItemView, containerEl, [viewOptions])
 
 * `collection` {Backbone Collection} The instantiated collection we wish to render.
@@ -264,6 +270,7 @@ var view = HumanView.extend({
 
 ## Changelog
 
+- 1.6.2 [diff](https://github.com/HenrikJoreteg/human-view/compare/v1.6.1...v1.6.2) - Make `getByRole` work even if `role` attribute is on the root element. Throws an error if your view template contains more than one root element.
 - 1.6.1 [diff](https://github.com/HenrikJoreteg/human-view/compare/v1.6.0...v1.6.1) - Make sure renderSubview registers the subview first, so it has a `.parent` before it calls `.render()` on the subview.
 - 1.6.0 [diff](https://github.com/HenrikJoreteg/human-view/compare/v1.5.0...v1.6.0) - Adding `getByRole` method
 - 1.5.0 - Adding bower.json, adding missing dev dependencies, other small bugfixes.

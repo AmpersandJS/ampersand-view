@@ -377,3 +377,13 @@ test('getByRole', 4, function () {
     ok(view.getByRole('nothing') === undefined, 'should find username');
     ok(view.getByRole('list-item') instanceof Element, 'should also work for root element');
 });
+
+test('throw on multiple root elements', 2, function () {
+    var View = HumanView.extend({
+        template: '<li></li><div></div>'
+    });
+    var view = new View();
+    throws(view.renderAndBind, Error, 'Throws error on multiple root elements');
+    view.template = '<li></li><div></div><span></span>';
+    throws(view.renderAndBind, Error, 'Throws error on multiple root elements');
+});

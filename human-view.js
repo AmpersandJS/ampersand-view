@@ -152,7 +152,13 @@
       var template = templateArg || this.template;
       if (!template) throw new Error('Template string or function needed.');
       var html = _.isString(template) ? template : template(context || {});
-      var newEl = $(html)[0];
+      var wrappedEl = $(html);
+      var newEl = wrappedEl[0];
+
+      // safeguard check to help developers debug situation where
+      // they have more than one root element in the template.
+      if (wrappedEl[1]) throw new Error('Views can only have one root element.');
+
       // this is needed because jQuery and others
       // do weird things if you try to replace the body.
       // Also doing $(newEl)[0] will give you first child if
