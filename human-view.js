@@ -134,9 +134,11 @@
     },
 
     // ## getByRole
-    // Gets an element within a view by its role
+    // Gets an element within a view by its role attribute.
+    // Also works for the root `el` if it has the right role.
     getByRole: function (role) {
-      return this.$('[role="' + role + '"]')[0];
+      return this.$('[role="' + role + '"]')[0] ||
+        ((this.el.getAttribute('role') === role && this.el) || undefined);
     },
 
     // Shortcut for doing everything we need to do to

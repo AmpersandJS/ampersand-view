@@ -246,7 +246,7 @@ This is shortcut for doing everything we need to do to render and fully replace 
 
 * `name` {String} The name of the 'role' attribute we're searching for.
 
-This is for convenience and also to encourage the use of the `role` attribute for grabbing elements from the view. Using roles to select elements in your view makes it much less likely that designers and JS devs accidentally break each other's code. 
+This is for convenience and also to encourage the use of the `role` attribute for grabbing elements from the view. Using roles to select elements in your view makes it much less likely that designers and JS devs accidentally break each other's code. This will work even if the `role` attribute is on the view's root `el`.
 
 #### Example:
 
