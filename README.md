@@ -120,7 +120,7 @@ Note that we're simply extending Backbone.View here, so all the methods/properti
 
 The `.template` is a property for the view prototype. It should either be a string of HTML or a function that returns a string of HTML. It isn't required, but it is used as a default for calling `renderAndBind` and `renderWithTemplate`.
 
-The important thing to note is that the *HTML should not have more than one root element*. This is because the vieww code assumes that it has one and only one root element that becomes the `.el` property of the instantiated view.
+The important thing to note is that the *HTML should not have more than one root element*. This is because the view code assumes that it has one and only one root element that becomes the `.el` property of the instantiated view.
 
 ### .renderCollection(collection, ItemView, containerEl, [viewOptions])
 
