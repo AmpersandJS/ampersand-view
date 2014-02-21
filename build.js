@@ -14,8 +14,8 @@ fs.writeFileSync('bower.json', JSON.stringify(bower, null, 2));
 
 bundle.add('./human-view');
 bundle.bundle({standalone: 'HumanView'}, function (err, source) {
-  'use strict';
   if (err) console.error(err);
+  fs.writeFileSync('human-view.bundle.js', source, 'utf-8');
   fs.writeFile('human-view.min.js', uglify.minify(source, {fromString: true}).code, function (err) {
     if (err) throw err;
   });

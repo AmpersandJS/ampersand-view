@@ -1,5 +1,4 @@
 var collection;
-var container;
 var count = 0;
 var names = [
     'Henrik Joreteg',
@@ -20,6 +19,7 @@ var modelData = names.map(function (name) {
 
 var MainView
 var ItemView;
+var container;
 
 var Model = (window.HumanModel || Backbone.Model).extend({
     props: {
@@ -46,6 +46,8 @@ function addModel() {
 }
 
 QUnit.testStart(function () {
+    container = $('<div id="container"></div>');
+
     collection = new Backbone.Collection();
     collection.model = Model;
     collection.add(modelData);
@@ -53,8 +55,6 @@ QUnit.testStart(function () {
     collection.on('all', function () {
         console.log('collection event', arguments);
     });
-
-    container = $('#qunit-fixture');
 
     // our item view
     ItemView = HumanView.extend({
@@ -72,9 +72,8 @@ QUnit.testStart(function () {
 
     MainView = HumanView.extend({
         render: function (opts) {
-            this.$el.empty();
-            this.$el.append('<ul></ul>');
-            this.renderCollection(this.collection, ItemView, this.$('ul')[0], opts);
+            this.el.innerHTML = '<ul></ul>';
+            this.renderCollection(this.collection, ItemView, this.get('ul'), opts);
             return this;
         }
     });
@@ -128,9 +127,10 @@ asyncTest('animateRemove', 2, function () {
     var prevAnimateRemove = ItemView.prototype.animateRemove;
     ItemView.prototype.animateRemove = function () {
         var self = this;
-        this.$el.fadeOut(100, function () {
+        this.el.classList.add('fadeOut');
+        setTimeout(function () {
             self.remove();
-        });
+        }, 100);
         ok('animateRemove called');
     };
     collection.remove(collection.last());
@@ -168,7 +168,7 @@ test('cleanup', function () {
     // from subview
     ok(!collection.first()._events['change:something']);
 });
-test('child view can chose to insert self', 6, function () {
+test('child view can choose to insert self', 6, function () {
     ItemView.prototype.insertSelf = true;
     ItemView.prototype.render = function (extraInfo) {
         ok(extraInfo.containerEl);
@@ -179,26 +179,26 @@ test('child view can chose to insert self', 6, function () {
     window.view.remove();
 });
 
-
 module('method: subview methods');
 
 test('registerSubview', function () {
     var removeCalled = 0;
     var SubView = HumanView.extend({
+        template: '<div></div>',
         render: function () {
-            this.$el.addClass('subview');
+            this.renderAndBind();
+            this.el.classList.add('subview');
         },
         remove: function () {
             removeCalled++;
         }
     });
     var View = HumanView.extend({
+        template: '<section><div id="parent"></div></section>',
         render: function () {
-            this.$el.empty();
-            this.$el.html('<div id="parent"></div>');
+            this.renderAndBind();
             // all of these should work
-            this.renderSubview(new SubView(), this.$('#parent'));
-            this.renderSubview(new SubView(), this.$('#parent')[0]);
+            this.renderSubview(new SubView(), this.get('#parent'));
             this.renderSubview(new SubView(), '#parent');
 
             // some other thing with a remove method
@@ -213,9 +213,9 @@ test('registerSubview', function () {
     });
 
     main.render();
-    equal(main.$('.subview').length, 3);
+    equal(main.getAll('.subview').length, 2);
     main.remove();
-    equal(removeCalled, 4);
+    equal(removeCalled, 3);
 });
 
 
@@ -293,9 +293,9 @@ test('hrefBindings', function () {
             url: ''
         }
     });
-    equal(view.$el.attr('href'), '');
+    equal(view.el.setAttribute('href'), '');
     view.model.set('url', 'http://robohash.com/whammo');
-    equal(view.$el.attr('href'), 'http://robohash.com/whammo');
+    equal(view.el.setAttribute('href'), 'http://robohash.com/whammo');
 });
 
 test('attributeBindings', function () {
@@ -305,9 +305,9 @@ test('attributeBindings', function () {
             something: ['', 'data-thing']
         }
     });
-    deepEqual(view.$el.data(), {});
+    deepEqual(view.el.getAttribute('data-thing'), '');
     view.model.set('something', 'yo');
-    deepEqual(view.$el.data('thing'), 'yo');
+    deepEqual(view.el.getAttribute('data-thing'), 'yo');
 });
 
 test('inputBindings', function () {
@@ -378,12 +378,10 @@ test('getByRole', 4, function () {
     ok(view.getByRole('list-item') instanceof Element, 'should also work for root element');
 });
 
-test('throw on multiple root elements', 2, function () {
+test('throw on multiple root elements', 1, function () {
     var View = HumanView.extend({
         template: '<li></li><div></div>'
     });
     var view = new View();
-    throws(view.renderAndBind, Error, 'Throws error on multiple root elements');
-    view.template = '<li></li><div></div><span></span>';
     throws(view.renderAndBind, Error, 'Throws error on multiple root elements');
 });

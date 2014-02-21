@@ -10,6 +10,6 @@
     "browser": true,
     "node": true,
     "indent": 2,
-    "strict": true,
+    "strict": false,
     "eqnull": true
 }

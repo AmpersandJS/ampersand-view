@@ -112,15 +112,49 @@ module.exports = HumanView.extend({
 **registerSubview also, stores a reference to the parent view on the subview as `.parent`**
 
 
+### Optional automatic rendering
+
+
+
+
 ## API Reference 
 
-Note that we're simply extending Backbone.View here, so all the methods/properties here still exist: http://backbonejs.org/#View
+Note that this is a fork of Backbone's view so most of the public methods/properties here still exist: http://backbonejs.org/#View
 
 ### .template
 
 The `.template` is a property for the view prototype. It should either be a string of HTML or a function that returns a string of HTML. It isn't required, but it is used as a default for calling `renderAndBind` and `renderWithTemplate`.
 
 The important thing to note is that the *HTML should not have more than one root element*. This is because the view code assumes that it has one and only one root element that becomes the `.el` property of the instantiated view.
+
+### .autoRender
+
+The `.autoRender` property lets you optionally specify that the view should just automatically render with all the defaults. This requires that you at minimum specify a [template](#template) string of function.
+
+By setting `autoRender: true` the view will simply call `.renderAndBind` for you (after your `initialize` method if present). So for simple views, if you've got a few bindings and a template your whole view could just be really and declarative like this:
+
+
+```js
+var HumanView = require('human-view');
+
+
+module.exports = HumanView.extend({
+    autoRender: true,
+    template: '<div><span id="username"></span></div>',
+    textBindings: {
+        name: '#username'
+    } 
+});
+```
+
+**Note:** if you are using a template function (and not a string) the template function will get called with a context argument that looks like this:
+
+```js
+this.renderAndBind({
+    model: this.model,
+    collection: this.collection
+}, this.template);
+```
 
 ### .renderCollection(collection, ItemView, containerEl, [viewOptions])
 

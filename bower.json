@@ -1,9 +1,12 @@
 {
   "name": "human-view",
-  "version": "1.6.3",
+  "version": "2.0.0-beta",
   "main": "./human-view.js",
   "dependencies": {
-    "backbone": "~1.0.0",
-    "underscore": "~1.5.2"
+    "underscore": "*",
+    "statey": "0.0.2",
+    "backbone-events-standalone": "~0.2.1",
+    "backbone-extend-standalone": "~0.1.2",
+    "domify": "~1.2.2"
   }
 }

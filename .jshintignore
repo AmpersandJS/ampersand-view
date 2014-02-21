@@ -1,5 +1,6 @@
 node_modules
 human-model.min.js
+human-view.bundle.js
 human-view.min.js
 test.js
 idealUse.js
