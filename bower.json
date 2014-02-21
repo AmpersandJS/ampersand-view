@@ -7,6 +7,7 @@
     "statey": "0.0.2",
     "backbone-events-standalone": "~0.2.1",
     "backbone-extend-standalone": "~0.1.2",
-    "domify": "~1.2.2"
+    "domify": "~1.2.2",
+    "component-classes": "~1.2.1"
   }
 }

@@ -30,19 +30,14 @@ var viewOptions = ['model', 'collection', 'el', 'events', 'autoRender'];
 // Set up all inheritable **Backbone.View** properties and methods.
 _.extend(View.prototype, Events, {
 
-  // jQuery delegate for element lookup, scoped to DOM elements within the
-  // current view. This should be preferred to global lookups where possible.
-  $: function (selector) {
-    debugger;
-    return this.$el.find(selector);
+  get: function (selector) {
+    if (selector === '') return this.el;
+    return (typeof selector === 'string') ? this.el.querySelector(selector) : selector;
   },
 
   getAll: function (selector) {
+    if (selector === '') return [this.el];
     return this.el.querySelectorAll(selector);
-  },
-
-  get: function (selector) {
-    return (typeof selector === 'string') this.el.querySelector(selector) : selector;
   },
 
   // Initialize is an empty function by default. Override it with your own
@@ -148,78 +143,76 @@ _.extend(View.prototype, Events, {
   //
   //   var ProfileView = HumanView.extend({
   //     template: 'profile',
-  //     textBindings: {
-  //       'name': '.name'
-  //     },
-  //     classBindings: {
-  //       'active': ''
+  //     bindings: {
+  //       name: '#username',
+  //       active: ['.name', 'class'],
+  //       classList: ['item', 'classList'],
+  //       url: ['a.link', 'href']
   //     },
   //     render: function () {
   //       this.renderAndBind();
   //       return this;
   //     }
   //   });
-  registerBindings: function (specificModel, bindings) {
+  registerBindings: function (model, bindings) {
     var self = this;
-    var types = {
-      textBindings: 'text',
-      htmlBindings: 'html',
-      srcBindings: 'src',
-      hrefBindings: 'href',
-      attributeBindings: '',
-      inputBindings: 'val'
-    };
-    var model = specificModel || this.model;
-    var bindingObject = bindings || this;
-
+    model || (model = this.model);
+    bindings || (bindings = this.bindings);
     if (!model) throw new Error('Cannot register bindings without a model');
-    _.each(types, function (methodName, bindingType) {
-      _.each(bindingObject[bindingType], function (selector, key) {
-        var func;
-        var attrName = function () {
-          var res;
-          if (bindingType === 'attributeBindings') {
-            res = selector[1];
-            selector = selector[0];
-            return res;
-          } else if (methodName === 'href' || methodName === 'src') {
-            return methodName;
-          }
-        }();
-        func = function () {
-          var el = self.getAll(selector);
-          if (attrName) {
-            el.setAttribute(attrName, model.get(key));
-          } else {
-            el[methodName](model.get(key));
-          }
-        };
-        self.listenTo(model, 'change:' + key, func);
-        func();
-      });
-    });
+    if (!bindings) return this;
 
-    // Class bindings are a bit special. We have to
-    // remove previous, etc.
-    _.each(bindingObject.classBindings, function (selector, key) {
-      var func = function () {
-        var newVal = model.get(key);
-        var prevVal = model.previous(key);
-        var el = self.get(selector);
+    _.each(bindings, function (value, propertyName) {
+      var selector, attr, fn;
+      if (typeof value === 'string') {
+        selector = value;
+        attr = 'text';
+      } else {
+        selector = value[0];
+        attr = value[1];
+      }
 
-        if (_.isBoolean(newVal)) {
-          if (newVal) {
-            el.classList.add(key);
-          } else {
-            el.classList.remove(key);
+      fn = function () {
+        _.each(self.getAll(selector), function (el) {
+          var newVal = model.get(propertyName);
+          var isBool = _.isBoolean(newVal);
+          var prevVal;
+          var classList;
+
+          // coerce new val to string if undefined
+          if (!isBool && _.isUndefined(newVal)) newVal = '';
+
+          if (attr === 'text') {
+            el.textContent = newVal;
+            return;
           }
-        } else {
-          if (prevVal) el.classList.remove(prevVal);
-          el.classList.add(newVal);
-        }
+
+          // handle special "class" case
+          if (attr === 'class') {
+            classList = classes(el);
+            if (isBool) {
+              classList.toggle(propertyName, newVal);
+            } else {
+              prevVal = model.previous(propertyName);
+              if (prevVal) classList.remove(prevVal);
+              classList.add(newVal);
+            }
+            return;
+          }
+
+          // treat 'classList' attrs like
+          // set/get for class attr
+          if (attr === 'classList') attr = 'class';
+
+          // now we can treat them all the same
+          if (isBool && !newVal) {
+            el.removeAttribute(attr);
+          } else {
+            el.setAttribute(attr, newVal);
+          }
+        });
       };
-      self.listenTo(model, 'change:' + key, func);
-      func();
+      // bind/run it
+      self.listenToAndRun(model, 'change:' + propertyName, fn);
     });
 
     return this;

@@ -24,7 +24,7 @@ var container;
 var Model = (window.HumanModel || Backbone.Model).extend({
     props: {
         id: 'number',
-        name: 'string',
+        name: ['string', true],
         html: 'string',
         url: 'string',
         something: 'string',
@@ -255,71 +255,52 @@ function getView(bindings, model) {
 
 test('textBindings', function () {
     var view = getView({
-        textBindings: {
+        bindings: {
             name: 'span'
         }
     });
-    equal(view.$('span').text(), '');
+    equal(view.get('span').textContent, '');
     view.model.set('name', 'henrik');
-    equal(view.$('span').text(), 'henrik');
-});
-
-test('htmlBindings', function () {
-    var view = getView({
-        htmlBindings: {
-            html: 'span'
-        }
-    });
-    equal(view.$('span').html(), '');
-    view.model.set('html', '<a>');
-    equal(view.$('span').html(), '<a></a>');
+    //equal(view.get('span').textContent, 'henrik');
 });
 
 test('srcBindings', function () {
     var view = getView({
-        srcBindings: {
-            url: 'img'
+        bindings: {
+            url: ['img', 'src']
         }
     });
-    ok(!view.$('img').attr('src'));
+    var img = view.get('img');
+    console.log(img.getAttribute('src'));
+    ok(!img.getAttribute('src'));
     view.model.set('url', 'http://robohash.com/whammo');
-    equal(view.$('img').attr('src'), 'http://robohash.com/whammo');
+    equal(img.getAttribute('src'), 'http://robohash.com/whammo');
 });
 
 test('hrefBindings', function () {
     var view = getView({
         template: '<a href=""></a>',
-        hrefBindings: {
-            url: ''
+        bindings: {
+            url: ['', 'href']
         }
     });
-    equal(view.el.setAttribute('href'), '');
+    var el = view.el;
+    equal(el.getAttribute('href'), '');
     view.model.set('url', 'http://robohash.com/whammo');
-    equal(view.el.setAttribute('href'), 'http://robohash.com/whammo');
-});
-
-test('attributeBindings', function () {
-    var view = getView({
-        template: '<li><a href=""></a></li>',
-        attributeBindings: {
-            something: ['', 'data-thing']
-        }
-    });
-    deepEqual(view.el.getAttribute('data-thing'), '');
-    view.model.set('something', 'yo');
-    deepEqual(view.el.getAttribute('data-thing'), 'yo');
+    equal(el.getAttribute('href'), 'http://robohash.com/whammo');
 });
 
 test('inputBindings', function () {
     var view = getView({
         template: '<li><input/></li>',
-        inputBindings: {
-            something: 'input'
+        bindings: {
+            something: ['input', 'value']
         }
     });
-    equal(view.$('input').val(), '');
+    var input = view.get('input');
+    equal(input.value, '');
     view.model.set('something', 'yo');
-    equal(view.$('input').val(), 'yo');
+    equal(input.value, 'yo');
 });
 
 test('classBindings', function () {
@@ -330,19 +311,20 @@ test('classBindings', function () {
     });
     var view = getView({
         template: '<li></li>',
-        classBindings: {
-            fireDanger: '',
-            active: ''
+        bindings: {
+            fireDanger: ['', 'class'],
+            active: ['', 'class']
         }
     }, model);
-    ok(view.$el.hasClass('active'));
-    ok(view.$el.hasClass('high'));
+    var classList = view.el.classList;
+    ok(classList.contains('active'));
+    ok(classList.contains('high'));
     model.set('fireDanger', 'low');
-    ok(!view.$el.hasClass('high'));
-    ok(view.$el.hasClass('low'));
+    ok(!classList.contains('high'));
+    ok(classList.contains('low'));
     model.set('active', false);
-    ok(!view.$el.hasClass('active'));
-    ok(view.$el.hasClass('low'));
+    ok(!classList.contains('active'));
+    ok(classList.contains('low'));
 });
 
 module('error case: no model');

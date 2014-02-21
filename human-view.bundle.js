@@ -4,7 +4,8 @@ var bbExtend = require('backbone-extend-standalone');
 var Events = require('backbone-events-standalone');
 var domify = require('domify');
 var _ = require('underscore');
-var eventMixin = require('component-events');
+var events = require('component-events');
+var classes = require('component-classes');
 
 
 function View(options) {
@@ -30,18 +31,14 @@ var viewOptions = ['model', 'collection', 'el', 'events', 'autoRender'];
 // Set up all inheritable **Backbone.View** properties and methods.
 _.extend(View.prototype, Events, {
 
-  // jQuery delegate for element lookup, scoped to DOM elements within the
-  // current view. This should be preferred to global lookups where possible.
-  $: function (selector) {
-    return this.$el.find(selector);
+  get: function (selector) {
+    if (selector === '') return this.el;
+    return (typeof selector === 'string') ? this.el.querySelector(selector) : selector;
   },
 
   getAll: function (selector) {
+    if (selector === '') return [this.el];
     return this.el.querySelectorAll(selector);
-  },
-
-  get: function (selector) {
-    return this.el.querySelector(selector);
   },
 
   // Initialize is an empty function by default. Override it with your own
@@ -68,7 +65,7 @@ _.extend(View.prototype, Events, {
   setElement: function (element, delegate) {
     if (this.events) this.events.unbind();
     this.el = element;
-    this.events = eventMixin(this.el, this);
+    this.events = events(this.el, this);
     if (delegate !== false) this.delegateEvents();
     return this;
   },
@@ -147,78 +144,76 @@ _.extend(View.prototype, Events, {
   //
   //   var ProfileView = HumanView.extend({
   //     template: 'profile',
-  //     textBindings: {
-  //       'name': '.name'
-  //     },
-  //     classBindings: {
-  //       'active': ''
+  //     bindings: {
+  //       name: '#username',
+  //       active: ['.name', 'class'],
+  //       classList: ['item', 'classList'],
+  //       url: ['a.link', 'href']
   //     },
   //     render: function () {
   //       this.renderAndBind();
   //       return this;
   //     }
   //   });
-  registerBindings: function (specificModel, bindings) {
+  registerBindings: function (model, bindings) {
     var self = this;
-    var types = {
-      textBindings: 'text',
-      htmlBindings: 'html',
-      srcBindings: 'src',
-      hrefBindings: 'href',
-      attributeBindings: '',
-      inputBindings: 'val'
-    };
-    var model = specificModel || this.model;
-    var bindingObject = bindings || this;
-
+    model || (model = this.model);
+    bindings || (bindings = this.bindings);
     if (!model) throw new Error('Cannot register bindings without a model');
-    _.each(types, function (methodName, bindingType) {
-      _.each(bindingObject[bindingType], function (selector, key) {
-        var func;
-        var attrName = function () {
-          var res;
-          if (bindingType === 'attributeBindings') {
-            res = selector[1];
-            selector = selector[0];
-            return res;
-          } else if (methodName === 'href' || methodName === 'src') {
-            return methodName;
-          }
-        }();
-        func = function () {
-          var el = (selector.length > 0) ? self.$(selector) : $(self.el);
-          if (attrName) {
-            el.attr(attrName, model.get(key));
-          } else {
-            el[methodName](model.get(key));
-          }
-        };
-        self.listenTo(model, 'change:' + key, func);
-        func();
-      });
-    });
+    if (!bindings) return this;
 
-    // Class bindings are a bit special. We have to
-    // remove previous, etc.
-    _.each(bindingObject.classBindings, function (selector, key) {
-      var func = function () {
-        var newVal = model.get(key);
-        var prevVal = model.previous(key);
-        var el = (selector.length > 0) ? self.$(selector) : $(self.el);
+    _.each(bindings, function (value, propertyName) {
+      var selector, attr, fn;
+      if (typeof value === 'string') {
+        selector = value;
+        attr = 'text';
+      } else {
+        selector = value[0];
+        attr = value[1];
+      }
 
-        if (_.isBoolean(newVal)) {
-          if (newVal) {
-            el.addClass(key);
-          } else {
-            el.removeClass(key);
+      fn = function () {
+        _.each(self.getAll(selector), function (el) {
+          var newVal = model.get(propertyName);
+          var isBool = _.isBoolean(newVal);
+          var prevVal;
+          var classList;
+
+          // coerce new val to string if undefined
+          if (!isBool && _.isUndefined(newVal)) newVal = '';
+
+          if (attr === 'text') {
+            el.textContent = newVal;
+            return;
           }
-        } else {
-          if (prevVal) el.removeClass(prevVal);
-          el.addClass(newVal);
-        }
+
+          // handle special "class" case
+          if (attr === 'class') {
+            classList = classes(el);
+            if (isBool) {
+              classList.toggle(propertyName, newVal);
+            } else {
+              prevVal = model.previous(propertyName);
+              if (prevVal) classList.remove(prevVal);
+              classList.add(newVal);
+            }
+            return;
+          }
+
+          // treat 'classList' attrs like
+          // set/get for class attr
+          if (attr === 'classList') attr = 'class';
+
+          // now we can treat them all the same
+          if (isBool && !newVal) {
+            el.removeAttribute(attr);
+          } else {
+            el.setAttribute(attr, newVal);
+          }
+        });
       };
-      self.listenTo(model, 'change:' + key, func);
-      func();
+      // bind/run it
+      self.listenToAndRun(model, 'change:' + propertyName, fn);
     });
 
     return this;
@@ -377,7 +372,7 @@ _.extend(View.prototype, Events, {
 View.extend = bbExtend;
 module.exports = View;
 
-},{"backbone-events-standalone":3,"backbone-extend-standalone":4,"component-events":6,"domify":11,"statey":12,"underscore":13}],2:[function(require,module,exports){
+},{"backbone-events-standalone":3,"backbone-extend-standalone":4,"component-classes":5,"component-events":8,"domify":13,"statey":14,"underscore":15}],2:[function(require,module,exports){
 /**
  * Standalone extraction of Backbone.Events, no external dependency required.
  * Degrades nicely when Backone/underscore are already available in the current
@@ -728,6 +723,200 @@ module.exports = require('./backbone-events-standalone');
  * Module dependencies.
  */
 
+var index = require('indexof');
+
+/**
+ * Whitespace regexp.
+ */
+
+var re = /\s+/;
+
+/**
+ * toString reference.
+ */
+
+var toString = Object.prototype.toString;
+
+/**
+ * Wrap `el` in a `ClassList`.
+ *
+ * @param {Element} el
+ * @return {ClassList}
+ * @api public
+ */
+
+module.exports = function(el){
+  return new ClassList(el);
+};
+
+/**
+ * Initialize a new ClassList for `el`.
+ *
+ * @param {Element} el
+ * @api private
+ */
+
+function ClassList(el) {
+  if (!el) throw new Error('A DOM element reference is required');
+  this.el = el;
+  this.list = el.classList;
+}
+
+/**
+ * Add class `name` if not already present.
+ *
+ * @param {String} name
+ * @return {ClassList}
+ * @api public
+ */
+
+ClassList.prototype.add = function(name){
+  // classList
+  if (this.list) {
+    this.list.add(name);
+    return this;
+  }
+
+  // fallback
+  var arr = this.array();
+  var i = index(arr, name);
+  if (!~i) arr.push(name);
+  this.el.className = arr.join(' ');
+  return this;
+};
+
+/**
+ * Remove class `name` when present, or
+ * pass a regular expression to remove
+ * any which match.
+ *
+ * @param {String|RegExp} name
+ * @return {ClassList}
+ * @api public
+ */
+
+ClassList.prototype.remove = function(name){
+  if ('[object RegExp]' == toString.call(name)) {
+    return this.removeMatching(name);
+  }
+
+  // classList
+  if (this.list) {
+    this.list.remove(name);
+    return this;
+  }
+
+  // fallback
+  var arr = this.array();
+  var i = index(arr, name);
+  if (~i) arr.splice(i, 1);
+  this.el.className = arr.join(' ');
+  return this;
+};
+
+/**
+ * Remove all classes matching `re`.
+ *
+ * @param {RegExp} re
+ * @return {ClassList}
+ * @api private
+ */
+
+ClassList.prototype.removeMatching = function(re){
+  var arr = this.array();
+  for (var i = 0; i < arr.length; i++) {
+    if (re.test(arr[i])) {
+      this.remove(arr[i]);
+    }
+  }
+  return this;
+};
+
+/**
+ * Toggle class `name`, can force state via `force`.
+ *
+ * For browsers that support classList, but do not support `force` yet,
+ * the mistake will be detected and corrected.
+ *
+ * @param {String} name
+ * @param {Boolean} force
+ * @return {ClassList}
+ * @api public
+ */
+
+ClassList.prototype.toggle = function(name, force){
+  // classList
+  if (this.list) {
+    if ("undefined" !== typeof force) {
+      if (force !== this.list.toggle(name, force)) {
+        this.list.toggle(name); // toggle again to correct
+      }
+    } else {
+      this.list.toggle(name);
+    }
+    return this;
+  }
+
+  // fallback
+  if ("undefined" !== typeof force) {
+    if (!force) {
+      this.remove(name);
+    } else {
+      this.add(name);
+    }
+  } else {
+    if (this.has(name)) {
+      this.remove(name);
+    } else {
+      this.add(name);
+    }
+  }
+
+  return this;
+};
+
+/**
+ * Return an array of classes.
+ *
+ * @return {Array}
+ * @api public
+ */
+
+ClassList.prototype.array = function(){
+  var str = this.el.className.replace(/^\s+|\s+$/g, '');
+  var arr = str.split(re);
+  if ('' === arr[0]) arr.shift();
+  return arr;
+};
+
+/**
+ * Check if class `name` is present.
+ *
+ * @param {String} name
+ * @return {ClassList}
+ * @api public
+ */
+
+ClassList.prototype.has =
+ClassList.prototype.contains = function(name){
+  return this.list
+    ? this.list.contains(name)
+    : !! ~index(this.array(), name);
+};
+
+},{"indexof":6}],6:[function(require,module,exports){
+module.exports = function(arr, obj){
+  if (arr.indexOf) return arr.indexOf(obj);
+  for (var i = 0; i < arr.length; ++i) {
+    if (arr[i] === obj) return i;
+  }
+  return -1;
+};
+},{}],7:[function(require,module,exports){
+/**
+ * Module dependencies.
+ */
+
 var closest = require('./node_modules/component-delegate/node_modules/discore-closest')
   , event = require('component-event');
 
@@ -767,7 +956,7 @@ exports.unbind = function(el, type, fn, capture){
   event.unbind(el, type, fn, capture);
 };
 
-},{"./node_modules/component-delegate/node_modules/discore-closest":7,"component-event":10}],6:[function(require,module,exports){
+},{"./node_modules/component-delegate/node_modules/discore-closest":9,"component-event":12}],8:[function(require,module,exports){
 
 /**
  * Module dependencies.
@@ -945,7 +1134,7 @@ function parse(event) {
   }
 }
 
-},{"./delegate":5,"component-event":10}],7:[function(require,module,exports){
+},{"./delegate":7,"component-event":12}],9:[function(require,module,exports){
 var matches = require('./node_modules/component-matches-selector')
 
 module.exports = function (element, selector, checkYoSelf, root) {
@@ -966,7 +1155,7 @@ module.exports = function (element, selector, checkYoSelf, root) {
   }
 }
 
-},{"./node_modules/component-matches-selector":8}],8:[function(require,module,exports){
+},{"./node_modules/component-matches-selector":10}],10:[function(require,module,exports){
 /**
  * Module dependencies.
  */
@@ -1013,7 +1202,7 @@ function match(el, selector) {
   return false;
 }
 
-},{"./node_modules/component-query":9}],9:[function(require,module,exports){
+},{"./node_modules/component-query":11}],11:[function(require,module,exports){
 function one(selector, el) {
   return el.querySelector(selector);
 }
@@ -1036,7 +1225,7 @@ exports.engine = function(obj){
   return exports;
 };
 
-},{}],10:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 var bind = window.addEventListener ? 'addEventListener' : 'attachEvent',
     unbind = window.removeEventListener ? 'removeEventListener' : 'detachEvent',
     prefix = bind !== 'addEventListener' ? 'on' : '';
@@ -1072,7 +1261,7 @@ exports.unbind = function(el, type, fn, capture){
   el[unbind](prefix + type, fn, capture || false);
   return fn;
 };
-},{}],11:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 
 /**
  * Expose `parse`.
@@ -1161,7 +1350,7 @@ function parse(html) {
   return fragment;
 }
 
-},{}],12:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 //   (c) 2013 Henrik Joreteg
 //   MIT Licensed
 //   For all details and documentation:
@@ -1770,7 +1959,7 @@ StateyBase.extend = extend;
 // Our main exports
 module.exports = StateyBase;
 
-},{"backbone-events-standalone":3,"underscore":13}],13:[function(require,module,exports){
+},{"backbone-events-standalone":3,"underscore":15}],15:[function(require,module,exports){
 //     Underscore.js 1.6.0
 //     http://underscorejs.org
 //     (c) 2009-2014 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
