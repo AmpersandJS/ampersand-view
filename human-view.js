@@ -32,9 +32,15 @@ _.extend(View.prototype, Events, {
 
   // Get an single element based on CSS selector scoped to this.el
   // if you pass an empty string it return `this.el`.
+  // If you pass an element we just return it back.
+  // This lets us use `get` to handle cases where users
+  // can pass a selector or an already selected element.
   get: function (selector) {
-    if (selector === '') return this.el;
-    return (typeof selector === 'string') ? this.el.querySelector(selector) : selector;
+    if (!selector) return this.el;
+    if (typeof selector === 'string') {
+      return this.el.querySelector(selector) || undefined;
+    }
+    return selector;
   },
 
   // Returns an array of elements based on CSS selector scoped to this.el
@@ -235,7 +241,7 @@ _.extend(View.prototype, Events, {
   // Gets an element within a view by its role attribute.
   // Also works for the root `el` if it has the right role.
   getByRole: function (role) {
-    return this.el.querySelector('[role="' + role + '"]') ||
+    return this.get('[role="' + role + '"]') ||
       ((this.el.getAttribute('role') === role && this.el) || undefined);
   },
 

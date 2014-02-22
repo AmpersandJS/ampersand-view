@@ -271,7 +271,6 @@ test('srcBindings', function () {
         }
     });
     var img = view.get('img');
-    console.log(img.getAttribute('src'));
     ok(!img.getAttribute('src'));
     view.model.set('url', 'http://robohash.com/whammo');
     equal(img.getAttribute('src'), 'http://robohash.com/whammo');
@@ -378,4 +377,18 @@ test('getAll should return an array', 3, function () {
     ok(all instanceof Array);
     ok(all.forEach);
     equal(all.length, 3);
+});
+
+
+test('get should return undefined if no match', 4, function () {
+    var View = HumanView.extend({
+        autoRender: true,
+        template: '<ul></ul>'
+    });
+    var view = new View();
+    var el = view.get('div');
+    equal(typeof el, 'undefined');
+    strictEqual(view.get(''), view.el);
+    strictEqual(view.get(), view.el);
+    strictEqual(view.get(view.el), view.el);
 });
