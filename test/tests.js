@@ -367,3 +367,15 @@ test('throw on multiple root elements', 1, function () {
     var view = new View();
     throws(view.renderAndBind, Error, 'Throws error on multiple root elements');
 });
+
+test('getAll should return an array', 3, function () {
+    var View = HumanView.extend({
+        autoRender: true,
+        template: '<ul><li></li><li></li><li></li></ul>'
+    });
+    var view = new View();
+    var all = view.getAll('li');
+    ok(all instanceof Array);
+    ok(all.forEach);
+    equal(all.length, 3);
+});

@@ -25,19 +25,23 @@ function View(options) {
 var delegateEventSplitter = /^(\S+)\s*(.*)$/;
 
 // List of view options to be merged as properties.
-var viewOptions = ['model', 'collection', 'el', 'events', 'autoRender'];
+var viewOptions = ['model', 'collection', 'el', 'autoRender'];
 
-// Set up all inheritable **Backbone.View** properties and methods.
+// Set up all inheritable properties and methods.
 _.extend(View.prototype, Events, {
 
+  // Get an single element based on CSS selector scoped to this.el
+  // if you pass an empty string it return `this.el`.
   get: function (selector) {
     if (selector === '') return this.el;
     return (typeof selector === 'string') ? this.el.querySelector(selector) : selector;
   },
 
+  // Returns an array of elements based on CSS selector scoped to this.el
+  // if you pass an empty string it return `this.el`.
   getAll: function (selector) {
     if (selector === '') return [this.el];
-    return this.el.querySelectorAll(selector);
+    return Array.prototype.slice.call(this.el.querySelectorAll(selector));
   },
 
   // Initialize is an empty function by default. Override it with your own
@@ -154,6 +158,7 @@ _.extend(View.prototype, Events, {
   //       return this;
   //     }
   //   });
+  //
   registerBindings: function (model, bindings) {
     var self = this;
     model || (model = this.model);
