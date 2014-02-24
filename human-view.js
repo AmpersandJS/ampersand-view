@@ -3,7 +3,7 @@ var bbExtend = require('backbone-extend-standalone');
 var Events = require('backbone-events-standalone');
 var domify = require('domify');
 var _ = require('underscore');
-var events = require('component-events');
+var events = require('events-mixin');
 var classes = require('component-classes');
 
 

@@ -3,11 +3,12 @@
   "version": "2.0.0-beta",
   "main": "./human-view.js",
   "dependencies": {
-    "underscore": "*",
-    "statey": "0.0.2",
     "backbone-events-standalone": "~0.2.1",
     "backbone-extend-standalone": "~0.1.2",
+    "component-classes": "~1.2.1",
     "domify": "~1.2.2",
-    "component-classes": "~1.2.1"
+    "events-mixin": "~1.0.0",
+    "statey": "0.0.2",
+    "underscore": "*"
   }
 }

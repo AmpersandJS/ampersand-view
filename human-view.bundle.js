@@ -4,7 +4,7 @@ var bbExtend = require('backbone-extend-standalone');
 var Events = require('backbone-events-standalone');
 var domify = require('domify');
 var _ = require('underscore');
-var events = require('component-events');
+var events = require('events-mixin');
 var classes = require('component-classes');
 
 
@@ -383,7 +383,7 @@ _.extend(View.prototype, Events, {
 View.extend = bbExtend;
 module.exports = View;
 
-},{"backbone-events-standalone":3,"backbone-extend-standalone":4,"component-classes":5,"component-events":8,"domify":13,"statey":14,"underscore":15}],2:[function(require,module,exports){
+},{"backbone-events-standalone":3,"backbone-extend-standalone":4,"component-classes":5,"domify":7,"events-mixin":8,"statey":13,"underscore":14}],2:[function(require,module,exports){
 /**
  * Standalone extraction of Backbone.Events, no external dependency required.
  * Degrades nicely when Backone/underscore are already available in the current
@@ -924,57 +924,102 @@ module.exports = function(arr, obj){
   return -1;
 };
 },{}],7:[function(require,module,exports){
-/**
- * Module dependencies.
- */
-
-var closest = require('./node_modules/component-delegate/node_modules/discore-closest')
-  , event = require('component-event');
 
 /**
- * Delegate event `type` to `selector`
- * and invoke `fn(e)`. A callback function
- * is returned which may be passed to `.unbind()`.
- *
- * @param {Element} el
- * @param {String} selector
- * @param {String} type
- * @param {Function} fn
- * @param {Boolean} capture
- * @return {Function}
- * @api public
+ * Expose `parse`.
  */
 
-exports.bind = function(el, selector, type, fn, capture){
-  return event.bind(el, type, function(e){
-    var target = e.target || e.srcElement;
-    e.delegateTarget = closest(target, selector, true, el);
-    if (e.delegateTarget) fn.call(el, e);
-  }, capture);
+module.exports = parse;
+
+/**
+ * Wrap map from jquery.
+ */
+
+var map = {
+  legend: [1, '<fieldset>', '</fieldset>'],
+  tr: [2, '<table><tbody>', '</tbody></table>'],
+  col: [2, '<table><tbody></tbody><colgroup>', '</colgroup></table>'],
+  _default: [0, '', '']
 };
 
+map.td =
+map.th = [3, '<table><tbody><tr>', '</tr></tbody></table>'];
+
+map.option =
+map.optgroup = [1, '<select multiple="multiple">', '</select>'];
+
+map.thead =
+map.tbody =
+map.colgroup =
+map.caption =
+map.tfoot = [1, '<table>', '</table>'];
+
+map.text =
+map.circle =
+map.ellipse =
+map.line =
+map.path =
+map.polygon =
+map.polyline =
+map.rect = [1, '<svg xmlns="http://www.w3.org/2000/svg" version="1.1">','</svg>'];
+
 /**
- * Unbind event `type`'s callback `fn`.
+ * Parse `html` and return the children.
  *
- * @param {Element} el
- * @param {String} type
- * @param {Function} fn
- * @param {Boolean} capture
- * @api public
+ * @param {String} html
+ * @return {Array}
+ * @api private
  */
 
-exports.unbind = function(el, type, fn, capture){
-  event.unbind(el, type, fn, capture);
-};
+function parse(html) {
+  if ('string' != typeof html) throw new TypeError('String expected');
+  
+  // tag name
+  var m = /<([\w:]+)/.exec(html);
+  if (!m) return document.createTextNode(html);
 
-},{"./node_modules/component-delegate/node_modules/discore-closest":9,"component-event":12}],8:[function(require,module,exports){
+  html = html.replace(/^\s+|\s+$/g, ''); // Remove leading/trailing whitespace
+
+  var tag = m[1];
+
+  // body support
+  if (tag == 'body') {
+    var el = document.createElement('html');
+    el.innerHTML = html;
+    return el.removeChild(el.lastChild);
+  }
+
+  // wrap map
+  var wrap = map[tag] || map._default;
+  var depth = wrap[0];
+  var prefix = wrap[1];
+  var suffix = wrap[2];
+  var el = document.createElement('div');
+  el.innerHTML = prefix + html + suffix;
+  while (depth--) el = el.lastChild;
+
+  // one element
+  if (el.firstChild == el.lastChild) {
+    return el.removeChild(el.firstChild);
+  }
+
+  // several elements
+  var fragment = document.createDocumentFragment();
+  while (el.firstChild) {
+    fragment.appendChild(el.removeChild(el.firstChild));
+  }
+
+  return fragment;
+}
+
+},{}],8:[function(require,module,exports){
 
 /**
  * Module dependencies.
  */
 
 var events = require('component-event');
-var delegate = require('./delegate');
+var delegate = require('delegate-events');
 
 /**
  * Expose `Events`.
@@ -1145,98 +1190,7 @@ function parse(event) {
   }
 }
 
-},{"./delegate":7,"component-event":12}],9:[function(require,module,exports){
-var matches = require('./node_modules/component-matches-selector')
-
-module.exports = function (element, selector, checkYoSelf, root) {
-  element = checkYoSelf ? {parentNode: element} : element
-
-  root = root || document
-
-  // Make sure `element !== document` and `element != null`
-  // otherwise we get an illegal invocation
-  while ((element = element.parentNode) && element !== document) {
-    if (matches(element, selector))
-      return element
-    // After `matches` on the edge case that
-    // the selector matches the root
-    // (when the root is not the document)
-    if (element === root)
-      return
-  }
-}
-
-},{"./node_modules/component-matches-selector":10}],10:[function(require,module,exports){
-/**
- * Module dependencies.
- */
-
-var query = require('./node_modules/component-query');
-
-/**
- * Element prototype.
- */
-
-var proto = Element.prototype;
-
-/**
- * Vendor function.
- */
-
-var vendor = proto.matches
-  || proto.webkitMatchesSelector
-  || proto.mozMatchesSelector
-  || proto.msMatchesSelector
-  || proto.oMatchesSelector;
-
-/**
- * Expose `match()`.
- */
-
-module.exports = match;
-
-/**
- * Match `el` to `selector`.
- *
- * @param {Element} el
- * @param {String} selector
- * @return {Boolean}
- * @api public
- */
-
-function match(el, selector) {
-  if (vendor) return vendor.call(el, selector);
-  var nodes = query.all(selector, el.parentNode);
-  for (var i = 0; i < nodes.length; ++i) {
-    if (nodes[i] == el) return true;
-  }
-  return false;
-}
-
-},{"./node_modules/component-query":11}],11:[function(require,module,exports){
-function one(selector, el) {
-  return el.querySelector(selector);
-}
-
-exports = module.exports = function(selector, el){
-  el = el || document;
-  return one(selector, el);
-};
-
-exports.all = function(selector, el){
-  el = el || document;
-  return el.querySelectorAll(selector);
-};
-
-exports.engine = function(obj){
-  if (!obj.one) throw new Error('.one callback required');
-  if (!obj.all) throw new Error('.all callback required');
-  one = obj.one;
-  exports.all = obj.all;
-  return exports;
-};
-
-},{}],12:[function(require,module,exports){
+},{"component-event":9,"delegate-events":10}],9:[function(require,module,exports){
 var bind = window.addEventListener ? 'addEventListener' : 'attachEvent',
     unbind = window.removeEventListener ? 'removeEventListener' : 'detachEvent',
     prefix = bind !== 'addEventListener' ? 'on' : '';
@@ -1272,96 +1226,104 @@ exports.unbind = function(el, type, fn, capture){
   el[unbind](prefix + type, fn, capture || false);
   return fn;
 };
-},{}],13:[function(require,module,exports){
-
+},{}],10:[function(require,module,exports){
 /**
- * Expose `parse`.
+ * Module dependencies.
  */
 
-module.exports = parse;
+var closest = require('closest')
+  , event = require('event');
 
 /**
- * Wrap map from jquery.
+ * Delegate event `type` to `selector`
+ * and invoke `fn(e)`. A callback function
+ * is returned which may be passed to `.unbind()`.
+ *
+ * @param {Element} el
+ * @param {String} selector
+ * @param {String} type
+ * @param {Function} fn
+ * @param {Boolean} capture
+ * @return {Function}
+ * @api public
  */
 
-var map = {
-  legend: [1, '<fieldset>', '</fieldset>'],
-  tr: [2, '<table><tbody>', '</tbody></table>'],
-  col: [2, '<table><tbody></tbody><colgroup>', '</colgroup></table>'],
-  _default: [0, '', '']
+exports.bind = function(el, selector, type, fn, capture){
+  return event.bind(el, type, function(e){
+    var target = e.target || e.srcElement;
+    e.delegateTarget = closest(target, selector, true, el);
+    if (e.delegateTarget) fn.call(el, e);
+  }, capture);
 };
 
-map.td =
-map.th = [3, '<table><tbody><tr>', '</tr></tbody></table>'];
-
-map.option =
-map.optgroup = [1, '<select multiple="multiple">', '</select>'];
-
-map.thead =
-map.tbody =
-map.colgroup =
-map.caption =
-map.tfoot = [1, '<table>', '</table>'];
-
-map.text =
-map.circle =
-map.ellipse =
-map.line =
-map.path =
-map.polygon =
-map.polyline =
-map.rect = [1, '<svg xmlns="http://www.w3.org/2000/svg" version="1.1">','</svg>'];
-
 /**
- * Parse `html` and return the children.
+ * Unbind event `type`'s callback `fn`.
  *
- * @param {String} html
- * @return {Array}
- * @api private
+ * @param {Element} el
+ * @param {String} type
+ * @param {Function} fn
+ * @param {Boolean} capture
+ * @api public
  */
 
-function parse(html) {
-  if ('string' != typeof html) throw new TypeError('String expected');
-  
-  // tag name
-  var m = /<([\w:]+)/.exec(html);
-  if (!m) return document.createTextNode(html);
+exports.unbind = function(el, type, fn, capture){
+  event.unbind(el, type, fn, capture);
+};
 
-  html = html.replace(/^\s+|\s+$/g, ''); // Remove leading/trailing whitespace
+},{"closest":11,"event":9}],11:[function(require,module,exports){
+var matches = require('matches-selector')
 
-  var tag = m[1];
+module.exports = function (element, selector, checkYoSelf) {
+  var parent = checkYoSelf ? element : element.parentNode
 
-  // body support
-  if (tag == 'body') {
-    var el = document.createElement('html');
-    el.innerHTML = html;
-    return el.removeChild(el.lastChild);
+  while (parent && parent !== document) {
+    if (matches(parent, selector)) return parent;
+    parent = parent.parentNode
   }
-
-  // wrap map
-  var wrap = map[tag] || map._default;
-  var depth = wrap[0];
-  var prefix = wrap[1];
-  var suffix = wrap[2];
-  var el = document.createElement('div');
-  el.innerHTML = prefix + html + suffix;
-  while (depth--) el = el.lastChild;
-
-  // one element
-  if (el.firstChild == el.lastChild) {
-    return el.removeChild(el.firstChild);
-  }
-
-  // several elements
-  var fragment = document.createDocumentFragment();
-  while (el.firstChild) {
-    fragment.appendChild(el.removeChild(el.firstChild));
-  }
-
-  return fragment;
 }
 
-},{}],14:[function(require,module,exports){
+},{"matches-selector":12}],12:[function(require,module,exports){
+
+/**
+ * Element prototype.
+ */
+
+var proto = Element.prototype;
+
+/**
+ * Vendor function.
+ */
+
+var vendor = proto.matchesSelector
+  || proto.webkitMatchesSelector
+  || proto.mozMatchesSelector
+  || proto.msMatchesSelector
+  || proto.oMatchesSelector;
+
+/**
+ * Expose `match()`.
+ */
+
+module.exports = match;
+
+/**
+ * Match `el` to `selector`.
+ *
+ * @param {Element} el
+ * @param {String} selector
+ * @return {Boolean}
+ * @api public
+ */
+
+function match(el, selector) {
+  if (vendor) return vendor.call(el, selector);
+  var nodes = el.parentNode.querySelectorAll(selector);
+  for (var i = 0; i < nodes.length; ++i) {
+    if (nodes[i] == el) return true;
+  }
+  return false;
+}
+},{}],13:[function(require,module,exports){
 //   (c) 2013 Henrik Joreteg
 //   MIT Licensed
 //   For all details and documentation:
@@ -1970,7 +1932,7 @@ StateyBase.extend = extend;
 // Our main exports
 module.exports = StateyBase;
 
-},{"backbone-events-standalone":3,"underscore":15}],15:[function(require,module,exports){
+},{"backbone-events-standalone":3,"underscore":14}],14:[function(require,module,exports){
 //     Underscore.js 1.6.0
 //     http://underscorejs.org
 //     (c) 2009-2014 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
