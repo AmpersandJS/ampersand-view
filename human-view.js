@@ -1,4 +1,3 @@
-var Statey = require('statey');
 var bbExtend = require('backbone-extend-standalone');
 var Events = require('backbone-events-standalone');
 var domify = require('domify');
