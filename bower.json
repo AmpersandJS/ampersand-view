@@ -1,6 +1,6 @@
 {
   "name": "human-view",
-  "version": "2.0.0-beta",
+  "version": "2.0.1-beta",
   "main": "./human-view.js",
   "dependencies": {
     "backbone-events-standalone": "0.x.x",
