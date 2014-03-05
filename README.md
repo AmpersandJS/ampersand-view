@@ -75,11 +75,17 @@ var MyView = HumanView.extend({
         selected: ['input', 'checked']
 
         // If you really need to, you can even bind the same attribute to different
-        // types of things. If "superActive" was a string, the following would put
+        // types of things with different options. If "superActive" was a string, the following would put
         // the text value of it, inside `.userName` and add it as a class on the `li`.
         superActive: [
-            '.userName',
-            ['li', 'class']
+            // the *only* restriction here is that if you pass an array of binding
+            // declarations for a single property, each sub-item must also be an
+            // array.
+            ['.userName'],
+            ['li', 'class'],
+            // you can even get crazy... this would bind both
+            // data attributes to both the li and .username elements
+            ['li, .username', 'data-attribute1 data-attribute2'],
         ]        
     },
     render: function () {
@@ -96,6 +102,8 @@ var MyView = HumanView.extend({
 ### What about two-way bindings?
 
 Note that these are all one-way bindings. People love to talk about the feature of two-way bindings, but from my experience, the vast majority of the time it's not actually something that you want. Why make two different ways of doing the same thing? The most common two-way bindings that people do are for form elements, which, is super easy to do with the events hash. Plus, then it's very easy to configure exactly when you want the user action to actually change the model.
+
+Having said that, we may enable it anyway, in a future release, that's still up for discussion.
 
 
 ### handling subviews
