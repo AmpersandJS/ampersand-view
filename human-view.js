@@ -166,63 +166,98 @@ _.extend(View.prototype, Events, {
   //
   registerBindings: function (model, bindings) {
     var self = this;
+    var processedBindings = {};
     model || (model = this.model);
     bindings || (bindings = this.bindings);
     if (!model) throw new Error('Cannot register bindings without a model');
     if (!bindings) return this;
 
-    _.each(bindings, function (value, propertyName) {
-      var selector, attr, fn;
-      if (typeof value === 'string') {
-        selector = value;
-        attr = 'text';
+    // create new object with same keys but
+    // with arrays for values.
+    // This is where we'll push our results
+    _.each(_.keys(bindings), function (key) {
+      processedBindings[key] = [];
+    });
+
+    function addBinding(propName, definition) {
+      var processedDef = processedBindings[propName];
+      var selector, attr, name, split;
+      if (typeof definition === 'string') {
+        processedDef.push([definition, 'text']);
       } else {
-        selector = value[0];
-        attr = value[1];
+        selector = definition[0];
+        attr = definition[1];
+        name = definition[2];
+        split = attr.split(' ');
+        if (split.length > 1) {
+          _.each(split, function (attributeName) {
+            processedDef.push([selector, attributeName, name]);
+          });
+        } else {
+          processedDef.push([selector, attr, name]);
+        }
       }
+    }
 
-      fn = function () {
-        _.each(self.getAll(selector), function (el) {
-          var newVal = model.get(propertyName);
-          var isBool = _.isBoolean(newVal);
-          var prevVal;
-          var classList;
-
-          // coerce new val to string if undefined
-          if (!isBool && _.isUndefined(newVal)) newVal = '';
-
-          if (attr === 'text') {
-            el.textContent = newVal;
-            return;
-          }
-
-          // handle special "class" case
-          if (attr === 'class') {
-            classList = classes(el);
-            if (isBool) {
-              classList.toggle(propertyName, newVal);
-            } else {
-              prevVal = model.previous(propertyName);
-              if (prevVal) classList.remove(prevVal);
-              classList.add(newVal);
-            }
-            return;
-          }
-
-          // treat 'classList' attrs like
-          // set/get for class attr
-          if (attr === 'classList') attr = 'class';
-
-          // now we can treat them all the same
-          if (isBool && !newVal) {
-            el.removeAttribute(attr);
-          } else {
-            el.setAttribute(attr, newVal);
-          }
+    // extract any nested bindings
+    _.each(bindings, function (value, propertyName) {
+      if (_.isArray(value) && _.isArray(value[0])) {
+        _.each(value, function (item) {
+          addBinding(propertyName, item);
         });
-      };
-      // bind/run it
-      self.listenToAndRun(model, 'change:' + propertyName, fn);
+      } else {
+        addBinding(propertyName, value);
+      }
+    });
+
+    _.each(processedBindings, function (value, propertyName) {
+      _.each(value, function (value) {
+        var selector = value[0];
+        var attr = value[1];
+        var name = value[2];
+        var fn = function () {
+          _.each(self.getAll(selector), function (el) {
+            var newVal = model.get(propertyName);
+            var isBool = _.isBoolean(newVal);
+            var prevVal;
+            var classList;
+
+            // coerce new val to string if undefined
+            if (!isBool && _.isUndefined(newVal)) newVal = '';
+
+            if (attr === 'text') {
+              el.textContent = newVal;
+              return;
+            }
+
+            // handle special "class" case
+            if (attr === 'class') {
+              classList = classes(el);
+              if (isBool) {
+                classList.toggle(propertyName, newVal);
+              } else {
+                prevVal = model.previous(propertyName);
+                if (prevVal) classList.remove(prevVal);
+                classList.add(newVal);
+              }
+              return;
+            }
+
+            // treat 'classList' attrs like
+            // set/get for class attr
+            if (attr === 'classList') attr = 'class';
+
+            // now we can treat them all the same
+            if (isBool && !newVal) {
+              el.removeAttribute(name);
+            } else {
+              el.setAttribute(attr, name || newVal);
+            }
+          });
+        };
+        // bind/run it
+        self.listenToAndRun(model, 'change:' + propertyName, fn);
+      });
     });
 
     return this;

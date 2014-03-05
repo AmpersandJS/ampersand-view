@@ -1,10 +1,10 @@
-!function(e){"object"==typeof exports?module.exports=e():"function"==typeof define&&define.amd?define(e):"undefined"!=typeof window?window.HumanView=e():"undefined"!=typeof global?global.HumanView=e():"undefined"!=typeof self&&(self.HumanView=e())}(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-var bbExtend = require('backbone-extend-standalone');
-var Events = require('backbone-events-standalone');
-var domify = require('domify');
-var _ = require('underscore');
-var events = require('events-mixin');
-var classes = require('component-classes');
+!function(e){if("object"==typeof exports)module.exports=e();else if("function"==typeof define&&define.amd)define(e);else{var f;"undefined"!=typeof window?f=window:"undefined"!=typeof global?f=global:"undefined"!=typeof self&&(f=self),f.HumanView=e()}}(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(_dereq_,module,exports){
+var bbExtend = _dereq_('backbone-extend-standalone');
+var Events = _dereq_('backbone-events-standalone');
+var domify = _dereq_('domify');
+var _ = _dereq_('underscore');
+var events = _dereq_('events-mixin');
+var classes = _dereq_('component-classes');
 
 
 function View(options) {
@@ -167,63 +167,98 @@ _.extend(View.prototype, Events, {
   //
   registerBindings: function (model, bindings) {
     var self = this;
+    var processedBindings = {};
     model || (model = this.model);
     bindings || (bindings = this.bindings);
     if (!model) throw new Error('Cannot register bindings without a model');
     if (!bindings) return this;
 
-    _.each(bindings, function (value, propertyName) {
-      var selector, attr, fn;
-      if (typeof value === 'string') {
-        selector = value;
-        attr = 'text';
+    // create new object with same keys but
+    // with arrays for values.
+    // This is where we'll push our results
+    _.each(_.keys(bindings), function (key) {
+      processedBindings[key] = [];
+    });
+
+    function addBinding(propName, definition) {
+      var processedDef = processedBindings[propName];
+      var selector, attr, name, split;
+      if (typeof definition === 'string') {
+        processedDef.push([definition, 'text']);
       } else {
-        selector = value[0];
-        attr = value[1];
+        selector = definition[0];
+        attr = definition[1];
+        name = definition[2];
+        split = attr.split(' ');
+        if (split.length > 1) {
+          _.each(split, function (attributeName) {
+            processedDef.push([selector, attributeName, name]);
+          });
+        } else {
+          processedDef.push([selector, attr, name]);
+        }
       }
+    }
 
-      fn = function () {
-        _.each(self.getAll(selector), function (el) {
-          var newVal = model.get(propertyName);
-          var isBool = _.isBoolean(newVal);
-          var prevVal;
-          var classList;
-
-          // coerce new val to string if undefined
-          if (!isBool && _.isUndefined(newVal)) newVal = '';
-
-          if (attr === 'text') {
-            el.textContent = newVal;
-            return;
-          }
-
-          // handle special "class" case
-          if (attr === 'class') {
-            classList = classes(el);
-            if (isBool) {
-              classList.toggle(propertyName, newVal);
-            } else {
-              prevVal = model.previous(propertyName);
-              if (prevVal) classList.remove(prevVal);
-              classList.add(newVal);
-            }
-            return;
-          }
-
-          // treat 'classList' attrs like
-          // set/get for class attr
-          if (attr === 'classList') attr = 'class';
-
-          // now we can treat them all the same
-          if (isBool && !newVal) {
-            el.removeAttribute(attr);
-          } else {
-            el.setAttribute(attr, newVal);
-          }
+    // extract any nested bindings
+    _.each(bindings, function (value, propertyName) {
+      if (_.isArray(value) && _.isArray(value[0])) {
+        _.each(value, function (item) {
+          addBinding(propertyName, item);
         });
-      };
-      // bind/run it
-      self.listenToAndRun(model, 'change:' + propertyName, fn);
+      } else {
+        addBinding(propertyName, value);
+      }
+    });
+
+    _.each(processedBindings, function (value, propertyName) {
+      _.each(value, function (value) {
+        var selector = value[0];
+        var attr = value[1];
+        var name = value[2];
+        var fn = function () {
+          _.each(self.getAll(selector), function (el) {
+            var newVal = model.get(propertyName);
+            var isBool = _.isBoolean(newVal);
+            var prevVal;
+            var classList;
+
+            // coerce new val to string if undefined
+            if (!isBool && _.isUndefined(newVal)) newVal = '';
+
+            if (attr === 'text') {
+              el.textContent = newVal;
+              return;
+            }
+
+            // handle special "class" case
+            if (attr === 'class') {
+              classList = classes(el);
+              if (isBool) {
+                classList.toggle(propertyName, newVal);
+              } else {
+                prevVal = model.previous(propertyName);
+                if (prevVal) classList.remove(prevVal);
+                classList.add(newVal);
+              }
+              return;
+            }
+
+            // treat 'classList' attrs like
+            // set/get for class attr
+            if (attr === 'classList') attr = 'class';
+
+            // now we can treat them all the same
+            if (isBool && !newVal) {
+              el.removeAttribute(name);
+            } else {
+              el.setAttribute(attr, name || newVal);
+            }
+          });
+        };
+        // bind/run it
+        self.listenToAndRun(model, 'change:' + propertyName, fn);
+      });
     });
 
     return this;
@@ -382,7 +417,7 @@ _.extend(View.prototype, Events, {
 View.extend = bbExtend;
 module.exports = View;
 
-},{"backbone-events-standalone":3,"backbone-extend-standalone":4,"component-classes":5,"domify":7,"events-mixin":8,"underscore":13}],2:[function(require,module,exports){
+},{"backbone-events-standalone":3,"backbone-extend-standalone":4,"component-classes":5,"domify":7,"events-mixin":8,"underscore":13}],2:[function(_dereq_,module,exports){
 /**
  * Standalone extraction of Backbone.Events, no external dependency required.
  * Degrades nicely when Backone/underscore are already available in the current
@@ -650,10 +685,10 @@ module.exports = View;
   }
 })(this);
 
-},{}],3:[function(require,module,exports){
-module.exports = require('./backbone-events-standalone');
+},{}],3:[function(_dereq_,module,exports){
+module.exports = _dereq_('./backbone-events-standalone');
 
-},{"./backbone-events-standalone":2}],4:[function(require,module,exports){
+},{"./backbone-events-standalone":2}],4:[function(_dereq_,module,exports){
 (function (definition) {
   if (typeof exports === "object") {
     module.exports = definition();
@@ -728,12 +763,12 @@ module.exports = require('./backbone-events-standalone');
   return extend;
 });
 
-},{}],5:[function(require,module,exports){
+},{}],5:[function(_dereq_,module,exports){
 /**
  * Module dependencies.
  */
 
-var index = require('indexof');
+var index = _dereq_('indexof');
 
 /**
  * Whitespace regexp.
@@ -914,7 +949,7 @@ ClassList.prototype.contains = function(name){
     : !! ~index(this.array(), name);
 };
 
-},{"indexof":6}],6:[function(require,module,exports){
+},{"indexof":6}],6:[function(_dereq_,module,exports){
 module.exports = function(arr, obj){
   if (arr.indexOf) return arr.indexOf(obj);
   for (var i = 0; i < arr.length; ++i) {
@@ -922,7 +957,7 @@ module.exports = function(arr, obj){
   }
   return -1;
 };
-},{}],7:[function(require,module,exports){
+},{}],7:[function(_dereq_,module,exports){
 
 /**
  * Expose `parse`.
@@ -1011,14 +1046,14 @@ function parse(html) {
   return fragment;
 }
 
-},{}],8:[function(require,module,exports){
+},{}],8:[function(_dereq_,module,exports){
 
 /**
  * Module dependencies.
  */
 
-var events = require('component-event');
-var delegate = require('delegate-events');
+var events = _dereq_('component-event');
+var delegate = _dereq_('delegate-events');
 
 /**
  * Expose `Events`.
@@ -1189,7 +1224,7 @@ function parse(event) {
   }
 }
 
-},{"component-event":9,"delegate-events":10}],9:[function(require,module,exports){
+},{"component-event":9,"delegate-events":10}],9:[function(_dereq_,module,exports){
 var bind = window.addEventListener ? 'addEventListener' : 'attachEvent',
     unbind = window.removeEventListener ? 'removeEventListener' : 'detachEvent',
     prefix = bind !== 'addEventListener' ? 'on' : '';
@@ -1225,13 +1260,13 @@ exports.unbind = function(el, type, fn, capture){
   el[unbind](prefix + type, fn, capture || false);
   return fn;
 };
-},{}],10:[function(require,module,exports){
+},{}],10:[function(_dereq_,module,exports){
 /**
  * Module dependencies.
  */
 
-var closest = require('closest')
-  , event = require('event');
+var closest = _dereq_('closest')
+  , event = _dereq_('event');
 
 /**
  * Delegate event `type` to `selector`
@@ -1269,8 +1304,8 @@ exports.unbind = function(el, type, fn, capture){
   event.unbind(el, type, fn, capture);
 };
 
-},{"closest":11,"event":9}],11:[function(require,module,exports){
-var matches = require('matches-selector')
+},{"closest":11,"event":9}],11:[function(_dereq_,module,exports){
+var matches = _dereq_('matches-selector')
 
 module.exports = function (element, selector, checkYoSelf) {
   var parent = checkYoSelf ? element : element.parentNode
@@ -1281,7 +1316,7 @@ module.exports = function (element, selector, checkYoSelf) {
   }
 }
 
-},{"matches-selector":12}],12:[function(require,module,exports){
+},{"matches-selector":12}],12:[function(_dereq_,module,exports){
 
 /**
  * Element prototype.
@@ -1322,7 +1357,7 @@ function match(el, selector) {
   }
   return false;
 }
-},{}],13:[function(require,module,exports){
+},{}],13:[function(_dereq_,module,exports){
 //     Underscore.js 1.6.0
 //     http://underscorejs.org
 //     (c) 2009-2014 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors

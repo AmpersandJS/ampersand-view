@@ -6,12 +6,13 @@ A set of common helpers and conventions for using as a base view for humanjs / b
 <p class="docLink">Part of the <a href="http://docs.humanjavascript.com/#all_human_view">Human JavaScript toolkit</a></p>
 <!---endhide-->
 
-It adds: 
+What does it do?
 
-1. Simple declarative property/template bindings without needing to include a template engine that does it for you. Which keeps your code with your code and your template as a simple function that returns an HTML string, and your payload light.
-2. A pattern for easily including the view's base element into render. Rather than having to specify tag type and attributes in javascript in the view definition you can just include that in your template like everything else.
-3. A way to render a collection of models within an element in the view, each with their own view, preserving order, and doing proper cleanup when the main view is removed.
-4. A simple way to render sub-views that get cleaned up when the parent view is removed.
+1. Gives you a proven pattern for managing/binding the contents of an element.
+2. Simple declarative property/template bindings without needing to include a template engine that does it for you. This keeps your logic out of your templates and lets you use a string of HTML as a fully dynamic template or just a simple function that returns an HTML string.
+3. The view's base element is replaced (or created) during a render. So, rather than having to specify tag type and attributes in javascript in the view definition you can just include that in your template like everything else.
+4. A way to render a collection of models within an element in the view, each with their own view, preserving order, and doing proper cleanup when the main view is removed.
+5. A simple way to render sub-views that get cleaned up when the parent view is removed.
 
 
 ## Install
@@ -40,10 +41,46 @@ var MyView = HumanView.extend({
     // set a `template` property of your view. This can either be
     // a function that returns an HTML string or just a string if 
     // no logic is required.
-    template: myTemplateFunction, 
-    textBindings: {
-        // the model property: the css selector
-        name: 'li a' 
+    template: '<li><a><span class="userName"></span></a></li>', 
+    // Simple declarative bindings
+    // The key is the name of the model property
+    bindings: {
+        // the value is a selector, by default a text binding is assumed
+        // this would keep the model's `name` attribute in the span, even
+        // if it's changed.
+        name: '.userName',
+        
+        // If the `active` property is a boolean the class 
+        // will be added/removed based on the boolean property.
+        // But, if the `active` property were a string, the previous
+        // value would be removed and the new one added from the class
+        // list without affecting other classes that may alreay be there.
+        active: ['li', 'class'],
+        
+        // If you've got a boolean property, you can also specify a third
+        // item in the array. It will be used to determine what the class
+        // is that will be toggled. This way your property name can be 
+        // different than the class. 
+        isActive: ['li', 'class', 'active'], // will toggle the 'active' class
+        
+        // If you prefer, you *can* also bind to the whole class list. Which
+        // will wipe out all existing classes.
+        myClasses: ['li', 'classList'],
+
+        // As you might have guessed, you can bind to any attribute you want
+        userUrl: ['a', 'href'],
+
+        // This works for boolean attributes. The following would add and remove 
+        // the entire `checked` attribute (assuming the property value was a boolean)
+        selected: ['input', 'checked']
+
+        // If you really need to, you can even bind the same attribute to different
+        // types of things. If "superActive" was a string, the following would put
+        // the text value of it, inside `.userName` and add it as a class on the `li`.
+        superActive: [
+            '.userName',
+            ['li', 'class']
+        ]        
     },
     render: function () {
         // method for rendering the view's template and binding all
@@ -55,27 +92,11 @@ var MyView = HumanView.extend({
 });
 ```
 
-#### Binding types:
 
-* `classBindings`: Maintains a class on the element according to the following rules:
-    1. **If the bound property is a boolean**: the name of the property will be used as the name of the class. The class will be on the element when true, and removed when the propety is false.
-    2. **If the property is a string**: the current value of the property will be used as the class name. When the property value changes the previous class will be removed and be replaced by the current value. No other classes on that element will be disturbed.
-* `textBindings`: Maintains the current value of the property as the text content of the element specified by the selector.
-* `htmlBindings`: Just like `textBindings` except html is not escaped.
-* `srcBindings`: Binds to the `src` attribute (useful for avatars, etc).
-* `hrefBindings`: Binds to the `href` attribute.
-* `inputBindings`: Binds to the `input` value.
-* `attributeBindings`: Lets you create other arbitrary attributes bindings. For example, this would bind the model's `id` attribute to the `data-id` attribute of the span element:
+### What about two-way bindings?
 
-```javascript
-var View = HumanView.extend({
-    template: '<li><span></span></li>',
-    attributeBindings: {
-        // <model_property>: [ '<css-selector>', '<attribute-name>']
-        id: ['span', 'data-thing']
-    }
-});
-```
+Note that these are all one-way bindings. People love to talk about the feature of two-way bindings, but from my experience, the vast majority of the time it's not actually something that you want. Why make two different ways of doing the same thing? The most common two-way bindings that people do are for form elements, which, is super easy to do with the events hash. Plus, then it's very easy to configure exactly when you want the user action to actually change the model.
+
 
 ### handling subviews
 
@@ -112,10 +133,6 @@ module.exports = HumanView.extend({
 **registerSubview also, stores a reference to the parent view on the subview as `.parent`**
 
 
-### Optional automatic rendering
-
-
-
 
 ## API Reference 
 
@@ -141,7 +158,7 @@ var HumanView = require('human-view');
 module.exports = HumanView.extend({
     autoRender: true,
     template: '<div><span id="username"></span></div>',
-    textBindings: {
+    bindings: {
         name: '#username'
     } 
 });
@@ -256,7 +273,7 @@ This is shortcut for the default rendering you're going to do in most every rend
 ```js
 var view = HumanView.extend({
     template: '<li><a></a></li>',
-    textBindings: {
+    bindings: {
         'name': 'a'
     },
     events: {

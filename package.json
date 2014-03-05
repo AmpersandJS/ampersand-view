@@ -1,22 +1,22 @@
 {
   "name": "human-view",
   "description": "A smart base view for Backbone apps, to make it easy to bind collections and properties to the DOM.",
-  "version": "2.0.0-beta1",
+  "version": "2.0.0-beta",
   "author": "Henrik Joreteg <henrik@andyet.net>",
   "browser": "./human-view.js",
   "bugs": "https://github.com/henrikjoreteg/human-view/issues",
   "dependencies": {
-    "backbone-events-standalone": "~0.2.1",
-    "backbone-extend-standalone": "~0.1.2",
-    "component-classes": "~1.2.1",
-    "domify": "~1.2.2",
-    "events-mixin": "~1.0.0",
-    "underscore": "*"
+    "backbone-events-standalone": "0.x.x",
+    "backbone-extend-standalone": "0.x.x",
+    "component-classes": "1.x.x",
+    "domify": "1.x.x",
+    "events-mixin": "1.x.x",
+    "underscore": "1.x.x"
   },
   "devDependencies": {
-    "browserify": "~3.14.1",
-    "precommit-hook": "~0.3.8",
-    "uglify-js": "~2.4.8"
+    "browserify": "3.x.x",
+    "precommit-hook": "0.x.x",
+    "uglify-js": "~2.x.x"
   },
   "homepage": "http://docs.humanjavascript.com",
   "keywords": [

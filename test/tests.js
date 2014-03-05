@@ -32,6 +32,14 @@ var Model = (window.HumanModel || Backbone.Model).extend({
     },
     session: {
         active: 'boolean'
+    },
+    derived: {
+        classes: {
+            deps: ['something', 'fireDanger', 'active'],
+            fn: function () {
+                return this.something + this.active;
+            }
+        }
     }
 });
 
@@ -264,7 +272,7 @@ test('textBindings', function () {
     //equal(view.get('span').textContent, 'henrik');
 });
 
-test('srcBindings', function () {
+test('src bindings', function () {
     var view = getView({
         bindings: {
             url: ['img', 'src']
@@ -276,7 +284,7 @@ test('srcBindings', function () {
     equal(img.getAttribute('src'), 'http://robohash.com/whammo');
 });
 
-test('hrefBindings', function () {
+test('href bindings', function () {
     var view = getView({
         template: '<a href=""></a>',
         bindings: {
@@ -289,7 +297,7 @@ test('hrefBindings', function () {
     equal(el.getAttribute('href'), 'http://robohash.com/whammo');
 });
 
-test('inputBindings', function () {
+test('input bindings', function () {
     var view = getView({
         template: '<li><input/></li>',
         bindings: {
@@ -302,7 +310,7 @@ test('inputBindings', function () {
     equal(input.value, 'yo');
 });
 
-test('classBindings', function () {
+test('class bindings', function () {
     var model = new Model();
     model.set({
         fireDanger: 'high',
@@ -324,6 +332,52 @@ test('classBindings', function () {
     model.set('active', false);
     ok(!classList.contains('active'));
     ok(classList.contains('low'));
+});
+
+test('classList bindings', function () {
+    var model = new Model();
+    model.set({
+        fireDanger: 'high',
+        active: true,
+        something: 'cool'
+    });
+    var view = getView({
+        autoRender: true,
+        template: '<li class="something else perhaps"></li>',
+        bindings: {
+            classes: ['', 'classList']
+        }
+    }, model);
+    equal(view.el.classList.toString(), 'cooltrue', 'wipes out existing classes');
+});
+
+test('nested bindingDefinitions', function () {
+    var model = new Model();
+    model.set({
+        fireDanger: 'high',
+        active: true,
+        something: 'cool'
+    });
+    var View = HumanView.extend({
+        autoRender: true,
+        template: '<li><div></div></li>',
+        bindings: {
+            active: [
+                ['div', 'data-active data-something'],
+                ['div', 'text'],
+                ['', 'class'],
+                ['div', 'classList', 'selected']
+            ]
+        }
+    })
+    var view = new View({model: model});
+    var li = view.el;
+    var div = li.firstChild;
+    ok(div.hasAttribute('data-active'));
+    ok(div.hasAttribute('data-something'));
+    equal(div.textContent, 'true');
+    ok(li.classList.contains('active'));
+    equal(div.className, 'selected');
 });
 
 module('error case: no model');
