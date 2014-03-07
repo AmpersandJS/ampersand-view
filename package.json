@@ -1,7 +1,7 @@
 {
   "name": "human-view",
   "description": "A smart base view for Backbone apps, to make it easy to bind collections and properties to the DOM.",
-  "version": "1.6.3",
+  "version": "1.6.4",
   "author": "Henrik Joreteg <henrik@andyet.net>",
   "browser": "./human-view.js",
   "bugs": "https://github.com/henrikjoreteg/human-view/issues",
