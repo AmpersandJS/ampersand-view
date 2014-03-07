@@ -21,7 +21,7 @@ var modelData = names.map(function (name) {
 var MainView
 var ItemView;
 
-var Model = (window.HumanModel || Backbone.Model).extend({
+var Model = (window.HumanModel && HumanModel.define || Backbone.Model.extend)({
     props: {
         id: 'number',
         name: 'string',
