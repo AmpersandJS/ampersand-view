@@ -264,9 +264,10 @@
         // Empty without using jQuery's empty (which removes jQuery handlers)
         // Originally we did: containerEl[0].innerHTML = '';
         // but that fails in IE10 because of a browser bug.
-        // So, we look instead.
-        _.each(views, function (view) {
-          containerEl[0].removeChild(view.el);
+        var parent = containerEl[0];
+        var childNodes = Array.prototype.slice.call(parent.childNodes);
+        _.each(childNodes, function (child) {
+          parent.removeChild(child);
         });
         collection.each(addView);
       }

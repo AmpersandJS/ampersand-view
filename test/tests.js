@@ -95,7 +95,6 @@ function numberRendered() {
 function itemsHaveChildren() {
     var isEmpty;
     container.find('li').each(function () {
-        console.log(this.innerHTML);
         if (this.innerHTML.length === 0) isEmpty = true;
     });
     return !(isEmpty);
