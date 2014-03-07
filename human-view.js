@@ -261,8 +261,13 @@
         }
       }
       function reRender() {
-        // empty without using jQuery's empty (which removes jQuery handlers)
-        containerEl[0].innerHTML = '';
+        // Empty without using jQuery's empty (which removes jQuery handlers)
+        // Originally we did: containerEl[0].innerHTML = '';
+        // but that fails in IE10 because of a browser bug.
+        // So, we look instead.
+        _.each(views, function (view) {
+          containerEl[0].removeChild(view.el);
+        });
         collection.each(addView);
       }
       this.listenTo(collection, 'add', addView);

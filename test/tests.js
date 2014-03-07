@@ -89,26 +89,42 @@ function numberRendered() {
     return container.find('li').length;
 }
 
+// this was to check for a weird bug in IE10 where setting
+// innerHTML = '' to clear the container also did the same
+// on all its children.
+function itemsHaveChildren() {
+    var isEmpty;
+    container.find('li').each(function () {
+        console.log(this.innerHTML);
+        if (this.innerHTML.length === 0) isEmpty = true;
+    });
+    return !(isEmpty);
+}
+
 module('method: renderCollection');
 
 test('test initial render', function() {
     window.view.render();
     equal(numberRendered(), collection.length);
+    ok(itemsHaveChildren());
 });
 test('add', function() {
     window.view.render();
     addModel();
     equal(numberRendered(), collection.length);
+    ok(itemsHaveChildren());
 });
-test('remove', 1, function () {
+test('remove', 2, function () {
     window.view.render();
     collection.remove(collection.last());
     equal(numberRendered(), collection.length);
+    ok(itemsHaveChildren());
 });
 test('reset', function () {
     window.view.render();
     collection.reset();
     equal(numberRendered(), collection.length);
+    ok(itemsHaveChildren());
 });
 test('sort', function () {
     window.view.render();
@@ -122,8 +138,9 @@ test('sort', function () {
         domIds.push(Number(this.id.slice(1)));
     });
     deepEqual(domIds, [5, 2, 4, 1, 3]);
+    ok(itemsHaveChildren());
 });
-asyncTest('animateRemove', 2, function () {
+asyncTest('animateRemove', 3, function () {
     window.view.render();
     var prevAnimateRemove = ItemView.prototype.animateRemove;
     ItemView.prototype.animateRemove = function () {
@@ -136,6 +153,7 @@ asyncTest('animateRemove', 2, function () {
     collection.remove(collection.last());
     setTimeout(function () {
         equal(numberRendered(), collection.length);
+        ok(itemsHaveChildren());
         // set it back
         ItemView.prototype.animateRemove = prevAnimateRemove;
         start();
@@ -148,6 +166,7 @@ test('filtered', function () {
         }
     });
     equal(numberRendered(), 2);
+    ok(itemsHaveChildren());
 });
 test('reversed', function () {
     window.view.render({
@@ -158,6 +177,7 @@ test('reversed', function () {
         domIds.push(Number(this.id.slice(1)));
     });
     deepEqual(domIds, [5, 4, 3, 2, 1]);
+    ok(itemsHaveChildren());
 });
 test('cleanup', function () {
     window.view.render();

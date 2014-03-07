@@ -270,6 +270,7 @@ var view = HumanView.extend({
 
 ## Changelog
 
+- 1.6.4 [diff](https://github.com/HenrikJoreteg/human-view/compare/v1.6.3...v1.6.4) - Switch from `.innnerHTML = ""` to looping/removing children in renderCollection. This is a workaround for a bug in IE10.
 - 1.6.3 [diff](https://github.com/HenrikJoreteg/human-view/compare/v1.6.2...v1.6.3) - Move throw statment for too many root elements inside non `<body>` case.
 - 1.6.2 [diff](https://github.com/HenrikJoreteg/human-view/compare/v1.6.1...v1.6.2) - Make `getByRole` work even if `role` attribute is on the root element. Throws an error if your view template contains more than one root element.
 - 1.6.1 [diff](https://github.com/HenrikJoreteg/human-view/compare/v1.6.0...v1.6.1) - Make sure renderSubview registers the subview first, so it has a `.parent` before it calls `.render()` on the subview.
