@@ -1,7 +1,7 @@
 {
-  "name": "human-view",
+  "name": "ampersand-view",
   "version": "2.0.1-beta",
-  "main": "./human-view.js",
+  "main": "./ampersand-view.js",
   "dependencies": {
     "backbone-events-standalone": "0.x.x",
     "backbone-extend-standalone": "0.x.x",

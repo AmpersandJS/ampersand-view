@@ -2,11 +2,11 @@
 
 ## Introduction
 
-human-view is a 
+ampersand-view is a 
 
 ## Bindings
 
-Bindings are view-level objects that map model properties to specific DOM selectors in the view's template. Once bindings are declared, human-view will automatically update the appropriate DOM elements or attributes when the bound model property changes.
+Bindings are view-level objects that map model properties to specific DOM selectors in the view's template. Once bindings are declared, ampersand-view will automatically update the appropriate DOM elements or attributes when the bound model property changes.
 
 
 ### textBindings
@@ -106,7 +106,7 @@ model.set('status', 'away'); // `available` class will be removed and `away` cla
 ## Methods
 
 ### renderCollection(collection, ViewClass, container [, opts])
-human-view includes a `renderCollection` method that works as follows:
+ampersand-view includes a `renderCollection` method that works as follows:
 
 ```js
 // some view for individual items in the collection

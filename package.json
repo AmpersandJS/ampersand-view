@@ -1,10 +1,10 @@
 {
-  "name": "human-view",
+  "name": "ampersand-view",
   "description": "A smart base view for Backbone apps, to make it easy to bind collections and properties to the DOM.",
-  "version": "2.0.1-beta",
+  "version": "2.0.0",
   "author": "Henrik Joreteg <henrik@andyet.net>",
-  "browser": "./human-view.js",
-  "bugs": "https://github.com/henrikjoreteg/human-view/issues",
+  "browser": "./ampersand-view.js",
+  "bugs": "https://github.com/ampersandjs/ampersand-view/issues",
   "dependencies": {
     "backbone-events-standalone": "0.x.x",
     "backbone-extend-standalone": "0.x.x",
@@ -26,10 +26,10 @@
     "browserify"
   ],
   "license": "MIT",
-  "main": "./human-view.js",
+  "main": "./ampersand-view.js",
   "repository": {
     "type": "git",
-    "url": "git://github.com/henrikjoreteg/human-view.git"
+    "url": "git://github.com/ampersandjs/ampersand-view.git"
   },
   "scripts": {
     "validate": "jshint .",

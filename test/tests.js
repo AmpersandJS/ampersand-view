@@ -65,7 +65,7 @@ QUnit.testStart(function () {
     });
 
     // our item view
-    ItemView = HumanView.extend({
+    ItemView = AmpersandView.extend({
         template: '<li><a href=""></a><span></span><input/></li>',
         initialize: function () {
             // register a misc handler so we can test release
@@ -78,7 +78,7 @@ QUnit.testStart(function () {
         }
     });
 
-    MainView = HumanView.extend({
+    MainView = AmpersandView.extend({
         render: function (opts) {
             this.el.innerHTML = '<ul></ul>';
             this.renderCollection(this.collection, ItemView, this.get('ul'), opts);
@@ -191,7 +191,7 @@ module('method: subview methods');
 
 test('registerSubview', function () {
     var removeCalled = 0;
-    var SubView = HumanView.extend({
+    var SubView = AmpersandView.extend({
         template: '<div></div>',
         render: function () {
             this.renderAndBind();
@@ -201,7 +201,7 @@ test('registerSubview', function () {
             removeCalled++;
         }
     });
-    var View = HumanView.extend({
+    var View = AmpersandView.extend({
         template: '<section><div id="parent"></div></section>',
         render: function () {
             this.renderAndBind();
@@ -234,7 +234,7 @@ asyncTest('basic', 1, function () {
             name: 'string'
         }
     });
-    var View = HumanView.extend({
+    var View = AmpersandView.extend({
         initialize: function () {
             this.model = model;
             this.listenToAndRun(this.model, 'change', this.handler);
@@ -254,7 +254,7 @@ function getView(bindings, model) {
     if (!bindings.template) {
         bindings.template = '<li><span></span><img/></li>';
     }
-    var View = HumanView.extend(bindings);
+    var View = AmpersandView.extend(bindings);
     var view = new View({
         model: model || new Model()
     });
@@ -358,7 +358,7 @@ test('nested bindingDefinitions', function () {
         active: true,
         something: 'cool'
     });
-    var View = HumanView.extend({
+    var View = AmpersandView.extend({
         autoRender: true,
         template: '<li><div></div></li>',
         bindings: {
@@ -383,7 +383,7 @@ test('nested bindingDefinitions', function () {
 module('error case: no model');
 
 test('renderAndBind with no model', function () {
-    var View = HumanView.extend({
+    var View = AmpersandView.extend({
         template: '<li><span></span><img/></li>',
         textBindings: { name: 'span' }
     });
@@ -392,7 +392,7 @@ test('renderAndBind with no model', function () {
 });
 
 test('registerBindings with no model', function () {
-    var View = HumanView.extend({
+    var View = AmpersandView.extend({
         template: '<li><span></span><img/></li>',
         textBindings: { name: 'span' }
     });
@@ -401,7 +401,7 @@ test('registerBindings with no model', function () {
 });
 
 test('getByRole', 4, function () {
-    var View = HumanView.extend({
+    var View = AmpersandView.extend({
         template: '<li role="list-item"><span role="username"></span><img role="user-avatar"/></li>'
     });
     var view = new View();
@@ -414,7 +414,7 @@ test('getByRole', 4, function () {
 });
 
 test('throw on multiple root elements', 1, function () {
-    var View = HumanView.extend({
+    var View = AmpersandView.extend({
         template: '<li></li><div></div>'
     });
     var view = new View();
@@ -422,7 +422,7 @@ test('throw on multiple root elements', 1, function () {
 });
 
 test('getAll should return an array', 3, function () {
-    var View = HumanView.extend({
+    var View = AmpersandView.extend({
         autoRender: true,
         template: '<ul><li></li><li></li><li></li></ul>'
     });
@@ -435,7 +435,7 @@ test('getAll should return an array', 3, function () {
 
 
 test('get should return undefined if no match', 4, function () {
-    var View = HumanView.extend({
+    var View = AmpersandView.extend({
         autoRender: true,
         template: '<ul></ul>'
     });
