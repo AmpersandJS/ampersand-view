@@ -1,4 +1,4 @@
-# human-view
+# ampersand-view
 
 A set of common helpers and conventions for using as a base view for humanjs / backbone applications.
 
@@ -18,17 +18,17 @@ What does it do?
 ## Install
 
 ```
-npm install human-view
+npm install ampersand-view
 ```
 
 ## Usage
 
 ### Basics
 
-Nothing special is required, just use `HumanView` in the same way as you would Backbone.View:
+Nothing special is required, just use `AmpersandView` in the same way as you would Backbone.View:
 
 ```javascript
-var MyView = HumanView.extend({
+var MyView = AmpersandView.extend({
     initialize: function () { ... }, 
     render: function () { ... }
 });
@@ -37,7 +37,7 @@ var MyView = HumanView.extend({
 ### Declarative Bindings
 
 ```javascript
-var MyView = HumanView.extend({
+var MyView = AmpersandView.extend({
     // set a `template` property of your view. This can either be
     // a function that returns an HTML string or just a string if 
     // no logic is required.
@@ -110,21 +110,21 @@ Having said that, we may enable it anyway, in a future release, that's still up 
 
 Often you want to render some other subview within a view. The trouble is that when you remove the parent view, you also want to remove all the subviews.
 
-HumanView has two convenience method for handling this that's also used by `renderCollection` to do cleanup.
+AmpersandView has two convenience method for handling this that's also used by `renderCollection` to do cleanup.
 
 It looks like this:
 
 ```javascript
-var HumanView = require('human-view');
+var AmpersandView = require('ampersand-view');
 
 // This can be *anything* with a `remove` method
-// and an `el` property... such as another human-view
+// and an `el` property... such as another ampersand-view
 // instance.
 // But you could very easily write other little custom views
 // that followed the same conventions. Such as custom dialogs, etc.
 var SubView = require('./my-sub-view');
 
-module.exports = HumanView.extend({
+module.exports = AmpersandView.extend({
     render: function () {
         // this takes a view instance and either an element, or element selector 
         // to draw the view into.
@@ -160,10 +160,10 @@ By setting `autoRender: true` the view will simply call `.renderAndBind` for you
 
 
 ```js
-var HumanView = require('human-view');
+var AmpersandView = require('ampersand-view');
 
 
-module.exports = HumanView.extend({
+module.exports = AmpersandView.extend({
     autoRender: true,
     template: '<div><span id="username"></span></div>',
     bindings: {
@@ -201,10 +201,10 @@ Each item view will only be `.render()`'ed once (unless you change that within t
 
 ```javascript
 // some view for individual items in the collection
-var ItemView = HumanView.extend({ ... });
+var ItemView = AmpersandView.extend({ ... });
 
 // the main view
-var MainView = HumanView.extend({
+var MainView = AmpersandView.extend({
     template: '<section class="page"><ul class="itemContainer"></ul></section>',
     render: function (opts) {
         // render our template as usual
@@ -251,7 +251,7 @@ It will:
 #### Example:
 
 ```js
-var view = HumanView.extend({
+var view = AmpersandView.extend({
     template: '<li><div class="container"></div></li>',
     render: function () {
         this.renderAndBind();
@@ -279,7 +279,7 @@ This is shortcut for the default rendering you're going to do in most every rend
 #### Example:
 
 ```js
-var view = HumanView.extend({
+var view = AmpersandView.extend({
     template: '<li><a></a></li>',
     bindings: {
         'name': 'a'
@@ -316,7 +316,7 @@ This is for convenience and also to encourage the use of the `role` attribute fo
 #### Example:
 
 ```js
-var view = HumanView.extend({
+var view = AmpersandView.extend({
     template: '<li><img role="avatar" src="/user.png"/></li>',
     render: function () {
         this.renderAndBind();
@@ -329,12 +329,12 @@ var view = HumanView.extend({
 
 ## Changelog
 
-- 1.6.3 [diff](https://github.com/HenrikJoreteg/human-view/compare/v1.6.2...v1.6.3) - Move throw statment for too many root elements inside non `<body>` case.
-- 1.6.2 [diff](https://github.com/HenrikJoreteg/human-view/compare/v1.6.1...v1.6.2) - Make `getByRole` work even if `role` attribute is on the root element. Throws an error if your view template contains more than one root element.
-- 1.6.1 [diff](https://github.com/HenrikJoreteg/human-view/compare/v1.6.0...v1.6.1) - Make sure renderSubview registers the subview first, so it has a `.parent` before it calls `.render()` on the subview.
-- 1.6.0 [diff](https://github.com/HenrikJoreteg/human-view/compare/v1.5.0...v1.6.0) - Adding `getByRole` method
+- 1.6.3 [diff](https://github.com/HenrikJoreteg/ampersand-view/compare/v1.6.2...v1.6.3) - Move throw statment for too many root elements inside non `<body>` case.
+- 1.6.2 [diff](https://github.com/HenrikJoreteg/ampersand-view/compare/v1.6.1...v1.6.2) - Make `getByRole` work even if `role` attribute is on the root element. Throws an error if your view template contains more than one root element.
+- 1.6.1 [diff](https://github.com/HenrikJoreteg/ampersand-view/compare/v1.6.0...v1.6.1) - Make sure renderSubview registers the subview first, so it has a `.parent` before it calls `.render()` on the subview.
+- 1.6.0 [diff](https://github.com/HenrikJoreteg/ampersand-view/compare/v1.5.0...v1.6.0) - Adding `getByRole` method
 - 1.5.0 - Adding bower.json, adding missing dev dependencies, other small bugfixes.
-- 1.4.1 - Removing elements without using jQuery's `.empty()` in renderCollection. (fixes: https://github.com/HenrikJoreteg/human-view/issues/13)
+- 1.4.1 - Removing elements without using jQuery's `.empty()` in renderCollection. (fixes: https://github.com/HenrikJoreteg/ampersand-view/issues/13)
 - 1.4.0 - Adding `parent` reference to subviews registered via registerSubview
 
 <!---starthide-->
