@@ -7,7 +7,7 @@
   "bugs": "https://github.com/ampersandjs/ampersand-view/issues",
   "dependencies": {
     "backbone-events-standalone": "0.x.x",
-    "backbone-extend-standalone": "0.x.x",
+    "ampersand-class-extend": "0.x.x",
     "component-classes": "1.x.x",
     "domify": "1.x.x",
     "events-mixin": "1.x.x",

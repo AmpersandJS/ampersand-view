@@ -1,5 +1,5 @@
 !function(e){if("object"==typeof exports)module.exports=e();else if("function"==typeof define&&define.amd)define(e);else{var f;"undefined"!=typeof window?f=window:"undefined"!=typeof global?f=global:"undefined"!=typeof self&&(f=self),f.AmpersandView=e()}}(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(_dereq_,module,exports){
-var bbExtend = _dereq_('backbone-extend-standalone');
+var ampersandExtend = _dereq_('ampersand-class-extend');
 var Events = _dereq_('backbone-events-standalone');
 var domify = _dereq_('domify');
 var _ = _dereq_('underscore');
@@ -414,10 +414,77 @@ _.extend(View.prototype, Events, {
   }
 });
 
-View.extend = bbExtend;
+View.extend = ampersandExtend;
 module.exports = View;
 
-},{"backbone-events-standalone":3,"backbone-extend-standalone":4,"component-classes":5,"domify":7,"events-mixin":8,"underscore":13}],2:[function(_dereq_,module,exports){
+},{"ampersand-class-extend":2,"backbone-events-standalone":5,"component-classes":6,"domify":8,"events-mixin":9,"underscore":14}],2:[function(_dereq_,module,exports){
+var objectExtend = _dereq_('extend-object');
+
+
+/// Following code is largely pasted from Backbone.js
+
+// Helper function to correctly set up the prototype chain, for subclasses.
+// Similar to `goog.inherits`, but uses a hash of prototype properties and
+// class properties to be extended.
+var extend = function(protoProps) {
+    var parent = this;
+    var child;
+    var args = [].slice.call(arguments);
+
+    // The constructor function for the new subclass is either defined by you
+    // (the "constructor" property in your `extend` definition), or defaulted
+    // by us to simply call the parent's constructor.
+    if (protoProps && protoProps.hasOwnProperty('constructor')) {
+        child = protoProps.constructor;
+    } else {
+        child = function () {
+            return parent.apply(this, arguments);
+        };
+    }
+
+    // Add static properties to the constructor function from parent
+    objectExtend(child, parent);
+
+    // Set the prototype chain to inherit from `parent`, without calling
+    // `parent`'s constructor function.
+    var Surrogate = function(){ this.constructor = child; };
+    Surrogate.prototype = parent.prototype;
+    child.prototype = new Surrogate();
+
+    // Mix in all prototype properties to the subclass if supplied.
+    if (protoProps) {
+        args.unshift(child.prototype);
+        objectExtend.apply(null, args);
+    }
+
+    // Set a convenience property in case the parent's prototype is needed
+    // later.
+    child.__super__ = parent.prototype;
+
+    return child;
+};
+
+// Expose the extend function
+module.exports = extend;
+
+},{"extend-object":3}],3:[function(_dereq_,module,exports){
+var arr = [];
+var each = arr.forEach;
+var slice = arr.slice;
+
+
+module.exports = function(obj) {
+    each.call(slice.call(arguments, 1), function(source) {
+        if (source) {
+            for (var prop in source) {
+                obj[prop] = source[prop];
+            }
+        }
+    });
+    return obj;
+};
+
+},{}],4:[function(_dereq_,module,exports){
 /**
  * Standalone extraction of Backbone.Events, no external dependency required.
  * Degrades nicely when Backone/underscore are already available in the current
@@ -685,85 +752,10 @@ module.exports = View;
   }
 })(this);
 
-},{}],3:[function(_dereq_,module,exports){
+},{}],5:[function(_dereq_,module,exports){
 module.exports = _dereq_('./backbone-events-standalone');
 
-},{"./backbone-events-standalone":2}],4:[function(_dereq_,module,exports){
-(function (definition) {
-  if (typeof exports === "object") {
-    module.exports = definition();
-  }
-  else if (typeof define === 'function' && define.amd) {
-    define(definition);
-  }
-  else {
-    window.BackboneExtend = definition();
-  }
-})(function () {
-  "use strict";
-  
-  // mini-underscore
-  var _ = {
-    has: function (obj, key) {
-      return Object.prototype.hasOwnProperty.call(obj, key);
-    },
-  
-    extend: function(obj) {
-      for (var i=1; i<arguments.length; ++i) {
-        var source = arguments[i];
-        if (source) {
-          for (var prop in source) {
-            obj[prop] = source[prop];
-          }
-        }
-      }
-      return obj;
-    }
-  };
-
-  /// Following code is pasted from Backbone.js ///
-
-  // Helper function to correctly set up the prototype chain, for subclasses.
-  // Similar to `goog.inherits`, but uses a hash of prototype properties and
-  // class properties to be extended.
-  var extend = function(protoProps, staticProps) {
-    var parent = this;
-    var child;
-
-    // The constructor function for the new subclass is either defined by you
-    // (the "constructor" property in your `extend` definition), or defaulted
-    // by us to simply call the parent's constructor.
-    if (protoProps && _.has(protoProps, 'constructor')) {
-      child = protoProps.constructor;
-    } else {
-      child = function(){ return parent.apply(this, arguments); };
-    }
-
-    // Add static properties to the constructor function, if supplied.
-    _.extend(child, parent, staticProps);
-
-    // Set the prototype chain to inherit from `parent`, without calling
-    // `parent`'s constructor function.
-    var Surrogate = function(){ this.constructor = child; };
-    Surrogate.prototype = parent.prototype;
-    child.prototype = new Surrogate();
-
-    // Add prototype properties (instance properties) to the subclass,
-    // if supplied.
-    if (protoProps) _.extend(child.prototype, protoProps);
-
-    // Set a convenience property in case the parent's prototype is needed
-    // later.
-    child.__super__ = parent.prototype;
-
-    return child;
-  };
-
-  // Expose the extend function
-  return extend;
-});
-
-},{}],5:[function(_dereq_,module,exports){
+},{"./backbone-events-standalone":4}],6:[function(_dereq_,module,exports){
 /**
  * Module dependencies.
  */
@@ -949,7 +941,7 @@ ClassList.prototype.contains = function(name){
     : !! ~index(this.array(), name);
 };
 
-},{"indexof":6}],6:[function(_dereq_,module,exports){
+},{"indexof":7}],7:[function(_dereq_,module,exports){
 module.exports = function(arr, obj){
   if (arr.indexOf) return arr.indexOf(obj);
   for (var i = 0; i < arr.length; ++i) {
@@ -957,7 +949,7 @@ module.exports = function(arr, obj){
   }
   return -1;
 };
-},{}],7:[function(_dereq_,module,exports){
+},{}],8:[function(_dereq_,module,exports){
 
 /**
  * Expose `parse`.
@@ -1046,7 +1038,7 @@ function parse(html) {
   return fragment;
 }
 
-},{}],8:[function(_dereq_,module,exports){
+},{}],9:[function(_dereq_,module,exports){
 
 /**
  * Module dependencies.
@@ -1224,7 +1216,7 @@ function parse(event) {
   }
 }
 
-},{"component-event":9,"delegate-events":10}],9:[function(_dereq_,module,exports){
+},{"component-event":10,"delegate-events":11}],10:[function(_dereq_,module,exports){
 var bind = window.addEventListener ? 'addEventListener' : 'attachEvent',
     unbind = window.removeEventListener ? 'removeEventListener' : 'detachEvent',
     prefix = bind !== 'addEventListener' ? 'on' : '';
@@ -1260,7 +1252,7 @@ exports.unbind = function(el, type, fn, capture){
   el[unbind](prefix + type, fn, capture || false);
   return fn;
 };
-},{}],10:[function(_dereq_,module,exports){
+},{}],11:[function(_dereq_,module,exports){
 /**
  * Module dependencies.
  */
@@ -1304,7 +1296,7 @@ exports.unbind = function(el, type, fn, capture){
   event.unbind(el, type, fn, capture);
 };
 
-},{"closest":11,"event":9}],11:[function(_dereq_,module,exports){
+},{"closest":12,"event":10}],12:[function(_dereq_,module,exports){
 var matches = _dereq_('matches-selector')
 
 module.exports = function (element, selector, checkYoSelf) {
@@ -1316,7 +1308,7 @@ module.exports = function (element, selector, checkYoSelf) {
   }
 }
 
-},{"matches-selector":12}],12:[function(_dereq_,module,exports){
+},{"matches-selector":13}],13:[function(_dereq_,module,exports){
 
 /**
  * Element prototype.
@@ -1357,7 +1349,7 @@ function match(el, selector) {
   }
   return false;
 }
-},{}],13:[function(_dereq_,module,exports){
+},{}],14:[function(_dereq_,module,exports){
 //     Underscore.js 1.6.0
 //     http://underscorejs.org
 //     (c) 2009-2014 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors

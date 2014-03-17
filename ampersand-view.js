@@ -1,4 +1,4 @@
-var bbExtend = require('backbone-extend-standalone');
+var ampersandExtend = require('ampersand-class-extend');
 var Events = require('backbone-events-standalone');
 var domify = require('domify');
 var _ = require('underscore');
@@ -413,5 +413,5 @@ _.extend(View.prototype, Events, {
   }
 });
 
-View.extend = bbExtend;
+View.extend = ampersandExtend;
 module.exports = View;
