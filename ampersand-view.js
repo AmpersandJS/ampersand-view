@@ -71,9 +71,9 @@ _.extend(View.prototype, Events, {
   // Change the view's element (`this.el` property), including event
   // re-delegation.
   setElement: function (element, delegate) {
-    if (this.events) this.events.unbind();
+    if (this.eventManager) this.eventManager.unbind();
     this.el = element;
-    this.events = events(this.el, this);
+    this.eventManager = events(this.el, this);
     if (delegate !== false) this.delegateEvents();
     return this;
   },
@@ -97,16 +97,7 @@ _.extend(View.prototype, Events, {
     if (!(events || (events = _.result(this, 'events')))) return this;
     this.undelegateEvents();
     for (var key in events) {
-      var method = events[key];
-      var match = key.match(delegateEventSplitter);
-      var eventName = match[1];
-      var selector = match[2];
-      eventName += '.delegateEvents' + this.cid;
-      if (selector === '') {
-        this.events.bind(eventName, method);
-      } else {
-        this.events.bind(eventName, selector, method);
-      }
+      this.eventManager.bind(key, events[key]);
     }
     return this;
   },
@@ -115,7 +106,7 @@ _.extend(View.prototype, Events, {
   // You usually don't need to use this, but may wish to if you have multiple
   // Backbone views attached to the same DOM element.
   undelegateEvents: function () {
-    this.events.unbind();
+    this.eventManager.unbind();
     return this;
   },
 
