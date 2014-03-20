@@ -1,10 +1,6 @@
 # ampersand-view
 
-A set of common helpers and conventions for using as a base view for humanjs / backbone applications.
-
-<!---starthide-->
-<p class="docLink">Part of the <a href="http://docs.humanjavascript.com/#all_human_view">Human JavaScript toolkit</a></p>
-<!---endhide-->
+A set of common helpers and conventions for using as a base view for ampersand.js apps.
 
 What does it do?
 
@@ -14,6 +10,9 @@ What does it do?
 4. A way to render a collection of models within an element in the view, each with their own view, preserving order, and doing proper cleanup when the main view is removed.
 5. A simple way to render sub-views that get cleaned up when the parent view is removed.
 
+<!-- starthide -->
+Part of the [Ampersand.js toolkit](http://ampersandjs.com) for building clientside applications.
+<!-- endhide -->
 
 ## Install
 
@@ -92,7 +91,7 @@ var MyView = AmpersandView.extend({
         // method for rendering the view's template and binding all
         // the model properties as described by `textBindings` above.
         // You can also bind other attributes, and if you're using
-        // human-model, you can bind derived properties too.
+        // ampersand-model, you can bind derived properties too.
         this.renderAndBind({what: 'some context object for the template'});
     }
 });
