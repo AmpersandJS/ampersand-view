@@ -1,22 +1,24 @@
 {
   "name": "ampersand-view",
   "description": "A smart base view for Backbone apps, to make it easy to bind collections and properties to the DOM.",
-  "version": "2.0.3",
+  "version": "2.0.4",
   "author": "Henrik Joreteg <henrik@andyet.net>",
   "browser": "./ampersand-view.js",
   "bugs": "https://github.com/ampersandjs/ampersand-view/issues",
   "dependencies": {
-    "backbone-events-standalone": "0.x.x",
     "ampersand-class-extend": "0.x.x",
+    "backbone-events-standalone": "0.x.x",
     "component-classes": "1.x.x",
     "domify": "1.x.x",
     "events-mixin": "1.x.x",
     "underscore": "1.x.x"
   },
   "devDependencies": {
-    "browserify": "3.x.x",
+    "ampersand-model": "~2.7.2",
+    "ampersand-rest-collection": "~0.1.6",
     "precommit-hook": "0.x.x",
-    "uglify-js": "~2.x.x"
+    "run-browser": "~1.2.0",
+    "tape": "~2.11.0"
   },
   "homepage": "http://docs.humanjavascript.com",
   "keywords": [
@@ -33,7 +35,19 @@
   },
   "scripts": {
     "validate": "jshint .",
-    "build": "node build.js",
-    "test": "npm run build && open ./test/test.html"
+    "start": "run-browser test/index.js"
+  },
+  "testling": {
+    "files": "test/index.js",
+    "browsers": [
+      "ie/9..latest",
+      "chrome/22..latest",
+      "firefox/16..latest",
+      "safari/5.1..latest",
+      "opera/11.0..latest",
+      "iphone/6..latest",
+      "ipad/6..latest",
+      "android-browser/latest"
+    ]
   }
 }

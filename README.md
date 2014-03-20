@@ -14,6 +14,11 @@ What does it do?
 Part of the [Ampersand.js toolkit](http://ampersandjs.com) for building clientside applications.
 <!-- endhide -->
 
+## Browser support
+
+[![browser support](https://ci.testling.com/ampersandjs/ampersand-view.png)
+](https://ci.testling.com/ampersandjs/ampersand-view)
+
 ## Install
 
 ```
