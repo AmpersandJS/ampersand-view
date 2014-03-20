@@ -230,7 +230,7 @@ _.extend(View.prototype, Events, {
               } else {
                 prevVal = model.previous(propertyName);
                 if (prevVal) classList.remove(prevVal);
-                classList.add(newVal);
+                if (newVal) classList.add(newVal);
               }
               return;
             }
