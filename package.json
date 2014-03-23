@@ -20,7 +20,7 @@
     "run-browser": "~1.2.0",
     "tape": "~2.11.0"
   },
-  "homepage": "http://docs.humanjavascript.com",
+  "homepage": "http://ampersandjs.com",
   "keywords": [
     "backbone",
     "view",
