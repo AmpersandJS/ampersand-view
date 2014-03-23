@@ -306,7 +306,7 @@ _.extend(View.prototype, Events, {
   //       });
   //     }
   //
-  // Then later you can access elements by reference like so: `this.$pages`, or `this.$chat`.
+  // Then later you can access elements by reference like so: `this.pages`, or `this.chat`.
   cacheElements: function (hash) {
     for (var item in hash) {
       this[item] = this.get(hash[item]);
