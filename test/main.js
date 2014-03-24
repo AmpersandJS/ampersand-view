@@ -2,6 +2,10 @@ var test = require('tape');
 var Model = require('ampersand-model');
 var AmpersandView = require('../ampersand-view');
 
+var contains = function (str1, str2) {
+    return str1.indexOf(str2) !== -1;
+};
+
 var Model = Model.extend({
     props: {
         id: 'number',
@@ -159,15 +163,17 @@ test('class bindings', function (t) {
             active: ['', 'class']
         }
     }, model);
-    var classList = view.el.classList;
-    t.ok(classList.contains('active'));
-    t.ok(classList.contains('high'));
+    var className = view.el.className;
+    t.ok(contains(className, 'active'));
+    t.ok(contains(className, 'high'));
     model.set('fireDanger', 'low');
-    t.ok(!classList.contains('high'));
-    t.ok(classList.contains('low'));
+    className = view.el.className;
+    t.ok(!contains(className, 'high'));
+    t.ok(contains(className, 'low'));
     model.set('active', false);
-    t.ok(!classList.contains('active'));
-    t.ok(classList.contains('low'));
+    className = view.el.className;
+    t.ok(!contains(className, 'active'));
+    t.ok(contains(className, 'low'));
     t.end();
 });
 
@@ -185,7 +191,7 @@ test('classList bindings', function (t) {
             classes: ['', 'classList']
         }
     }, model);
-    t.equal(view.el.classList.toString(), 'cooltrue', 'wipes out existing classes');
+    t.equal(view.el.className, 'cooltrue', 'wipes out existing classes');
     t.end();
 });
 
@@ -214,7 +220,7 @@ test('nested binding definitions', function (t) {
     t.ok(div.hasAttribute('data-active'));
     t.ok(div.hasAttribute('data-something'));
     t.equal(div.textContent, 'true');
-    t.ok(li.classList.contains('active'));
+    t.ok(contains(li.className, 'active'));
     t.equal(div.className, 'selected');
     t.end();
 });
