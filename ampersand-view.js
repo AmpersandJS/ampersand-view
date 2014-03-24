@@ -56,6 +56,7 @@ _.extend(View.prototype, Events, {
   // **render** is the core function that your view should override, in order
   // to populate its element (`this.el`), with the appropriate HTML.
   render: function () {
+    this.renderAndBind();
     return this;
   },
 
