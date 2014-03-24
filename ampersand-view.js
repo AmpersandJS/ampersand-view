@@ -12,10 +12,7 @@ function View(options) {
   _.extend(this, _.pick(options, viewOptions));
   this.initialize.apply(this, arguments);
   if (this.autoRender && this.template) {
-    this.renderAndBind({
-      model: this.model,
-      collection: this.collection
-    }, this.template);
+    this.render();
   }
   if (this.el) this.setElement(this.el);
 }
@@ -53,10 +50,13 @@ _.extend(View.prototype, Events, {
   // initialization logic.
   initialize: function () {},
 
-  // **render** is the core function that your view should override, in order
+  // **render** is the core function that your view can override, its job is
   // to populate its element (`this.el`), with the appropriate HTML.
   render: function () {
-    this.renderAndBind();
+    this.renderAndBind({
+      model: this.model,
+      collection: this.collection
+    });
     return this;
   },
 
