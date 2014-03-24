@@ -4,6 +4,7 @@ var domify = require('domify');
 var _ = require('underscore');
 var events = require('events-mixin');
 var classes = require('component-classes');
+var matches = require('matches-selector');
 
 
 function View(options) {
@@ -34,6 +35,7 @@ _.extend(View.prototype, Events, {
     get: function (selector) {
         if (!selector) return this.el;
         if (typeof selector === 'string') {
+            if (matches(this.el, selector)) return this.el;
             return this.el.querySelector(selector) || undefined;
         }
         return selector;
@@ -42,8 +44,10 @@ _.extend(View.prototype, Events, {
     // Returns an array of elements based on CSS selector scoped to this.el
     // if you pass an empty string it return `this.el`.
     getAll: function (selector) {
+        var res = [];
         if (selector === '') return [this.el];
-        return Array.prototype.slice.call(this.el.querySelectorAll(selector));
+        if (matches(this.el, selector)) res.push(this.el);
+        return res.concat(Array.prototype.slice.call(this.el.querySelectorAll(selector)));
     },
 
     // Initialize is an empty function by default. Override it with your own

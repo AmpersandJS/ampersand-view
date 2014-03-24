@@ -11,7 +11,8 @@
     "component-classes": "1.x.x",
     "domify": "1.x.x",
     "events-mixin": "1.x.x",
-    "underscore": "1.x.x"
+    "underscore": "1.x.x",
+    "matches-selector": "1.x.x"
   },
   "devDependencies": {
     "ampersand-model": "~2.7.2",

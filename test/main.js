@@ -245,7 +245,7 @@ test('registerBindings with no model', function (t) {
     t.end();
 });
 
-test('getByRole', 4, function (t) {
+test('getByRole', function (t) {
     var View = AmpersandView.extend({
         template: '<li role="list-item"><span role="username"></span><img role="user-avatar"/></li>'
     });
@@ -259,7 +259,7 @@ test('getByRole', 4, function (t) {
     t.end();
 });
 
-test('throw on multiple root elements', 1, function (t) {
+test('throw on multiple root elements', function (t) {
     var View = AmpersandView.extend({
         template: '<li></li><div></div>'
     });
@@ -268,7 +268,7 @@ test('throw on multiple root elements', 1, function (t) {
     t.end();
 });
 
-test('getAll should return an array', 3, function (t) {
+test('getAll should return an array', function (t) {
     var View = AmpersandView.extend({
         autoRender: true,
         template: '<ul><li></li><li></li><li></li></ul>'
@@ -281,7 +281,7 @@ test('getAll should return an array', 3, function (t) {
     t.end();
 });
 
-test('get should return undefined if no match', 4, function (t) {
+test('get should return undefined if no match', function (t) {
     var View = AmpersandView.extend({
         autoRender: true,
         template: '<ul></ul>'
@@ -292,5 +292,31 @@ test('get should return undefined if no match', 4, function (t) {
     t.strictEqual(view.get(''), view.el);
     t.strictEqual(view.get(), view.el);
     t.strictEqual(view.get(view.el), view.el);
+    t.end();
+});
+
+test('get should work for root element too', function (t) {
+    var View = AmpersandView.extend({
+        autoRender: true,
+        template: '<ul></ul>'
+    });
+    var view = new View();
+    t.equal(view.get('ul'), view.el);
+    t.end();
+});
+
+test('getAll should include root element if matches', function (t) {
+    var View = AmpersandView.extend({
+        autoRender: true,
+        template: '<div class="test"><div class="test deep"><div class="test deep"></div></div></div>'
+    });
+    var view = new View();
+    var hasTestClass = view.getAll('.test');
+    var hasDeepClass = view.getAll('.deep');
+    t.equal(hasTestClass.length, 3);
+    t.equal(hasDeepClass.length, 2);
+    t.ok(hasTestClass instanceof Array);
+    t.ok(hasDeepClass instanceof Array);
+    t.ok(view.getAll('bogus') instanceof Array);
     t.end();
 });
