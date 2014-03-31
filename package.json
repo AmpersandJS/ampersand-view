@@ -11,8 +11,8 @@
     "component-classes": "1.x.x",
     "domify": "1.x.x",
     "events-mixin": "1.x.x",
-    "underscore": "1.x.x",
-    "matches-selector": "1.x.x"
+    "matches-selector": "1.x.x",
+    "underscore": "1.x.x"
   },
   "devDependencies": {
     "ampersand-model": "~2.7.2",
@@ -39,16 +39,19 @@
     "start": "run-browser test/index.js"
   },
   "testling": {
-    "files": "test/index.js",
+    "files": "test/*.js",
     "browsers": [
       "ie/9..latest",
+      "firefox/17..latest",
+      "firefox/nightly",
       "chrome/22..latest",
-      "firefox/16..latest",
+      "chrome/canary",
+      "opera/12..latest",
+      "opera/next",
       "safari/5.1..latest",
-      "opera/11.0..latest",
-      "iphone/6..latest",
-      "ipad/6..latest",
-      "android-browser/latest"
+      "ipad/6.0..latest",
+      "iphone/6.0..latest",
+      "android-browser/4.2..latest"
     ]
   }
 }
