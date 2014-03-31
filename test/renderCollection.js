@@ -132,7 +132,7 @@ test('animateRemove', function (t) {
     var prevAnimateRemove = ItemView.prototype.animateRemove;
     ItemView.prototype.animateRemove = function () {
         var self = this;
-        this.el.classList.add('fadeOut');
+        this.el.className = 'fadeOut';
         setTimeout(function () {
             self.remove();
         }, 100);
