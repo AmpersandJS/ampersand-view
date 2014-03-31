@@ -19,7 +19,7 @@
     "ampersand-rest-collection": "~0.1.6",
     "precommit-hook": "0.x.x",
     "run-browser": "~1.2.0",
-    "tape": "~2.11.0"
+    "tape": "~2.12.1"
   },
   "homepage": "http://ampersandjs.com",
   "keywords": [
