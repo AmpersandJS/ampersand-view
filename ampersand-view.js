@@ -14,8 +14,9 @@ function View(options) {
     this.initialize.apply(this, arguments);
     if (this.autoRender && this.template) {
         this.render();
+    } else if (this.el) {
+        this.setElement(this.el);
     }
-    if (this.el) this.setElement(this.el);
 }
 
 // Cached regex to split keys for `delegate`.

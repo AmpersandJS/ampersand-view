@@ -2,6 +2,4 @@ node_modules
 human-model.min.js
 ampersand-view.bundle.js
 ampersand-view.min.js
-test.js
 idealUse.js
-test/*

@@ -8,8 +8,12 @@
     "white": true,
     "undef": true,
     "browser": true,
-    "node": true,
+    "node": false,
     "indent": 4,
     "strict": false,
-    "eqnull": true
+    "eqnull": true,
+    "predef": [
+        "require",
+        "module"
+    ]
 }

@@ -213,7 +213,7 @@ test('nested binding definitions', function (t) {
                 ['div', 'classList', 'selected']
             ]
         }
-    })
+    });
     var view = new View({model: model});
     var li = view.el;
     var div = li.firstChild;
@@ -319,4 +319,34 @@ test('getAll should include root element if matches', function (t) {
     t.ok(hasDeepClass instanceof Array);
     t.ok(view.getAll('bogus') instanceof Array);
     t.end();
+});
+
+test('focus/blur events should work in events hash. Issue #8', function (t) {
+    t.plan(2);
+    var View = AmpersandView.extend({
+        events: {
+            'focus #thing': 'handleFocus',
+            'blur #thing': 'handleBlur'
+        },
+        autoRender: true,
+        template: '<div><input id="thing"/></div></div>',
+        handleFocus: function () {
+            t.pass('focus called');
+        },
+        handleBlur: function () {
+            t.pass('blur called');
+            t.end();
+        }
+    });
+    var view = new View();
+    // should be able to do this without
+    // ending up with too many handlers
+    view.delegateEvents();
+    view.delegateEvents();
+    view.delegateEvents();
+
+    document.body.appendChild(view.el);
+    view.el.firstChild.focus();
+    view.el.firstChild.blur();
+    document.body.removeChild(view.el);
 });

@@ -115,7 +115,7 @@ test('sort', function (t) {
     view.render();
     view.collection.comparator = function (model) {
         return model.get('name');
-    }
+    };
     view.collection.sort();
     t.equal(view.numberRendered(), view.collection.length);
     var domIds = [];
