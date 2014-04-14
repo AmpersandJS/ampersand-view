@@ -350,3 +350,33 @@ test('focus/blur events should work in events hash. Issue #8', function (t) {
     view.el.firstChild.blur();
     document.body.removeChild(view.el);
 });
+
+test('should be able to specify sub-models in bindings hash', function () {
+    var Model1 = Model.extend({
+        props: {
+            name: 'string'
+        }
+    });
+    var Model2 = Model.extend({
+        props: {
+            wholeThing: 'string'
+        }
+    });
+    var View = AmpersandView.extend({
+        initialize: function () {
+            this.model1 = new Model1({name: 'eric'});
+            this.model2 = new Model2({wholeThing: 'as much as you can'});
+        },
+        bindings: {
+            model1: {
+                name: '[role=name]'
+            },
+            model2: {
+                wholeThing: '[role=thing]'
+            }
+        },
+        autoRender: true,
+        template: '<div><span role="name"></span><span role="whole-thing"></span></div>'
+    });
+    var view = new View({});
+});
