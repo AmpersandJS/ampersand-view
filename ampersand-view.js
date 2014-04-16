@@ -1,4 +1,4 @@
-var ampersandExtend = require('ampersand-class-extend');
+var State = require('ampersand-state');
 var Events = require('backbone-events-standalone');
 var domify = require('domify');
 var _ = require('underscore');
@@ -10,23 +10,48 @@ var matches = require('matches-selector');
 function View(options) {
     this.cid = _.uniqueId('view');
     options || (options = {});
-    _.extend(this, _.pick(options, viewOptions));
-    this.initialize.apply(this, arguments);
+    BaseState.call(this, options);
+    this.on('change:el', this.handleElementChange, this);
+    this.set(_.pick(options, viewOptions));
     if (this.autoRender && this.template) {
         this.render();
-    } else if (this.el) {
-        this.setElement(this.el);
     }
 }
+
+var BaseState = State.extend({
+    props: {
+        model: 'object',
+        el: 'object',
+        collection: 'object'
+    },
+    derived: {
+        rendered: {
+            deps: ['el'],
+            fn: function () {
+                return !!this.el;
+            }
+        },
+        hasData: {
+            deps: ['model'],
+            fn: function () {
+                return !!this.model;
+            }
+        }
+    }
+});
 
 // Cached regex to split keys for `delegate`.
 var delegateEventSplitter = /^(\S+)\s*(.*)$/;
 
 // List of view options to be merged as properties.
-var viewOptions = ['model', 'collection', 'el', 'autoRender'];
+var viewOptions = ['model', 'collection', 'el'];
+
+View.prototype = Object.create(BaseState.prototype, {
+    constructor: View
+});
 
 // Set up all inheritable properties and methods.
-_.extend(View.prototype, Events, {
+_.extend(View.prototype, {
 
     // Get an single element based on CSS selector scoped to this.el
     // if you pass an empty string it return `this.el`.
@@ -76,11 +101,10 @@ _.extend(View.prototype, Events, {
 
     // Change the view's element (`this.el` property), including event
     // re-delegation.
-    setElement: function (element, delegate) {
+    handleElementChange: function (element, delegate) {
         if (this.eventManager) this.eventManager.unbind();
-        this.el = element;
         this.eventManager = events(this.el, this);
-        if (delegate !== false) this.delegateEvents();
+        this.delegateEvents();
         return this;
     },
 
@@ -290,7 +314,7 @@ _.extend(View.prototype, Events, {
         var parent = this.el && this.el.parentNode;
         if (parent) parent.replaceChild(newDom, this.el);
         if (newDom[1]) throw new Error('Views can only have one root element.');
-        this.setElement(newDom, !this.renderedByParentView);
+        this.el = newDom;
     },
 
     // ## cacheElements
@@ -370,7 +394,7 @@ _.extend(View.prototype, Events, {
                     views.push(view);
                     view.parent = self;
                     view.renderedByParentView = true;
-                    view.render({containerEl: container});
+                    if (!view.rendered) view.render({containerEl: container});
                 }
                 // give the option for the view to choose where it's inserted if you so choose
                 if (!view.insertSelf) {
@@ -386,7 +410,9 @@ _.extend(View.prototype, Events, {
         function reRender() {
             // empty without using jQuery's empty (which removes jQuery handlers)
             container.innerHTML = '';
-            collection.each(addView);
+            collection.each(function (model) {
+                addView(model);
+            });
         }
         this.listenTo(collection, 'add', addView);
         this.listenTo(collection, 'remove', function (model) {
@@ -410,5 +436,5 @@ _.extend(View.prototype, Events, {
     }
 });
 
-View.extend = ampersandExtend;
+View.extend = BaseState.extend;
 module.exports = View;

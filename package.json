@@ -6,7 +6,7 @@
   "browser": "./ampersand-view.js",
   "bugs": "https://github.com/ampersandjs/ampersand-view/issues",
   "dependencies": {
-    "ampersand-class-extend": "0.x.x",
+    "ampersand-state": "^2.0.1",
     "backbone-events-standalone": "0.x.x",
     "component-classes": "1.x.x",
     "domify": "1.x.x",
@@ -17,9 +17,11 @@
   "devDependencies": {
     "ampersand-model": "~2.7.2",
     "ampersand-rest-collection": "~0.1.6",
+    "browserify": "~3.41.0",
     "precommit-hook": "0.x.x",
     "run-browser": "~1.2.0",
-    "tape": "~2.12.1"
+    "tape": "~2.12.1",
+    "tape-run": "~0.1.1"
   },
   "homepage": "http://ampersandjs.com",
   "keywords": [
@@ -36,7 +38,8 @@
   },
   "scripts": {
     "validate": "jshint .",
-    "start": "run-browser test/index.js"
+    "start": "run-browser test/index.js",
+    "test": "browserify test/index.js | tape-run"
   },
   "testling": {
     "files": "test/*.js",

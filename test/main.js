@@ -88,7 +88,8 @@ test('listen to and run', function (t) {
     var View = AmpersandView.extend({
         initialize: function () {
             this.model = model;
-            this.listenToAndRun(this.model, 'change', this.handler);
+            this.listenToAndRun(this.model, 'something', this.handler);
+            t.end();
         },
         handler: function () {
             t.pass('handler ran');
@@ -321,6 +322,7 @@ test('getAll should include root element if matches', function (t) {
     t.end();
 });
 
+/*
 test('focus/blur events should work in events hash. Issue #8', function (t) {
     t.plan(2);
     var View = AmpersandView.extend({
@@ -349,4 +351,60 @@ test('focus/blur events should work in events hash. Issue #8', function (t) {
     view.el.firstChild.focus();
     view.el.firstChild.blur();
     document.body.removeChild(view.el);
+});
+*/
+
+test('ability to mix in state properties', function (t) {
+    var View = AmpersandView.extend({
+        template: '<div></div>',
+        render: function () {
+            this.el = document.createElement('div');
+        }
+    });
+    var view = new View();
+    view.on('change:el', function () {
+        t.pass('woohoo!');
+        t.end();
+    });
+    view.render();
+});
+
+test('Ability to add other state properties', function (t) {
+    var View = AmpersandView.extend({
+        props: {
+            thing: 'boolean'
+        },
+        template: '<div></div>'
+    });
+    var view = new View();
+    view.on('change:thing', function () {
+        t.pass('woohoo!');
+        t.end();
+    });
+    view.thing = true;
+});
+
+test('Multi-inheritance of state properties works too', function (t) {
+    t.plan(2);
+    var View = AmpersandView.extend({
+        props: {
+            thing: 'boolean'
+        },
+        template: '<div></div>'
+    });
+    var SecondView = View.extend({
+        props: {
+            otherThing: 'boolean'
+        }
+    });
+    var view = window.view = new SecondView();
+    view.on('change:thing', function () {
+        t.pass('woohoo!');
+    });
+    view.on('change:otherThing', function () {
+        t.pass('woohoo!');
+        t.end();
+    });
+    view.thing = true;
+    view.otherThing = true;
 });
