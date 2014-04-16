@@ -6,7 +6,7 @@
   "browser": "./ampersand-view.js",
   "bugs": "https://github.com/ampersandjs/ampersand-view/issues",
   "dependencies": {
-    "ampersand-state": "^2.0.1",
+    "ampersand-state": "^3.0.0",
     "backbone-events-standalone": "0.x.x",
     "component-classes": "1.x.x",
     "domify": "1.x.x",

@@ -19,9 +19,22 @@ function View(options) {
 }
 
 var BaseState = State.extend({
+    dataTypes: {
+        element: {
+            set: function (newVal) {
+                return {
+                    val: newVal,
+                    type: newVal instanceof Element ? 'element' : typeof newVal
+                };
+            },
+            compare: function (el1, el2) {
+                return el1 === el2;
+            }
+        }
+    },
     props: {
         model: 'object',
-        el: 'object',
+        el: 'element',
         collection: 'object'
     },
     derived: {

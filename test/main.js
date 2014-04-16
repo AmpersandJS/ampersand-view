@@ -408,3 +408,24 @@ test('Multi-inheritance of state properties works too', function (t) {
     view.thing = true;
     view.otherThing = true;
 });
+
+test('Setting an `el` should only fire change if new instance of element', function (t) {
+    t.plan(1);
+    var View = AmpersandView.extend({
+        template: '<div></div>',
+        autoRender: true
+    });
+    var view = new View();
+    t.ok(view.el);
+    t.once('change:el', function () {
+        t.pass('this should fire');
+    });
+    t.el = document.createElement('div');
+    t.once('change:el', function () {
+        t.fail('this should *not* fire');
+    });
+    var el = t.el;
+    el.innerHTML = '<span></span>';
+    t.el = el;
+    t.end();
+});
