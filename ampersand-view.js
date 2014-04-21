@@ -1,4 +1,4 @@
-var ampersandExtend = require('ampersand-class-extend');
+var State = require('ampersand-state');
 var Events = require('backbone-events-standalone');
 var domify = require('domify');
 var _ = require('underscore');
@@ -10,23 +10,74 @@ var matches = require('matches-selector');
 function View(options) {
     this.cid = _.uniqueId('view');
     options || (options = {});
-    _.extend(this, _.pick(options, viewOptions));
-    this.initialize.apply(this, arguments);
+    BaseState.call(this, options);
+    this.on('change:el', this.handleElementChange, this);
+    this._parsedBindings = {};
+    this._initializeBindings();
+    this.set(_.pick(options, viewOptions));
     if (this.autoRender && this.template) {
         this.render();
-    } else if (this.el) {
-        this.setElement(this.el);
     }
 }
+
+var BaseState = State.extend({
+    dataTypes: {
+        element: {
+            set: function (newVal) {
+                return {
+                    val: newVal,
+                    type: newVal instanceof Element ? 'element' : typeof newVal
+                };
+            },
+            compare: function (el1, el2) {
+                return el1 === el2;
+            }
+        },
+        model: {
+            set: function (newVal) {
+                return {
+                    val: newVal,
+                    type: (newVal && newVal.initialize) ? 'model' : typeof newVal
+                };
+            },
+            compare: function (m1, m2) {
+                return m1 === m2;
+            }
+        }
+    },
+    props: {
+        model: 'model',
+        el: 'element',
+        collection: 'model'
+    },
+    derived: {
+        rendered: {
+            deps: ['el'],
+            fn: function () {
+                return !!this.el;
+            }
+        },
+        hasData: {
+            deps: ['model'],
+            fn: function () {
+                return !!this.model;
+            }
+        }
+    }
+});
 
 // Cached regex to split keys for `delegate`.
 var delegateEventSplitter = /^(\S+)\s*(.*)$/;
 
 // List of view options to be merged as properties.
-var viewOptions = ['model', 'collection', 'el', 'autoRender'];
+var viewOptions = ['model', 'collection', 'el'];
+
+View.prototype = Object.create(BaseState.prototype, {
+    constructor: View
+});
 
 // Set up all inheritable properties and methods.
-_.extend(View.prototype, Events, {
+_.extend(View.prototype, {
 
     // Get an single element based on CSS selector scoped to this.el
     // if you pass an empty string it return `this.el`.
@@ -46,6 +97,7 @@ _.extend(View.prototype, Events, {
     // if you pass an empty string it return `this.el`.
     getAll: function (selector) {
         var res = [];
+        if (!this.el) return res;
         if (selector === '') return [this.el];
         if (matches(this.el, selector)) res.push(this.el);
         return res.concat(Array.prototype.slice.call(this.el.querySelectorAll(selector)));
@@ -58,7 +110,7 @@ _.extend(View.prototype, Events, {
     // **render** is the core function that your view can override, its job is
     // to populate its element (`this.el`), with the appropriate HTML.
     render: function () {
-        this.renderAndBind({
+        this.renderWithTemplate({
             model: this.model,
             collection: this.collection
         });
@@ -68,19 +120,29 @@ _.extend(View.prototype, Events, {
     // Remove this view by taking the element out of the DOM, and removing any
     // applicable Backbone.Events listeners.
     remove: function () {
+        var parsedBindings = this._parsedBindings;
         if (this.el && this.el.parentNode) this.el.parentNode.removeChild(this.el);
         _.chain(this._subviews).flatten().invoke('remove');
         this.stopListening();
+        // TODO: Not sure if this is actually necessary.
+        // Just trying to de-reference this potentially large
+        // amount of generated functions to avoid memory leaks.
+        _.each(parsedBindings, function (properties, modelName) {
+            _.each(properties, function (value, key) {
+                delete parsedBindings[modelName][key];
+            });
+            delete parsedBindings[modelName];
+        });
         return this;
     },
 
     // Change the view's element (`this.el` property), including event
     // re-delegation.
-    setElement: function (element, delegate) {
+    handleElementChange: function (element, delegate) {
         if (this.eventManager) this.eventManager.unbind();
-        this.el = element;
         this.eventManager = events(this.el, this);
-        if (delegate !== false) this.delegateEvents();
+        this.delegateEvents();
+        this._applyAllBindings();
         return this;
     },
 
@@ -143,31 +205,60 @@ _.extend(View.prototype, Events, {
         return view;
     },
 
-    // ## registerBindings
-    // This makes it simple to bind model attributes to the DOM.
-    // To use it, add a declarative bindings to your view like this:
+    _applyAllBindings: function () {
+        if (!this.el) return;
+        var self = this;
+        _.each(this._parsedBindings, function (value, key) {
+            self._applyBindingsForModel(key);
+        });
+    },
+
+    _applyBindingsForModel: function (name) {
+        if (!this.el) return;
+        var self = this;
+        var model = this[name];
+        var bindings, fns;
+        if (!model) return;
+        bindings = this._parsedBindings[name];
+        if (!bindings) return;
+        _.each(bindings, function (fns, key) {
+            _.each(fns, function (fn) {
+                fn();
+            });
+        });
+    },
+
+    _applyBindingsForModelProperty: function (modelName, prop) {
+        if (!this.el) return;
+        var bindings = this._parsedBindings[modelName];
+        var fns = bindings && bindings[prop];
+        if (!fns) return;
+        _.each(fns, function (fn) {
+            fn();
+        });
+    },
+
+    // Builds array of functions grouped by model name and property
+    // that can be used to apply a binding rule based on model name
+    // and optionally property.
+    // The result of this parsing looks something like this:
     //
-    //   var ProfileView = HumanView.extend({
-    //     template: 'profile',
-    //     bindings: {
-    //       name: '#username',
-    //       active: ['.name', 'class'],
-    //       classList: ['item', 'classList'],
-    //       url: ['a.link', 'href']
-    //     },
-    //     render: function () {
-    //       this.renderAndBind();
-    //       return this;
-    //     }
-    //   });
+    // _parsedBindings: {
+    //   model: {
+    //     active: [
+    //       fn1,
+    //       fn2,
+    //       ..etc..
+    //     ]
+    //   }
+    // }
     //
-    registerBindings: function (model, bindings) {
+    // Then, we can use these as callbacks for change handlers or simply
+    // or call them all if the root element is replaced
+    _parseBindings: function (modelName, bindings) {
         var self = this;
         var processedBindings = {};
-        model || (model = this.model);
-        bindings || (bindings = this.bindings);
-        if (!model) throw new Error('Cannot register bindings without a model');
-        if (!bindings) return this;
+        var bindingsForModel = this._parsedBindings[modelName] || (this._parsedBindings[modelName] = {});
 
         // create new object with same keys but
         // with arrays for values.
@@ -211,61 +302,102 @@ _.extend(View.prototype, Events, {
             _.each(value, function (value) {
                 var selector = value[0];
                 var attr = value[1];
-                var name = value[2];
-                var fn = function () {
-                    _.each(self.getAll(selector), function (el) {
-                        var newVal = model.get(propertyName);
-                        var isBool = _.isBoolean(newVal);
-                        var prevVal;
-                        var classList;
+                var attributeName = value[2];
+                var fns = bindingsForModel[propertyName] || (bindingsForModel[propertyName] = []);
 
-                        // coerce new val to string if undefined
-                        if (!isBool && _.isUndefined(newVal)) newVal = '';
+                // handle text bindings
+                if (attr === 'text') {
+                    fns.push(function () {
+                        _.each(self.getAll(selector), function (el) {
+                            var model = self[modelName];
+                            var value = model && model.get(propertyName);
+                            el.textContent = value || '';
+                        });
+                    });
+                    return;
+                }
 
-                        if (attr === 'text') {
-                            el.textContent = newVal;
-                            return;
-                        }
-
-                        // handle special "class" case
-                        if (attr === 'class') {
-                            classList = classes(el);
-                            if (isBool) {
+                if (attr === 'class') {
+                    fns.push(function () {
+                        _.each(self.getAll(selector), function (el) {
+                            var model = self[modelName];
+                            var newVal = model && model.get(propertyName);
+                            var classList = classes(el);
+                            var prevVal;
+                            if (_.isBoolean(newVal)) {
                                 classList.toggle(propertyName, newVal);
                             } else {
                                 prevVal = model.previous(propertyName);
                                 if (prevVal) classList.remove(prevVal);
                                 if (newVal) classList.add(newVal);
                             }
-                            return;
-                        }
+                        });
+                    });
+                    return;
+                }
 
-                        // treat 'classList' attrs like
-                        // set/get for class attr
-                        if (attr === 'classList') attr = 'class';
+                // treat 'classList' attrs like
+                // set/get for class attr
+                if (attr === 'classList') {
+                    attr = 'class';
+                }
+
+                fns.push(function () {
+                    _.each(self.getAll(selector), function (el) {
+                        var model = self[modelName];
+                        var newVal = model && model.get(propertyName);
+
+                        // coerce undefined to empty string
+                        if (_.isUndefined(newVal)) newVal = '';
 
                         // now we can treat them all the same
-                        if (isBool && !newVal) {
-                            el.removeAttribute(name);
+                        if (_.isBoolean(newVal) && !newVal) {
+                            el.removeAttribute(attributeName);
                         } else {
-                            el.setAttribute(attr, name || newVal);
+                            el.setAttribute(attr, attributeName || newVal);
                         }
                     });
-                };
-                // bind/run it
-                self.listenToAndRun(model, 'change:' + propertyName, fn);
+                });
             });
         });
-
-        return this;
     },
 
-    // ## renderAndBind
-    // Commbo for renderWithTemplate and registering bindings
-    renderAndBind: function (context, templateArg) {
-        this.renderWithTemplate(context, templateArg);
-        if (this.model) this.registerBindings();
-        return this;
+    // this is  the replacement for method below potentially
+    _initializeBindings: function () {
+        if (!this.bindings) return;
+        var self = this;
+        var firstVal;
+
+        function register(name) {
+            var model = self[name];
+            var modelChangeHandler = function (view, newModel) {
+                var oldModel = self.previous(name);
+                if (oldModel) self.stopListening(oldModel);
+                // apply previuos bindings with new model present
+                self._applyBindingsForModel(name);
+                _.each(self._parsedBindings[name], function (thing, key) {
+                    self.listenTo(newModel, 'change:' + key, function (model, newVal) {
+                        self._applyBindingsForModelProperty(name, key);
+                    });
+                });
+            };
+            //
+            self.on('change:' + name, modelChangeHandler);
+            if (model) modelChangeHandler(self, model);
+        }
+
+        firstVal = _.values(this.bindings)[0];
+
+        // we can assume we're only binding on `model` here.
+        if (_.isArray(firstVal) || _.isString(firstVal)) {
+            self._parseBindings('model', this.bindings);
+            register('model');
+        } else {
+            _.each(this.bindings, function (value, key) {
+                self._parseBindings(key, value);
+                register(key);
+            });
+        }
     },
 
     // ## getByRole
@@ -290,7 +422,8 @@ _.extend(View.prototype, Events, {
         var parent = this.el && this.el.parentNode;
         if (parent) parent.replaceChild(newDom, this.el);
         if (newDom[1]) throw new Error('Views can only have one root element.');
-        this.setElement(newDom, !this.renderedByParentView);
+        this.el = newDom;
+        return this;
     },
 
     // ## cacheElements
@@ -370,7 +503,7 @@ _.extend(View.prototype, Events, {
                     views.push(view);
                     view.parent = self;
                     view.renderedByParentView = true;
-                    view.render({containerEl: container});
+                    if (!view.rendered) view.render({containerEl: container});
                 }
                 // give the option for the view to choose where it's inserted if you so choose
                 if (!view.insertSelf) {
@@ -386,7 +519,9 @@ _.extend(View.prototype, Events, {
         function reRender() {
             // empty without using jQuery's empty (which removes jQuery handlers)
             container.innerHTML = '';
-            collection.each(addView);
+            collection.each(function (model) {
+                addView(model);
+            });
         }
         this.listenTo(collection, 'add', addView);
         this.listenTo(collection, 'remove', function (model) {
@@ -410,5 +545,5 @@ _.extend(View.prototype, Events, {
     }
 });
 
-View.extend = ampersandExtend;
+View.extend = BaseState.extend;
 module.exports = View;

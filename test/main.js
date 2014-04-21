@@ -36,16 +36,15 @@ function getView(bindings, model) {
     var view = new View({
         model: model || new Model()
     });
-    return view.renderAndBind();
+    return view.renderWithTemplate();
 }
-
 
 test('registerSubview', function (t) {
     var removeCalled = 0;
     var SubView = AmpersandView.extend({
         template: '<div></div>',
         render: function () {
-            this.renderAndBind();
+            this.renderWithTemplate();
             this.el.className = 'subview';
         },
         remove: function () {
@@ -55,7 +54,7 @@ test('registerSubview', function (t) {
     var View = AmpersandView.extend({
         template: '<section><div id="parent"></div></section>',
         render: function () {
-            this.renderAndBind();
+            this.renderWithTemplate();
             // all of these should work
             this.renderSubview(new SubView(), this.get('#parent'));
             this.renderSubview(new SubView(), '#parent');
@@ -88,7 +87,8 @@ test('listen to and run', function (t) {
     var View = AmpersandView.extend({
         initialize: function () {
             this.model = model;
-            this.listenToAndRun(this.model, 'change', this.handler);
+            this.listenToAndRun(this.model, 'something', this.handler);
+            t.end();
         },
         handler: function () {
             t.pass('handler ran');
@@ -97,7 +97,7 @@ test('listen to and run', function (t) {
     var view = new View();
 });
 
-test('textBindings', function (t) {
+test('text bindings', function (t) {
     var view = getView({
         bindings: {
             name: 'span'
@@ -116,7 +116,7 @@ test('src bindings', function (t) {
         }
     });
     var img = view.get('img');
-    t.ok(!img.getAttribute('src'));
+    t.equal(img.getAttribute('src'), '');
     view.model.set('url', 'http://robohash.com/whammo');
     t.equal(img.getAttribute('src'), 'http://robohash.com/whammo');
     t.end();
@@ -228,20 +228,9 @@ test('nested binding definitions', function (t) {
 test('renderAndBind with no model', function (t) {
     var View = AmpersandView.extend({
         template: '<li><span></span><img/></li>',
-        textBindings: { name: 'span' }
     });
     var view = new View();
-    t.ok(view.renderAndBind()); //Should not throw error
-    t.end();
-});
-
-test('registerBindings with no model', function (t) {
-    var View = AmpersandView.extend({
-        template: '<li><span></span><img/></li>',
-        textBindings: { name: 'span' }
-    });
-    var view = new View();
-    t.throws(view.registerBindings, Error, 'Throws error on no model');
+    t.ok(view.renderWithTemplate()); //Should not throw error
     t.end();
 });
 
@@ -250,7 +239,7 @@ test('getByRole', function (t) {
         template: '<li role="list-item"><span role="username"></span><img role="user-avatar"/></li>'
     });
     var view = new View();
-    view.renderAndBind();
+    view.renderWithTemplate();
     var usenameEl = view.getByRole('username');
     t.ok(view.getByRole('username') instanceof Element, 'should find username element');
     t.ok(view.getByRole('user-avatar') instanceof Element, 'should find username');
@@ -264,7 +253,7 @@ test('throw on multiple root elements', function (t) {
         template: '<li></li><div></div>'
     });
     var view = new View();
-    t.throws(view.renderAndBind, Error, 'Throws error on multiple root elements');
+    t.throws(view.renderWithTemplate, Error, 'Throws error on multiple root elements');
     t.end();
 });
 
@@ -321,6 +310,7 @@ test('getAll should include root element if matches', function (t) {
     t.end();
 });
 
+/*
 test('focus/blur events should work in events hash. Issue #8', function (t) {
     t.plan(2);
     var View = AmpersandView.extend({
@@ -349,4 +339,175 @@ test('focus/blur events should work in events hash. Issue #8', function (t) {
     view.el.firstChild.focus();
     view.el.firstChild.blur();
     document.body.removeChild(view.el);
+});
+*/
+
+test('ability to mix in state properties', function (t) {
+    var View = AmpersandView.extend({
+        template: '<div></div>',
+        render: function () {
+            this.el = document.createElement('div');
+        }
+    });
+    var view = new View();
+    view.on('change:el', function () {
+        t.pass('woohoo!');
+        t.end();
+    });
+    view.render();
+});
+
+test('Ability to add other state properties', function (t) {
+    var View = AmpersandView.extend({
+        props: {
+            thing: 'boolean'
+        },
+        template: '<div></div>'
+    });
+    var view = new View();
+    view.on('change:thing', function () {
+        t.pass('woohoo!');
+        t.end();
+    });
+    view.thing = true;
+});
+
+test('Multi-inheritance of state properties works too', function (t) {
+    t.plan(2);
+    var View = AmpersandView.extend({
+        props: {
+            thing: 'boolean'
+        },
+        template: '<div></div>'
+    });
+    var SecondView = View.extend({
+        props: {
+            otherThing: 'boolean'
+        }
+    });
+    var view = window.view = new SecondView();
+    view.on('change:thing', function () {
+        t.pass('woohoo!');
+    });
+    view.on('change:otherThing', function () {
+        t.pass('woohoo!');
+        t.end();
+    });
+    view.thing = true;
+    view.otherThing = true;
+});
+
+test('Setting an `el` should only fire change if new instance of element', function (t) {
+    t.plan(1);
+    var View = AmpersandView.extend({
+        template: '<div></div>',
+        autoRender: true
+    });
+    var view = new View();
+    t.ok(view.el);
+    t.once('change:el', function () {
+        t.pass('this should fire');
+    });
+    t.el = document.createElement('div');
+    t.once('change:el', function () {
+        t.fail('this should *not* fire');
+    });
+    var el = t.el;
+    el.innerHTML = '<span></span>';
+    t.el = el;
+    t.end();
+});
+
+test('Should be able to bind multiple models in bindings hash', function (t) {
+    var Person = Model.extend({
+        props: {
+            name: 'string'
+        }
+    });
+    var View = AmpersandView.extend({
+        template: '<div><span id="model1"></span><span id="model2"></span></div>',
+        autoRender: true,
+        props: {
+            model1: 'model',
+            model2: 'model'
+        },
+        bindings: {
+            model1: {
+                name: '#model1'
+            },
+            model2: {
+                name: ['#model2', 'class']
+            }
+        }
+    });
+    var view = new View({
+        model1: new Person({name: 'henrik'}),
+        model2: new Person({name: 'larry'})
+    });
+    t.equal(view.el.firstChild.textContent, 'henrik');
+    t.equal(view.el.children[1].className, 'larry');
+    t.end();
+});
+
+test('Should be able to declare bindings first, before model is added', function (t) {
+    var Person = Model.extend({props: {name: 'string'}});
+    var View = AmpersandView.extend({
+        template: '<div></div>',
+        autoRender: true,
+        bindings: {
+            name: ''
+        }
+    });
+    var view = new View();
+    t.equal(view.el.textContent, '');
+    view.model = new Person({name: 'henrik'});
+    t.equal(view.el.textContent, 'henrik');
+    view.model.name = 'something new';
+    t.equal(view.el.textContent, 'something new');
+    t.end();
+});
+
+test('Should be able to swap out models and bindings should still work', function (t) {
+    var Person = Model.extend({props: {name: 'string'}});
+    var View = AmpersandView.extend({
+        template: '<div></div>',
+        autoRender: true,
+        bindings: {
+            name: ''
+        }
+    });
+    var p1 = new Person({name: 'first'});
+    var p2 = new Person({name: 'second'});
+    var view = new View();
+    t.equal(view.el.textContent, '');
+    view.model = p1;
+    t.equal(view.el.textContent, 'first');
+    view.model = p2;
+    t.equal(view.el.textContent, 'second');
+    // make sure it's not still bound to first
+    p1.name = 'third';
+    t.equal(view.el.textContent, 'second');
+    t.end();
+});
+
+test('Should be able to re-render and maintain bindings', function (t) {
+    var Person = Model.extend({props: {name: 'string'}});
+    var View = AmpersandView.extend({
+        template: '<div></div>',
+        autoRender: true,
+        bindings: {
+            name: ''
+        }
+    });
+    var p1 = new Person({name: 'first'});
+    var view = new View({model: p1});
+    var el1 = view.el;
+    t.equal(view.el.textContent, 'first');
+    view.renderWithTemplate();
+    var el2 = view.el;
+    t.ok(el1 !== el2, 'sanity check to make sure it\'s a new element');
+    t.equal(el2.textContent, 'first', 'new one should have the binding still');
+    p1.name = 'third';
+    t.equal(el2.textContent, 'third', 'new element should also get the change');
+    t.end();
 });

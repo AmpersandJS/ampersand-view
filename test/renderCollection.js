@@ -37,7 +37,7 @@ var ItemView = AmpersandView.extend({
         this.listenTo(this.model, 'change:something', function () {});
     },
     render: function () {
-        this.renderAndBind();
+        this.renderWithTemplate();
         this.el.id = '_' + this.model.id;
         return this;
     }
