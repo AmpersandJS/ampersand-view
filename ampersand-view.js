@@ -7,14 +7,16 @@ var classes = require('component-classes');
 var matches = require('matches-selector');
 
 
-function View(options) {
+function View(attrs) {
     this.cid = _.uniqueId('view');
-    options || (options = {});
-    BaseState.call(this, options);
+    attrs || (attrs = {});
+    attrs.init = false;
+    BaseState.call(this, attrs, {init: false});
     this.on('change:el', this.handleElementChange, this);
     this._parsedBindings = {};
     this._initializeBindings();
-    this.set(_.pick(options, viewOptions));
+    this.initialize.apply(this, arguments);
+    this.set(_.pick(attrs, viewOptions));
     if (this.autoRender && this.template) {
         this.render();
     }
