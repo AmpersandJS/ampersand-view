@@ -319,6 +319,17 @@ _.extend(View.prototype, {
                     return;
                 }
 
+                if (attr === 'html') {
+                    fns.push(function () {
+                        _.each(self.getAll(selector), function (el) {
+                            var model = self[modelName];
+                            var value = model && model.get(propertyName);
+                            el.innerHTML = value || '';
+                        });
+                    });
+                    return;
+                }
+
                 if (attr === 'class') {
                     fns.push(function () {
                         _.each(self.getAll(selector), function (el) {

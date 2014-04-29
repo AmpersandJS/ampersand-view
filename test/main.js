@@ -109,6 +109,18 @@ test('text bindings', function (t) {
     t.end();
 });
 
+test('html bindings', function (t) {
+    var view = getView({
+        bindings: {
+            name: ['', 'html']
+        }
+    });
+    t.equal(view.el.innerHTML, '');
+    view.model.set('name', '<span>henrik</span>');
+    t.equal(view.el.innerHTML, '<span>henrik</span>');
+    t.end();
+});
+
 test('src bindings', function (t) {
     var view = getView({
         bindings: {
