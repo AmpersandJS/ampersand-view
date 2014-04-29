@@ -135,7 +135,7 @@ _.extend(View.prototype, {
             });
             delete parsedBindings[modelName];
         });
-        this.trigger('remove');
+        this.trigger('remove', this);
         return this;
     },
 
