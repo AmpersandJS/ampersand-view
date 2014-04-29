@@ -523,3 +523,16 @@ test('Should be able to re-render and maintain bindings', function (t) {
     t.equal(el2.textContent, 'third', 'new element should also get the change');
     t.end();
 });
+
+test('trigger `remove` when view is removed', function (t) {
+    var View = AmpersandView.extend({
+        template: '<div></div>',
+        autoRender: true
+    });
+    var view = new View();
+    view.on('remove', function () {
+        t.pass('remove fired');
+        t.end();
+    });
+    view.remove();
+});
