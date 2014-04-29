@@ -339,7 +339,7 @@ _.extend(View.prototype, {
                             var classList = classes(el);
                             var prevVal;
                             if (_.isBoolean(newVal)) {
-                                classList.toggle(propertyName, newVal);
+                                classList.toggle(attributeName || propertyName, newVal);
                             } else {
                                 prevVal = model.previous(propertyName);
                                 if (prevVal) classList.remove(prevVal);
