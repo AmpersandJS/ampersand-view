@@ -189,6 +189,29 @@ test('class bindings', function (t) {
     t.end();
 });
 
+test('class bindings, with renamed class', function (t) {
+    var model = new Model();
+    model.set({
+        fireDanger: 'high',
+        active: true
+    });
+    var view = getView({
+        template: '<li></li>',
+        bindings: {
+            active: ['', 'class', 'active-class-name']
+        }
+    }, model);
+
+    var className = view.el.className;
+    t.ok(contains(className, 'active-class-name'));
+
+    model.set('active', false);
+    className = view.el.className;
+    t.ok(!contains(className, 'active-class-name'));
+
+    t.end();
+});
+
 test('classList bindings', function (t) {
     var model = new Model();
     model.set({
