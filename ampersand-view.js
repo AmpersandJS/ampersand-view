@@ -74,9 +74,7 @@ var delegateEventSplitter = /^(\S+)\s*(.*)$/;
 // List of view options to be merged as properties.
 var viewOptions = ['model', 'collection', 'el'];
 
-View.prototype = Object.create(BaseState.prototype, {
-    constructor: View
-});
+View.prototype = Object.create(BaseState.prototype);
 
 // Set up all inheritable properties and methods.
 _.extend(View.prototype, {
