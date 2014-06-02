@@ -430,7 +430,8 @@ _.extend(View.prototype, {
     renderWithTemplate: function (context, templateArg) {
         var template = templateArg || this.template;
         if (!template) throw new Error('Template string or function needed.');
-        var newDom = domify(_.isString(template) ? template : template(context || {model: this.model}));
+        var newDom = _.isString(template) ? template : template(context || {model: this.model});
+        if (_.isString(newDom)) newDom = domify(newDom);
         var parent = this.el && this.el.parentNode;
         if (parent) parent.replaceChild(newDom, this.el);
         if (newDom[1]) throw new Error('Views can only have one root element.');
