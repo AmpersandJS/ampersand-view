@@ -3,8 +3,9 @@ var Events = require('backbone-events-standalone');
 var domify = require('domify');
 var _ = require('underscore');
 var events = require('events-mixin');
-var classes = require('component-classes');
 var matches = require('matches-selector');
+var bindings = require('dom-bindings');
+var getPath = require('get-object-path');
 
 
 function View(attrs) {
@@ -13,7 +14,7 @@ function View(attrs) {
     attrs.init = false;
     BaseState.call(this, attrs, {init: false});
     this.on('change:el', this.handleElementChange, this);
-    this._parsedBindings = {};
+    this._parsedBindings = bindings(this.bindings);
     this._initializeBindings();
     this.initialize.apply(this, arguments);
     this.set(_.pick(attrs, viewOptions));
@@ -35,22 +36,22 @@ var BaseState = State.extend({
                 return el1 === el2;
             }
         },
-        model: {
+        collection: {
             set: function (newVal) {
                 return {
                     val: newVal,
-                    type: (newVal && newVal.initialize) ? 'model' : typeof newVal
+                    type: newVal && newVal.isCollection ? 'collection' : typeof newVal
                 };
             },
-            compare: function (m1, m2) {
-                return m1 === m2;
+            compare: function (currentVal, newVal) {
+                return currentVal === newVal;
             }
         }
     },
     props: {
-        model: 'model',
+        model: 'state',
         el: 'element',
-        collection: 'model'
+        collection: 'collection'
     },
     derived: {
         rendered: {
@@ -110,10 +111,7 @@ _.extend(View.prototype, {
     // **render** is the core function that your view can override, its job is
     // to populate its element (`this.el`), with the appropriate HTML.
     render: function () {
-        this.renderWithTemplate({
-            model: this.model,
-            collection: this.collection
-        });
+        this.renderWithTemplate(this);
         return this;
     },
 
@@ -143,7 +141,7 @@ _.extend(View.prototype, {
         if (this.eventManager) this.eventManager.unbind();
         this.eventManager = events(this.el, this);
         this.delegateEvents();
-        this._applyAllBindings();
+        this._applyBindingsForKey();
         return this;
     },
 
@@ -206,210 +204,25 @@ _.extend(View.prototype, {
         return view;
     },
 
-    _applyAllBindings: function () {
+    _applyBindingsForKey: function (name) {
         if (!this.el) return;
-        var self = this;
-        _.each(this._parsedBindings, function (value, key) {
-            self._applyBindingsForModel(key);
-        });
-    },
-
-    _applyBindingsForModel: function (name) {
-        if (!this.el) return;
-        var self = this;
-        var model = this[name];
-        var bindings, fns;
-        if (!model) return;
-        bindings = this._parsedBindings[name];
-        if (!bindings) return;
-        _.each(bindings, function (fns, key) {
-            _.each(fns, function (fn) {
-                fn();
-            });
-        });
-    },
-
-    _applyBindingsForModelProperty: function (modelName, prop) {
-        if (!this.el) return;
-        var bindings = this._parsedBindings[modelName];
-        var fns = bindings && bindings[prop];
-        if (!fns) return;
-        _.each(fns, function (fn) {
-            fn();
-        });
-    },
-
-    // Builds array of functions grouped by model name and property
-    // that can be used to apply a binding rule based on model name
-    // and optionally property.
-    // The result of this parsing looks something like this:
-    //
-    // _parsedBindings: {
-    //   model: {
-    //     active: [
-    //       fn1,
-    //       fn2,
-    //       ..etc..
-    //     ]
-    //   }
-    // }
-    //
-    // Then, we can use these as callbacks for change handlers or simply
-    // or call them all if the root element is replaced
-    _parseBindings: function (modelName, bindings) {
-        var self = this;
-        var processedBindings = {};
-        var bindingsForModel = this._parsedBindings[modelName] || (this._parsedBindings[modelName] = {});
-
-        // create new object with same keys but
-        // with arrays for values.
-        // This is where we'll push our results
-        _.each(_.keys(bindings), function (key) {
-            processedBindings[key] = [];
-        });
-
-        function addBinding(propName, definition) {
-            var processedDef = processedBindings[propName];
-            var selector, attr, name, split;
-            if (typeof definition === 'string') {
-                processedDef.push([definition, 'text']);
-            } else {
-                selector = definition[0];
-                attr = definition[1];
-                name = definition[2];
-                split = attr.split(' ');
-                if (split.length > 1) {
-                    _.each(split, function (attributeName) {
-                        processedDef.push([selector, attributeName, name]);
-                    });
-                } else {
-                    processedDef.push([selector, attr, name]);
-                }
-            }
+        var fns = this._parsedBindings.getGrouped(name);
+        var item;
+        for (item in fns) {
+            fns[item].forEach(function (fn) {
+                fn(this.el, getPath(this, item), _.last(item.split('.')));
+            }, this);
         }
-
-        // extract any nested bindings
-        _.each(bindings, function (value, propertyName) {
-            if (_.isArray(value) && _.isArray(value[0])) {
-                _.each(value, function (item) {
-                    addBinding(propertyName, item);
-                });
-            } else {
-                addBinding(propertyName, value);
-            }
-        });
-
-        _.each(processedBindings, function (value, propertyName) {
-            _.each(value, function (value) {
-                var selector = value[0];
-                var attr = value[1];
-                var attributeName = value[2];
-                var fns = bindingsForModel[propertyName] || (bindingsForModel[propertyName] = []);
-
-                // handle text bindings
-                if (attr === 'text') {
-                    fns.push(function () {
-                        _.each(self.getAll(selector), function (el) {
-                            var model = self[modelName];
-                            var value = model && model.get(propertyName);
-                            el.textContent = value || '';
-                        });
-                    });
-                    return;
-                }
-
-                if (attr === 'html') {
-                    fns.push(function () {
-                        _.each(self.getAll(selector), function (el) {
-                            var model = self[modelName];
-                            var value = model && model.get(propertyName);
-                            el.innerHTML = value || '';
-                        });
-                    });
-                    return;
-                }
-
-                if (attr === 'class') {
-                    fns.push(function () {
-                        _.each(self.getAll(selector), function (el) {
-                            var model = self[modelName];
-                            var newVal = model && model.get(propertyName);
-                            var classList = classes(el);
-                            var prevVal;
-                            if (_.isBoolean(newVal)) {
-                                classList.toggle(propertyName, newVal);
-                            } else {
-                                prevVal = model.previous(propertyName);
-                                if (prevVal) classList.remove(prevVal);
-                                if (newVal) classList.add(newVal);
-                            }
-                        });
-                    });
-                    return;
-                }
-
-                // treat 'classList' attrs like
-                // set/get for class attr
-                if (attr === 'classList') {
-                    attr = 'class';
-                }
-
-                fns.push(function () {
-                    _.each(self.getAll(selector), function (el) {
-                        var model = self[modelName];
-                        var newVal = model && model.get(propertyName);
-
-                        // coerce undefined to empty string
-                        if (_.isUndefined(newVal)) newVal = '';
-
-                        // now we can treat them all the same
-                        if (_.isBoolean(newVal) && !newVal) {
-                            el.removeAttribute(attributeName);
-                        } else {
-                            el.setAttribute(attr, attributeName || newVal);
-                        }
-                    });
-                });
-            });
-        });
     },
 
     // this is  the replacement for method below potentially
     _initializeBindings: function () {
         if (!this.bindings) return;
-        var self = this;
-        var firstVal;
-
-        function register(name) {
-            var model = self[name];
-            var modelChangeHandler = function (view, newModel) {
-                var oldModel = self.previous(name);
-                if (oldModel) self.stopListening(oldModel);
-                // apply previuos bindings with new model present
-                self._applyBindingsForModel(name);
-                _.each(self._parsedBindings[name], function (thing, key) {
-                    self.listenTo(newModel, 'change:' + key, function (model, newVal) {
-                        self._applyBindingsForModelProperty(name, key);
-                    });
-                });
-            };
-            //
-            self.on('change:' + name, modelChangeHandler);
-            if (model) modelChangeHandler(self, model);
-        }
-
-        firstVal = _.values(this.bindings)[0];
-
-        // we can assume we're only binding on `model` here.
-        if (_.isArray(firstVal) || _.isString(firstVal)) {
-            self._parseBindings('model', this.bindings);
-            register('model');
-        } else {
-            _.each(this.bindings, function (value, key) {
-                self._parseBindings(key, value);
-                register(key);
-            });
-        }
+        this.on('all', function (eventName) {
+            if (eventName.slice(0, 7) === 'change:') {
+                this._applyBindingsForKey(eventName.split(':')[1]);
+            }
+        }, this);
     },
 
     // ## getByRole
@@ -430,8 +243,7 @@ _.extend(View.prototype, {
     renderWithTemplate: function (context, templateArg) {
         var template = templateArg || this.template;
         if (!template) throw new Error('Template string or function needed.');
-        var newDom = _.isString(template) ? template : template(context || {model: this.model});
-        if (_.isString(newDom)) newDom = domify(newDom);
+        var newDom = domify(_.isString(template) ? template : template(context || this));
         var parent = this.el && this.el.parentNode;
         if (parent) parent.replaceChild(newDom, this.el);
         if (newDom[1]) throw new Error('Views can only have one root element.');

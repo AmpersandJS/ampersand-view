@@ -39,6 +39,7 @@ function getView(bindings, model) {
     return view.renderWithTemplate();
 }
 
+
 test('registerSubview', function (t) {
     var removeCalled = 0;
     var SubView = AmpersandView.extend({
@@ -100,7 +101,7 @@ test('listen to and run', function (t) {
 test('text bindings', function (t) {
     var view = getView({
         bindings: {
-            name: 'span'
+            'model.name': 'span'
         }
     });
     t.equal(view.get('span').textContent, '');
@@ -112,7 +113,10 @@ test('text bindings', function (t) {
 test('html bindings', function (t) {
     var view = getView({
         bindings: {
-            name: ['', 'html']
+            'model.name': {
+                type: 'innerHTML',
+                selector: ''
+            }
         }
     });
     t.equal(view.el.innerHTML, '');
@@ -124,7 +128,11 @@ test('html bindings', function (t) {
 test('src bindings', function (t) {
     var view = getView({
         bindings: {
-            url: ['img', 'src']
+            'model.url': {
+                type: 'attribute',
+                name: 'src',
+                selector: 'img'
+            }
         }
     });
     var img = view.get('img');
@@ -138,7 +146,11 @@ test('href bindings', function (t) {
     var view = getView({
         template: '<a href=""></a>',
         bindings: {
-            url: ['', 'href']
+            'model.url': {
+                type: 'attribute',
+                name: 'href',
+                selector: ''
+            }
         }
     });
     var el = view.el;
@@ -152,7 +164,11 @@ test('input bindings', function (t) {
     var view = getView({
         template: '<li><input/></li>',
         bindings: {
-            something: ['input', 'value']
+            'model.something': {
+                type: 'attribute',
+                selector: 'input',
+                name: 'value'
+            }
         }
     });
     var input = view.get('input');
@@ -171,8 +187,12 @@ test('class bindings', function (t) {
     var view = getView({
         template: '<li></li>',
         bindings: {
-            fireDanger: ['', 'class'],
-            active: ['', 'class']
+            'model.fireDanger': {
+                type: 'class'
+            },
+            'model.active': {
+                type: 'booleanClass'
+            }
         }
     }, model);
     var className = view.el.className;
@@ -189,40 +209,32 @@ test('class bindings', function (t) {
     t.end();
 });
 
-test('classList bindings', function (t) {
-    var model = new Model();
-    model.set({
-        fireDanger: 'high',
-        active: true,
-        something: 'cool'
-    });
-    var view = getView({
-        autoRender: true,
-        template: '<li class="something else perhaps"></li>',
-        bindings: {
-            classes: ['', 'classList']
-        }
-    }, model);
-    t.equal(view.el.className, 'cooltrue', 'wipes out existing classes');
-    t.end();
-});
-
 test('nested binding definitions', function (t) {
     var model = new Model();
     model.set({
-        fireDanger: 'high',
-        active: true,
-        something: 'cool'
+        active: true
     });
     var View = AmpersandView.extend({
         autoRender: true,
         template: '<li><div></div></li>',
         bindings: {
-            active: [
-                ['div', 'data-active data-something'],
-                ['div', 'text'],
-                ['', 'class'],
-                ['div', 'classList', 'selected']
+            'model.active': [
+                {
+                    type: 'booleanAttribute',
+                    name: 'data-active',
+                    selector: 'div'
+                },
+                {
+                    type: 'booleanAttribute',
+                    name: 'data-something',
+                    selector: 'div'
+                },
+                {
+                    selector: 'div'
+                },
+                {
+                    type: 'booleanClass'
+                }
             ]
         }
     });
@@ -233,7 +245,6 @@ test('nested binding definitions', function (t) {
     t.ok(div.hasAttribute('data-something'));
     t.equal(div.textContent, 'true');
     t.ok(contains(li.className, 'active'));
-    t.equal(div.className, 'selected');
     t.end();
 });
 
@@ -322,37 +333,36 @@ test('getAll should include root element if matches', function (t) {
     t.end();
 });
 
-/*
-test('focus/blur events should work in events hash. Issue #8', function (t) {
-    t.plan(2);
-    var View = AmpersandView.extend({
-        events: {
-            'focus #thing': 'handleFocus',
-            'blur #thing': 'handleBlur'
-        },
-        autoRender: true,
-        template: '<div><input id="thing"/></div></div>',
-        handleFocus: function () {
-            t.pass('focus called');
-        },
-        handleBlur: function () {
-            t.pass('blur called');
-            t.end();
-        }
-    });
-    var view = new View();
-    // should be able to do this without
-    // ending up with too many handlers
-    view.delegateEvents();
-    view.delegateEvents();
-    view.delegateEvents();
 
-    document.body.appendChild(view.el);
-    view.el.firstChild.focus();
-    view.el.firstChild.blur();
-    document.body.removeChild(view.el);
-});
-*/
+//test('focus/blur events should work in events hash. Issue #8', function (t) {
+//    t.plan(2);
+//    var View = AmpersandView.extend({
+//        events: {
+//            'focus #thing': 'handleFocus',
+//            'blur #thing': 'handleBlur'
+//        },
+//        autoRender: true,
+//        template: '<div><input id="thing"/></div></div>',
+//        handleFocus: function () {
+//            t.pass('focus called');
+//        },
+//        handleBlur: function () {
+//            t.pass('blur called');
+//            t.end();
+//        }
+//    });
+//    var view = new View();
+//    // should be able to do this without
+//    // ending up with too many handlers
+//    view.delegateEvents();
+//    view.delegateEvents();
+//    view.delegateEvents();
+//
+//    document.body.appendChild(view.el);
+//    view.el.firstChild.focus();
+//    view.el.firstChild.blur();
+//    document.body.removeChild(view.el);
+//});
 
 test('ability to mix in state properties', function (t) {
     var View = AmpersandView.extend({
@@ -444,11 +454,10 @@ test('Should be able to bind multiple models in bindings hash', function (t) {
             model2: 'model'
         },
         bindings: {
-            model1: {
-                name: '#model1'
-            },
-            model2: {
-                name: ['#model2', 'class']
+            'model1.name': '#model1',
+            'model2.name': {
+                type: 'class',
+                selector: '#model2'
             }
         }
     });
@@ -467,7 +476,7 @@ test('Should be able to declare bindings first, before model is added', function
         template: '<div></div>',
         autoRender: true,
         bindings: {
-            name: ''
+            'model.name': ''
         }
     });
     var view = new View();
@@ -485,7 +494,7 @@ test('Should be able to swap out models and bindings should still work', functio
         template: '<div></div>',
         autoRender: true,
         bindings: {
-            name: ''
+            'model.name': ''
         }
     });
     var p1 = new Person({name: 'first'});
@@ -508,7 +517,7 @@ test('Should be able to re-render and maintain bindings', function (t) {
         template: '<div></div>',
         autoRender: true,
         bindings: {
-            name: ''
+            'model.name': ''
         }
     });
     var p1 = new Person({name: 'first'});

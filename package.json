@@ -6,17 +6,20 @@
   "browser": "./ampersand-view.js",
   "bugs": "https://github.com/ampersandjs/ampersand-view/issues",
   "dependencies": {
-    "ampersand-state": "^4.0.0",
+    "ampersand-state": "~4.2.1",
     "backbone-events-standalone": "0.x.x",
     "component-classes": "1.x.x",
+    "dom-bindings": "~0.2.0",
     "domify": "1.x.x",
     "events-mixin": "^1.1.0",
+    "get-object-path": "0.0.2",
+    "key-tree-store": "~0.3.0",
     "matches-selector": "1.x.x",
     "underscore": "1.x.x"
   },
   "devDependencies": {
-    "ampersand-model": "~2.7.2",
-    "ampersand-rest-collection": "~0.1.6",
+    "ampersand-model": "~2.10.6",
+    "ampersand-rest-collection": "^1.0.3",
     "browserify": "~3.41.0",
     "precommit-hook": "0.x.x",
     "run-browser": "~1.2.0",

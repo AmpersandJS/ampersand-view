@@ -40,6 +40,11 @@ var MyView = AmpersandView.extend({
 
 ### Declarative Bindings
 
+
+Full description of the available binding types can be found here: https://github.com/henrikjoreteg/dom-bindings#binding-types
+
+A few examples below:
+
 ```javascript
 var MyView = AmpersandView.extend({
     // set a `template` property of your view. This can either be
@@ -52,44 +57,56 @@ var MyView = AmpersandView.extend({
         // the value is a selector, by default a text binding is assumed
         // this would keep the model's `name` attribute in the span, even
         // if it's changed.
-        name: '.userName',
+        'model.name': '.userName',
         
-        // If the `active` property is a boolean the class 
-        // will be added/removed based on the boolean property.
-        // But, if the `active` property were a string, the previous
-        // value would be removed and the new one added from the class
-        // list without affecting other classes that may alreay be there.
-        active: ['li', 'class'],
+        // You can add/remove a class based on a boolean property.
+        // Based on the truthiness of the `active` property an
+        // "active" class will be added or removed from element(s)
+        // that match the selector. without affecting other classes 
+        // that may alreay be there.
+        'model.active': {
+            type: 'booleanClass',
+            selector: 'li',
+            // you can optionally specify a name like this
+            // name: 'is-active'
+            // or even a true/false case like this:
+            // yes: 'is-active',
+            // no: 'is-not-active'
+            // if no name is given it will use the property name
+            // by default.
+        },
         
-        // If you've got a boolean property, you can also specify a third
-        // item in the array. It will be used to determine what the class
-        // is that will be toggled. This way your property name can be 
-        // different than the class. 
-        isActive: ['li', 'class', 'active'], // will toggle the 'active' class
-        
-        // If you prefer, you *can* also bind to the whole class list. Which
-        // will wipe out all existing classes.
-        myClasses: ['li', 'classList'],
-
         // As you might have guessed, you can bind to any attribute you want
-        userUrl: ['a', 'href'],
+        'model.userUrl': {
+            type: 'attribute',
+            name: 'href',
+            selector: 'a'
+        },
 
         // This works for boolean attributes. The following would add and remove 
         // the entire `checked` attribute (assuming the property value was a boolean)
-        selected: ['input', 'checked']
+        selected: {
+            type: 'booleanAttribute',
+            selector: 'input',
+            name: 'checked'
+        },
 
-        // If you really need to, you can even bind the same attribute to different
-        // types of things with different options. If "superActive" was a string, the following would put
-        // the text value of it, inside `.userName` and add it as a class on the `li`.
+        // If you really need to, you can have as many bindings as you want for the same
+        // property, just pass an array of binding definitions:
         superActive: [
-            // the *only* restriction here is that if you pass an array of binding
-            // declarations for a single property, each sub-item must also be an
-            // array.
-            ['.userName'],
-            ['li', 'class'],
-            // you can even get crazy... this would bind both
-            // data attributes to both the li and .username elements
-            ['li, .username', 'data-attribute1 data-attribute2'],
+            {
+                type: 'text',
+                selector: '.username'
+            },
+            {
+                type: 'class',
+                selector: 'li'
+            },
+            // btw, also works for selectors that match multiple elements
+            {
+                type: 'booleanAttribute',
+                selector: '.username, .thing'
+            }
         ]        
     },
     render: function () {
