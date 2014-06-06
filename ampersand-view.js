@@ -247,7 +247,7 @@ _.extend(View.prototype, {
         function action() {
             if (this.el && (!opts.waitFor || (opts.waitFor && getPath(this, opts.waitFor)))) {
                 var el = this.get(opts.selector);
-                this[name] = opts.prepareView(el);
+                this[name] = opts.prepareView.call(this, el);
                 this[name].render();
                 this.off('change', action);
             }
