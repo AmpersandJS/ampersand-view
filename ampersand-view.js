@@ -16,6 +16,7 @@ function View(attrs) {
     this.on('change:el', this.handleElementChange, this);
     this._parsedBindings = bindings(this.bindings);
     this._initializeBindings();
+    this._initializeSubviews();
     this.initialize.apply(this, arguments);
     this.set(_.pick(attrs, viewOptions));
     if (this.autoRender && this.template) {
@@ -215,7 +216,6 @@ _.extend(View.prototype, {
         }
     },
 
-    // this is  the replacement for method below potentially
     _initializeBindings: function () {
         if (!this.bindings) return;
         this.on('all', function (eventName) {
@@ -223,6 +223,36 @@ _.extend(View.prototype, {
                 this._applyBindingsForKey(eventName.split(':')[1]);
             }
         }, this);
+    },
+
+    _initializeSubviews: function () {
+        if (!this.subviews) return;
+        for (var item in this.subviews) {
+            this._parseSubview(this.subviews[item]);
+        }
+    },
+
+    _parseSubview: function (subview) {
+        var self = this;
+        var opts = {
+            selector: subview.container || '[role=' + subview.role + ']',
+            waitFor: subview.waitFor || '',
+            prepareView: subview.prepareView || function (el) {
+                return new subview.constructor({
+                    el: el,
+                    parent: self
+                });
+            }
+        };
+        function action() {
+            if (this.el && (!opts.waitFor || (opts.waitFor && getPath(this, opts.waitFor)))) {
+                var el = this.get(opts.selector);
+                this[name] = opts.prepareView(el);
+                this[name].render();
+                this.off('change', action);
+            }
+        }
+        this.on('change', action, this);
     },
 
     // ## getByRole

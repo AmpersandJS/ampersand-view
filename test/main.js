@@ -39,7 +39,6 @@ function getView(bindings, model) {
     return view.renderWithTemplate();
 }
 
-
 test('registerSubview', function (t) {
     var removeCalled = 0;
     var SubView = AmpersandView.extend({
@@ -544,4 +543,63 @@ test('trigger `remove` when view is removed', function (t) {
         t.end();
     });
     view.remove();
+});
+
+test('declarative subViews basics', function (t) {
+    var Sub = AmpersandView.extend({
+        template: '<span></span>'
+    });
+
+    var View = AmpersandView.extend({
+        template: '<div><div class="container"></div></div>',
+        autoRender: true,
+        subviews: {
+            sub1: {
+                container: '.container',
+                constructor: Sub
+            }
+        }
+    });
+    var view = new View();
+
+    t.equal(view.el.innerHTML, '<span></span>');
+
+    t.end();
+});
+
+test('make sure subviews dont fire until their `waitFor` is done', function (t) {
+    var Sub = AmpersandView.extend({
+        template: '<span>yes</span>'
+    });
+
+    var View = AmpersandView.extend({
+        template: '<div><span class="container"></span><span role="sub"></span></div>',
+        autoRender: true,
+        props: {
+            model2: 'state'
+        },
+        subviews: {
+            sub1: {
+                waitFor: 'model',
+                container: '.container',
+                constructor: Sub
+            },
+            sub2: {
+                waitFor: 'model2',
+                role: 'sub',
+                constructor: Sub
+            }
+        }
+    });
+    var view = new View();
+    t.equal(view._events.change.length, 2);
+    t.equal(view.el.outerHTML, '<div><span class="container"></span><span role="sub"></span></div>');
+    view.model = new Model();
+    t.equal(view._events.change.length, 1);
+    t.equal(view.el.outerHTML, '<div><span>yes</span><span role="sub"></span></div>');
+    view.model2 = new Model();
+    t.equal(view.el.outerHTML, '<div><span>yes</span><span>yes</span></div>');
+    t.notOk(view._events.change);
+
+    t.end();
 });
