@@ -225,6 +225,8 @@ _.extend(View.prototype, {
         }, this);
     },
 
+    // ## _initializeSubviews
+    // this is called at setup and grabs declared subviews
     _initializeSubviews: function () {
         if (!this.subviews) return;
         for (var item in this.subviews) {
@@ -232,6 +234,9 @@ _.extend(View.prototype, {
         }
     },
 
+    // ## _parseSubview
+    // helper for parsing out the subview declaration and registering
+    // the `waitFor` if need be.
     _parseSubview: function (subview) {
         var self = this;
         var opts = {
@@ -245,13 +250,17 @@ _.extend(View.prototype, {
             }
         };
         function action() {
-            if (this.el && (!opts.waitFor || (opts.waitFor && getPath(this, opts.waitFor)))) {
-                var el = this.get(opts.selector);
-                this[name] = opts.prepareView.call(this, el);
-                this[name].render();
+            var el, subview;
+            // if not rendered or we can't find our element, stop here.
+            if (!this.el || !(el = this.get(opts.selector))) return;
+            if (!opts.waitFor || getPath(this, opts.waitFor)) {
+                subview = this[name] = opts.prepareView.call(this, el);
+                subview.render();
+                this.registerSubview(subview);
                 this.off('change', action);
             }
         }
+        // we listen for main `change` items
         this.on('change', action, this);
     },
 
