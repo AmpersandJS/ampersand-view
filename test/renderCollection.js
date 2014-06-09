@@ -188,6 +188,7 @@ test('child view can choose to insert self', function (t) {
     ItemView.prototype.insertSelf = true;
     ItemView.prototype.render = function (extraInfo) {
         t.ok(extraInfo.containerEl);
+        this.renderWithTemplate();
     };
 
     view.render();

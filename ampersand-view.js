@@ -1,5 +1,6 @@
 var State = require('ampersand-state');
 var Events = require('backbone-events-standalone');
+var CollectionView = require('ampersand-collection-view');
 var domify = require('domify');
 var _ = require('underscore');
 var events = require('events-mixin');
@@ -338,74 +339,15 @@ _.extend(View.prototype, {
     // Just pass it the collection, and the view to use for the items in the
     // collection.
     renderCollection: function (collection, ViewClass, container, opts) {
-        var self = this;
-        var views = [];
-        var options = _.defaults(opts || {}, {
-            filter: null,
-            viewOptions: {},
-            reverse: false
-        });
-        container = (typeof container === 'string') ? this.get(container) : container;
-
-        // store a reference on the view to it's collection views
-        // so we can clean up memory references when we're done
-        this.registerSubview(views);
-
-        function getViewBy(model) {
-            return _.find(views, function (view) {
-                return model === view.model;
-            });
-        }
-
-        function addView(model, collection, opts) {
-            var matches = options.filter ? options.filter(model) : true;
-            var view;
-            if (matches) {
-                view = getViewBy(model);
-                if (!view) {
-                    view = new ViewClass(_({model: model, collection: collection}).extend(options.viewOptions));
-                    views.push(view);
-                    view.parent = self;
-                    view.renderedByParentView = true;
-                    if (!view.rendered) view.render({containerEl: container});
-                }
-                // give the option for the view to choose where it's inserted if you so choose
-                if (!view.insertSelf) {
-                    if (options.reverse) {
-                        container.insertBefore(view.el, container.firstChild);
-                    } else {
-                        container.appendChild(view.el);
-                    }
-                }
-                view.delegateEvents();
-            }
-        }
-        function reRender() {
-            // empty without using jQuery's empty (which removes jQuery handlers)
-            container.innerHTML = '';
-            collection.each(function (model) {
-                addView(model);
-            });
-        }
-        this.listenTo(collection, 'add', addView);
-        this.listenTo(collection, 'remove', function (model) {
-            var index = views.indexOf(getViewBy(model));
-            if (index !== -1) {
-                // remove it if we found it calling animateRemove
-                // to give user option of gracefully destroying.
-                views.splice(index, 1)[0].animateRemove();
-            }
-        });
-        this.listenTo(collection, 'move sort', reRender);
-        this.listenTo(collection, 'refresh reset', function () {
-            // empty array calling `remove` on each
-            // without re-defining `views`
-            while (views.length) {
-                views.pop().remove();
-            }
-            reRender();
-        });
-        reRender();
+        var containerEl = (typeof container === 'string') ? this.get(container) : container;
+        var config = _.extend({
+            collection: collection,
+            el: containerEl,
+            view: ViewClass
+        }, opts);
+        var collectionView = new CollectionView(config);
+        collectionView.render();
+        this.registerSubview(collectionView);
     }
 });
 

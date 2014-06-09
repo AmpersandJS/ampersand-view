@@ -1,2 +1,2 @@
 require('./main');
-//require('./renderCollection');
+require('./renderCollection');

@@ -15,7 +15,8 @@
     "get-object-path": "0.0.2",
     "key-tree-store": "~0.3.0",
     "matches-selector": "1.x.x",
-    "underscore": "1.x.x"
+    "underscore": "1.x.x",
+    "ampersand-collection-view": "~1.0.0"
   },
   "devDependencies": {
     "ampersand-model": "~2.10.6",
@@ -41,7 +42,8 @@
   },
   "scripts": {
     "validate": "jshint .",
-    "start": "run-browser test/index.js"
+    "start": "run-browser test/index.js",
+    "test": "browserify test/index.js | tape-run"
   },
   "testling": {
     "files": "test/*.js",
