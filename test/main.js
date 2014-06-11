@@ -603,3 +603,16 @@ test('make sure subviews dont fire until their `waitFor` is done', function (t) 
 
     t.end();
 });
+
+test('make sure template can return a dom node', function (t) {
+    var Sub = AmpersandView.extend({
+        template: function () {
+            return document.createElement('div');
+        }
+    });
+
+    var view = new Sub();
+    view.render();
+
+    t.end();
+});
