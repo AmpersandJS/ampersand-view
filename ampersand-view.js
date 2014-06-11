@@ -12,8 +12,9 @@ var getPath = require('get-object-path');
 function View(attrs) {
     this.cid = _.uniqueId('view');
     attrs || (attrs = {});
-    attrs.init = false;
-    BaseState.call(this, attrs, {init: false});
+    var parent = attrs.parent;
+    delete attrs.parent;
+    BaseState.call(this, attrs, {init: false, parent: parent});
     this.on('change:el', this.handleElementChange, this);
     this._parsedBindings = bindings(this.bindings);
     this._initializeBindings();
