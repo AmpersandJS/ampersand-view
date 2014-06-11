@@ -232,14 +232,14 @@ _.extend(View.prototype, {
     _initializeSubviews: function () {
         if (!this.subviews) return;
         for (var item in this.subviews) {
-            this._parseSubview(this.subviews[item]);
+            this._parseSubview(this.subviews[item], item);
         }
     },
 
     // ## _parseSubview
     // helper for parsing out the subview declaration and registering
     // the `waitFor` if need be.
-    _parseSubview: function (subview) {
+    _parseSubview: function (subview, name) {
         var self = this;
         var opts = {
             selector: subview.container || '[role=' + subview.role + ']',
