@@ -465,7 +465,7 @@ test('Should be able to bind multiple models in bindings hash', function (t) {
         model2: new Person({name: 'larry'})
     });
     t.equal(view.el.firstChild.textContent, 'henrik');
-    t.equal(view.el.children[1].className, 'larry');
+    t.equal(view.el.children[1].className.trim(), 'larry');
     t.end();
 });
 
