@@ -15,7 +15,7 @@ function View(attrs) {
     var parent = attrs.parent;
     delete attrs.parent;
     BaseState.call(this, attrs, {init: false, parent: parent});
-    this.on('change:el', this.handleElementChange, this);
+    this.on('change:el', this._handleElementChange, this);
     this._parsedBindings = bindings(this.bindings);
     this._initializeBindings();
     this._initializeSubviews();
@@ -107,6 +107,14 @@ _.extend(View.prototype, {
         return res.concat(Array.prototype.slice.call(this.el.querySelectorAll(selector)));
     },
 
+    // ## getByRole
+    // Gets an element within a view by its role attribute.
+    // Also works for the root `el` if it has the right role.
+    getByRole: function (role) {
+        return this.get('[role="' + role + '"]') ||
+            ((this.el.getAttribute('role') === role && this.el) || undefined);
+    },
+
     // Initialize is an empty function by default. Override it with your own
     // initialization logic.
     initialize: function () {},
@@ -140,7 +148,7 @@ _.extend(View.prototype, {
 
     // Change the view's element (`this.el` property), including event
     // re-delegation.
-    handleElementChange: function (element, delegate) {
+    _handleElementChange: function (element, delegate) {
         if (this.eventManager) this.eventManager.unbind();
         this.eventManager = events(this.el, this);
         this.delegateEvents();
@@ -196,7 +204,7 @@ _.extend(View.prototype, {
     // ## renderSubview
     // Pass it a view instance and a container element
     // to render it in. It's `remove` method will be called
-    // when theh parent view is destroyed.
+    // when the parent view is destroyed.
     renderSubview: function (view, container) {
         if (typeof container === 'string') {
             container = this.get(container);
@@ -266,13 +274,6 @@ _.extend(View.prototype, {
         this.on('change', action, this);
     },
 
-    // ## getByRole
-    // Gets an element within a view by its role attribute.
-    // Also works for the root `el` if it has the right role.
-    getByRole: function (role) {
-        return this.get('[role="' + role + '"]') ||
-            ((this.el.getAttribute('role') === role && this.el) || undefined);
-    },
 
     // Shortcut for doing everything we need to do to
     // render and fully replace current root element.
