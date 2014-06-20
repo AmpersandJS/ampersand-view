@@ -15,6 +15,7 @@ Part of the [Ampersand.js toolkit](http://ampersandjs.com) for building clientsi
 <!-- endhide -->
 
 <!-- starthide -->
+
 ## Browser support
 
 [![browser support](https://ci.testling.com/ampersandjs/ampersand-view.png)
@@ -28,6 +29,7 @@ npm install ampersand-view
 ```
 
 <!-- starthide -->
+
 ## Usage
 
 ### Basics
@@ -163,21 +165,52 @@ module.exports = AmpersandView.extend({
 ```
 
 **registerSubview also, stores a reference to the parent view on the subview as `.parent`**
+
 <!-- endhide -->
 
 
 ## API Reference
 
-Note that this is a fork of Backbone's view so most of the public methods/properties here still exist: http://backbonejs.org/#View
+Note that this is a fork of Backbone's view so most of the public methods/properties here still exist: [http://backbonejs.org/#View](http://backbonejs.org/#View).
 
-### extend `AmpersandView.extend(properties)`
+### extend `AmpersandView.extend([properties])`
+
+Get started with views by creating a custom view class. Ampersand views have a sane default render function, which you don't necessarily have to override, but you probably will wish to specify a [`template`](#ampersand-view-template), your declarative [event handlers](#ampersand-view-events) and your [view bindings](#ampersand-view-bindings).
+
+```javascript
+var PersonRowView = AmpersandView.extend({
+    template: "<li> <span role='name'></span> <span role='age'></span> <a role='edit'>edit</a> </li>",
+
+    events: {
+        "click [role=edit]": "edit"
+    },
+
+    bindings: {
+        "model.name": {
+            type: 'text',
+            role: 'name'
+        },
+
+        "model.age": {
+            type: 'text',
+            role: 'age'
+        }
+    },
+
+    edit: funciton () {
+        //...
+    }
+});
+```
 
 
 ### template `AmpersandView.extend({ template: "<div><input></div>" })`
 
-The `.template` is a property for the view prototype. It should either be a string of HTML or a function that returns a string of HTML/DOM element. It isn't required, but it is used as a default for calling `renderWithTemplate`.
+The `.template` is a property for the view prototype. It should either be a string of HTML or a function that returns a string of HTML or a DOM element. It isn't required, but it is used as a default for calling `renderWithTemplate`.
 
-The important thing to note is that *the returned string/HTML should not have more than one root element*. This is because the view code assumes that it has one and only one root element that becomes the `.el` property of the instantiated view.
+The important thing to note is that __*the returned string/HTML should not have more than one root element*__. This is because the view code assumes that it has one and only one root element that becomes the `.el` property of the instantiated view.
+
+For more information about creating, and compiling templates, [read the templating guide](http://ampersandjs.com/learn/templates).
 
 ### autoRender `AmpersandView.extend({ autoRender: true })`
 
@@ -204,11 +237,122 @@ module.exports = AmpersandView.extend({
 this.renderWithTemplate(this, this.template);
 ```
 
-### events
+### events `AmpersandView.extend({ events: { /* ...events hash... */ } })`
+
+The events hash allows you to specify declarative callbacks for DOM events within the view. This is much clearer and less complex than calling `$('selector').on('click', ...)` or `el.addEventListener('click', ...)` everywhere.
+
+* Events are written in the format `{"event selector": "callback"}`.
+* The callback may either be the name of a method on the view, or an actual function.
+* Omitting the `selector` causes the event to be bound to the view's root element (`this.el`).
+* The events property may also be defined as a function that returns an *events* hash, to make it easier to programmatically define your events, as well as inherit them from parent views.
+
+Using the events hash has a number of benefits over manually binding events during the `render` call:
+
+* All attached callbacks are bound to the view before being handed off to the event handler, so when the callbacks are invoked, `this` continues to refer to the view object.
+* All event handlers are delegated to the view's root el, meaning elements changed when the view is updated don't need to be unbound and rebound.
+* All events handlers are cleanly remvoed when the view is [removed](#ampersand-view-remove).
+
+```
+var DocumentView = AmpersandView.extend({
+
+  events: {
+    //bind to a double click on the root element
+    "dblclick"                : "open",
+
+    //bind to a click on an element with both 'icon' and 'doc' classes
+    "click .icon.doc"         : "select",
+
+    "contextmenu .icon.doc"   : "showMenu",
+    "click .show_notes"       : "toggleNotes",
+    "click .title .lock"      : "editAccessLevel",
+    "mouseover .title .date"  : "showTooltip"
+  },
+
+  open: function() {
+    window.open(this.model.viewer_url);
+  },
+
+  select: function() {
+    this.model.selected = true;
+  },
+
+  //...
+
+});
+```
 
 ### bindings
 
-### el
+The bindings hash gives you a declarative way of specifying which elements in your view should be updated when the view's model is changed.
+
+For a full reference of available binding types see: [henrikjoreteg/dom-bindings](https://github.com/henrikjoreteg/dom-bindings#binding-types).
+
+For example, with a model like this:
+
+```javascript
+var Person = AmpersandModel.extend({
+    props: {
+        name: 'string',
+        age: 'number',
+        avatarURL: 'string'
+    },
+    session: {
+        selected: 'boolean'
+    }
+});
+```
+
+and a template like this:
+
+```html
+<!-- templates.person -->
+<li>
+  <img role="avatar">
+  <span role="name"></span>
+  age: <span role="age"></span>
+</li>
+```
+
+you might have a binding hash in your view like this:
+
+```javascript
+var PersonView = AmpersandView.extend({
+    templates: templates.person,
+
+    bindings: {
+        'model.name': {
+            type: 'text',
+            role: 'name'
+        },
+
+        'model.age': '[role=age]', //shorthand of the above
+
+        'model.avatarURL': {
+            type: 'attribute',
+            name: 'src',
+            role: 'avatar'
+        },
+
+        //no selector, selects the root element
+        'model.selected': {
+            type: 'booleanClass',
+            name: 'active' //class to toggle
+        }
+    }
+});
+```
+
+### el `view.el`
+
+All rendered views have a single DOM node which they manage, which is acessible from the `.el` property on the view. Allowing you to insert it into the DOM from the parent context.
+
+```
+var view = new PersonView({ model: me });
+view.render();
+
+document.querySelector('#viewContainer').appendChild(view.el);
+```
+
 
 ### constructor `new AmpersandView([options])`
 
@@ -416,6 +560,7 @@ var view = AmpersandView.extend({
 
 Runs a [`querySelectorAll`](https://developer.mozilla.org/en-US/docs/Web/API/document.querySelectorAll) scoped within the view's current element (`view.el`), returning all the matching elements in the dom-tree.
 
+
 ### cacheElements `view.cacheElements(hash)`
 A shortcut for adding reference to specific elements within your view for access later. This is avoids excessive DOM queries and makes it easier to update your view if your template changes.
 
@@ -444,13 +589,35 @@ Then later you can access elements by reference like so: `this.pages`, or `this.
 ### listenToAndRun `view.listenToAndRun(object, eventsString, callback)`
 Shortcut for registering a listener for a model and also triggering it right away.
 
+
 ### remove `view.remove()`
 
-### animateRemove `view.animateRemove()`
+Removes a view from the DOM, and calls `stopListening` to remove any bound events that the view has `listenTo`'d.
+
 
 ### delegateEvents `view.delegateEvents([events])`
 
+Creates delegated DOM event handlers for view elements on `this.el`. If `events` is omitted, will use the `events` property on the view.
+
+Generally you won't need to call `delegateEvents` yourself, if you define an `event` hash when extending AmpersandView, `delegateEvents` will be called for you when the view is initialize.
+
+Events is a hash of  `{"event selector": "callback"}*`
+
+Will unbind existing events by calling `undelegateEvents` before binding new ones when called. Allowing you to switch events for different view contexts, or different views bound to the same element.
+
+```javascript
+{
+  'mousedown .title':  'edit',
+  'click .button':     'save',
+  'click .open':       function (e) { ... }
+}
+```
+
 ### undelegateEvents `view.undelegateEvents()`
+
+Clears all callbacks previously bound to the view with `delegateEvents`.
+You usually don't need to use this, but may wish to if you have multiple views attached to the same DOM element.
+
 
 ## Changelog
 
