@@ -28,147 +28,6 @@ Part of the [Ampersand.js toolkit](http://ampersandjs.com) for building clientsi
 npm install ampersand-view
 ```
 
-<!-- starthide -->
-
-## Usage
-
-### Basics
-
-Nothing special is required, just use `AmpersandView` in the same way as you would Backbone.View:
-
-```javascript
-var MyView = AmpersandView.extend({
-    initialize: function () { ... }, 
-    render: function () { ... }
-});
-```
-
-### Declarative Bindings
-
-
-Full description of the available binding types can be found here: https://github.com/henrikjoreteg/dom-bindings#binding-types
-
-A few examples below:
-
-```javascript
-var MyView = AmpersandView.extend({
-    // set a `template` property of your view. This can either be
-    // a function that returns an HTML string or just a string if 
-    // no logic is required.
-    template: '<li><a><span class="userName"></span></a></li>', 
-    // Simple declarative bindings
-    // The key is the name of the model property
-    bindings: {
-        // the value is a selector, by default a text binding is assumed
-        // this would keep the model's `name` attribute in the span, even
-        // if it's changed.
-        'model.name': '.userName',
-
-        // You can add/remove a class based on a boolean property.
-        // Based on the truthiness of the `active` property an
-        // "active" class will be added or removed from element(s)
-        // that match the selector. without affecting other classes 
-        // that may alreay be there.
-        'model.active': {
-            type: 'booleanClass',
-            selector: 'li',
-            // you can optionally specify a name like this
-            // name: 'is-active'
-            // or even a true/false case like this:
-            // yes: 'is-active',
-            // no: 'is-not-active'
-            // if no name is given it will use the property name
-            // by default.
-        },
-
-        // As you might have guessed, you can bind to any attribute you want
-        'model.userUrl': {
-            type: 'attribute',
-            name: 'href',
-            selector: 'a'
-        },
-
-        // This works for boolean attributes. The following would add and remove 
-        // the entire `checked` attribute (assuming the property value was a boolean)
-        selected: {
-            type: 'booleanAttribute',
-            selector: 'input',
-            name: 'checked'
-        },
-
-        // If you really need to, you can have as many bindings as you want for the same
-        // property, just pass an array of binding definitions:
-        superActive: [
-            {
-                type: 'text',
-                selector: '.username'
-            },
-            {
-                type: 'class',
-                selector: 'li'
-            },
-            // btw, also works for selectors that match multiple elements
-            {
-                type: 'booleanAttribute',
-                selector: '.username, .thing'
-            }
-        ]
-    },
-    render: function () {
-        // method for rendering the view's template and binding all
-        // the model properties as described by `textBindings` above.
-        // You can also bind other attributes, and if you're using
-        // ampersand-model, you can bind derived properties too.
-        this.renderWithTemplate({what: 'some context object for the template'});
-    }
-});
-```
-
-
-### What about two-way bindings?
-
-Note that these are all one-way bindings. People love to talk about the feature of two-way bindings, but from my experience, the vast majority of the time it's not actually something that you want. Why make two different ways of doing the same thing? The most common two-way bindings that people do are for form elements, which, is super easy to do with the events hash. Plus, then it's very easy to configure exactly when you want the user action to actually change the model.
-
-Having said that, we may enable it anyway, in a future release, that's still up for discussion.
-
-
-### handling subviews
-
-Often you want to render some other subview within a view. The trouble is that when you remove the parent view, you also want to remove all the subviews.
-
-AmpersandView has two convenience method for handling this that's also used by `renderCollection` to do cleanup.
-
-It looks like this:
-
-```javascript
-var AmpersandView = require('ampersand-view');
-
-// This can be *anything* with a `remove` method
-// and an `el` property... such as another ampersand-view
-// instance.
-// But you could very easily write other little custom views
-// that followed the same conventions. Such as custom dialogs, etc.
-var SubView = require('./my-sub-view');
-
-module.exports = AmpersandView.extend({
-    render: function () {
-        // this takes a view instance and either an element, or element selector 
-        // to draw the view into.
-        this.renderSubview(new Subview(), '.someElementSelector');
-
-        // There's an even lower level api that `renderSubview` usees
-        // that will do nothing other than call `remove` on it when
-        // the parent view is removed.
-        this.registerSubview(new Subview());
-    }
-})
-```
-
-**registerSubview also, stores a reference to the parent view on the subview as `.parent`**
-
-<!-- endhide -->
-
-
 ## API Reference
 
 Note that this is a fork of Backbone's view so most of the public methods/properties here still exist: [http://backbonejs.org/#View](http://backbonejs.org/#View).
@@ -285,7 +144,7 @@ var DocumentView = AmpersandView.extend({
 
 The bindings hash gives you a declarative way of specifying which elements in your view should be updated when the view's model is changed.
 
-For a full reference of available binding types see: [henrikjoreteg/dom-bindings](https://github.com/henrikjoreteg/dom-bindings#binding-types).
+For a full reference of available binding types see the [ampersand-dom-bindings](http://localhost:8080/docs/#ampersand-dom-bindings) section.
 
 For example, with a model like this:
 
@@ -452,46 +311,6 @@ var MainView = AmpersandView.extend({
 })
 ```
 
-
-### registerSubview `view.registerSubview(viewInstance)`
-
-* viewInstance {Object} Any object with a "remove" method, typically an instantiated view. But doesn't have to be, it can be anything with a remove method. The remove method doesn't have to actually remove itself from the DOM (since the parent view is being removed anyway), it is generally just used for unregistering any handler that it set up.
-
-
-### renderSubview `view.renderSubview(viewInstance, containerEl)`
-
-* viewInstance {Object} Any object with a `.remove()`, `.render()` and an `.el` property that is the DOM element for that view. Typically this is just an instantiated view. 
-* containerEl {Element | String | jQueryElement} This can either be an actual DOM element or a CSS selector string such as `.container`. If a string is passed human view runs `this.$("YOUR STRING")` to try to grab the element that should contain the sub view.
-
-This method is just sugar for the common use case of instantiating a view and putting in an element within the parent.
-
-It will:
-
-1. fetch your container (if you gave it a selector string)
-2. register your subview so it gets cleaned up if parent is removed and so `view.parent` will be available when your subview's `render` method gets called
-3. call the subview's `render()` method
-4. append it to the container
-5. return the subview
-
-```js
-var view = AmpersandView.extend({
-    template: '<li><div class="container"></div></li>',
-    render: function () {
-        this.renderWithTemplate();
-
-        //...
-
-        var model = this.model;
-        this.renderSubview(new SubView({
-            model: model
-        }), '.container');
-
-        //...
-
-    }
-});
-```
-
 ### renderWithTemplate `view.renderWithTemplate([context], [template])`
 
 * `context` {Object | null} [optional] The context that will be passed to the template function, usually it will be passed the view itself, so that `.model`, `.collection` etc are available.
@@ -593,6 +412,90 @@ Shortcut for registering a listener for a model and also triggering it right awa
 ### remove `view.remove()`
 
 Removes a view from the DOM, and calls `stopListening` to remove any bound events that the view has `listenTo`'d.
+
+
+
+### registerSubview `view.registerSubview(viewInstance)`
+
+* viewInstance {Object} Any object with a "remove" method, typically an instantiated view. But doesn't have to be, it can be anything with a remove method. The remove method doesn't have to actually remove itself from the DOM (since the parent view is being removed anyway), it is generally just used for unregistering any handler that it set up.
+
+
+### renderSubview `view.renderSubview(viewInstance, containerEl)`
+
+* viewInstance {Object} Any object with a `.remove()`, `.render()` and an `.el` property that is the DOM element for that view. Typically this is just an instantiated view. 
+* containerEl {Element | String | jQueryElement} This can either be an actual DOM element or a CSS selector string such as `.container`. If a string is passed human view runs `this.$("YOUR STRING")` to try to grab the element that should contain the sub view.
+
+This method is just sugar for the common use case of instantiating a view and putting in an element within the parent.
+
+It will:
+
+1. fetch your container (if you gave it a selector string)
+2. register your subview so it gets cleaned up if parent is removed and so `view.parent` will be available when your subview's `render` method gets called
+3. call the subview's `render()` method
+4. append it to the container
+5. return the subview
+
+```js
+var view = AmpersandView.extend({
+    template: '<li><div class="container"></div></li>',
+    render: function () {
+        this.renderWithTemplate();
+
+        //...
+
+        var model = this.model;
+        this.renderSubview(new SubView({
+            model: model
+        }), '.container');
+
+        //...
+
+    }
+});
+```
+
+### subviews `view.subviews`
+
+You can declare subviews that you want to render within a view, much like you would bindings. Useful for cases where the data you need for a subview may not be available on first render. Also, simplifies cases wehre you have lots of subviews.
+
+When the parent view is removed the `remove` method of all subviews will be called as well. 
+
+You declare them as follows:
+
+```js
+var AmpersandView = require('ampersand-view');
+var CollectionRenderer = require('ampersand-collection-view');
+var ViewSwitcher = require('ampersand-view-switcher');
+
+
+module.exports = AmpersandView.extend({
+    template: '<div><div></div><ul role="collection-container"></ul></div>',
+    subviews: {
+        myStuff: {
+            container: '[role=collection-container]',
+            waitFor: 'model.stuffCollection',
+            prepareView: function (el) {
+                new CollectionRenderer({
+                    el: el,
+                    collection: this.model.stuffCollection
+                });
+            }
+        },
+        tab: {
+            container: '[role=switcher]',
+            constructor: ViewSwitcher
+        }
+    }
+});
+```
+
+subview declarations consist of:
+
+* container {String} Selector that describes the element within the view that should hold the subview.
+* role {String} Alternate method for specifying a container element using its role name. Equivalent to `selector: '[role=some-role]'`.
+* constructor {ViewConstructor} Any [view conventions compliant](http://ampersandjs.com/learn/view-conventions) view constructor. It will be initialized with `{el: [Element grabbed from selector], parent: [reference to parent view instance]}`. So if you don't need to do any custom setup, you can just provide the constructor.
+* waitFor {String} String specifying they "key-path" (i.e. 'model.property') of the view that must be "truthy" before it should consider the subview ready.
+* prepareView {Function} Function that will be called once any `waitFor` condition is met. It will be called with the `this` context of the parent view and with the element that matches the selector as the argument. It should return an instantiated view instance.
 
 
 ### delegateEvents `view.delegateEvents([events])`
