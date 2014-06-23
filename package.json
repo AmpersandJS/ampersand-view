@@ -10,7 +10,7 @@
     "ampersand-state": "^4.2.7",
     "backbone-events-standalone": "^0.2.1",
     "component-classes": "^1.0.0",
-    "dom-bindings": "^2.0.0",
+    "ampersand-dom-bindings": "^2.1.0",
     "domify": "^1.0.0",
     "events-mixin": "^1.1.0",
     "get-object-path": "^0.0.2",

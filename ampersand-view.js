@@ -5,7 +5,7 @@ var domify = require('domify');
 var _ = require('underscore');
 //var events = require('events-mixin');
 var matches = require('matches-selector');
-var bindings = require('dom-bindings');
+var bindings = require('ampersand-dom-bindings');
 var getPath = require('get-object-path');
 
 
