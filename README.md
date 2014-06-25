@@ -144,7 +144,7 @@ var DocumentView = AmpersandView.extend({
 
 The bindings hash gives you a declarative way of specifying which elements in your view should be updated when the view's model is changed.
 
-For a full reference of available binding types see the [ampersand-dom-bindings](http://localhost:8080/docs/#ampersand-dom-bindings) section.
+For a full reference of available binding types see the [ampersand-dom-bindings](#ampersand-dom-bindings) section.
 
 For example, with a model like this:
 
