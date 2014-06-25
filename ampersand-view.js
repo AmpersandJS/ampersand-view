@@ -3,7 +3,7 @@ var Events = require('backbone-events-standalone');
 var CollectionView = require('ampersand-collection-view');
 var domify = require('domify');
 var _ = require('underscore');
-//var events = require('events-mixin');
+var events = require('events-mixin');
 var matches = require('matches-selector');
 var bindings = require('ampersand-dom-bindings');
 var getPath = require('get-object-path');
@@ -53,7 +53,7 @@ var BaseState = State.extend({
     },
     props: {
         model: 'state',
-        el: 'any',
+        el: 'element',
         collection: 'collection'
     },
     derived: {
@@ -150,7 +150,7 @@ _.extend(View.prototype, {
     // re-delegation.
     _handleElementChange: function (element, delegate) {
         if (this.eventManager) this.eventManager.unbind();
-        //this.eventManager = events(this.el, this);
+        this.eventManager = events(this.el, this);
         this.delegateEvents();
         this._applyBindingsForKey();
         return this;
