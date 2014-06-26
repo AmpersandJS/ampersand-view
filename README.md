@@ -56,7 +56,7 @@ var PersonRowView = AmpersandView.extend({
         }
     },
 
-    edit: funciton () {
+    edit: function () {
         //...
     }
 });
