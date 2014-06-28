@@ -8,7 +8,6 @@
   "dependencies": {
     "ampersand-collection-view": "^1.0.0",
     "ampersand-state": "^4.2.7",
-    "backbone-events-standalone": "^0.2.1",
     "component-classes": "^1.0.0",
     "ampersand-dom-bindings": "^2.1.0",
     "domify": "^1.0.0",

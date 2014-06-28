@@ -1,5 +1,4 @@
 var State = require('ampersand-state');
-var Events = require('backbone-events-standalone');
 var CollectionView = require('ampersand-collection-view');
 var domify = require('domify');
 var _ = require('underscore');
