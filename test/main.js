@@ -1,12 +1,12 @@
 var test = require('tape');
-var Model = require('ampersand-model');
+var AmpersandModel = require('ampersand-model');
 var AmpersandView = require('../ampersand-view');
 
 var contains = function (str1, str2) {
     return str1.indexOf(str2) !== -1;
 };
 
-var Model = Model.extend({
+var Model = AmpersandModel.extend({
     props: {
         id: 'number',
         name: ['string', true],
@@ -94,7 +94,7 @@ test('listen to and run', function (t) {
             t.pass('handler ran');
         }
     });
-    var view = new View();
+    new View();
 });
 
 test('text bindings', function (t) {
@@ -234,7 +234,7 @@ test('nested binding definitions', function (t) {
 
 test('renderAndBind with no model', function (t) {
     var View = AmpersandView.extend({
-        template: '<li><span></span><img/></li>',
+        template: '<li><span></span><img/></li>'
     });
     var view = new View();
     t.ok(view.renderWithTemplate()); //Should not throw error
@@ -247,7 +247,6 @@ test('getByRole', function (t) {
     });
     var view = new View();
     view.renderWithTemplate();
-    var usenameEl = view.getByRole('username');
     t.ok(view.getByRole('username') instanceof Element, 'should find username element');
     t.ok(view.getByRole('user-avatar') instanceof Element, 'should find username');
     t.ok(view.getByRole('nothing') === undefined, 'should find username');

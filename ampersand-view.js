@@ -1,5 +1,4 @@
 var State = require('ampersand-state');
-var Events = require('backbone-events-standalone');
 var CollectionView = require('ampersand-collection-view');
 var domify = require('domify');
 var _ = require('underscore');
@@ -127,7 +126,7 @@ _.extend(View.prototype, {
     },
 
     // Remove this view by taking the element out of the DOM, and removing any
-    // applicable Backbone.Events listeners.
+    // applicable events listeners.
     remove: function () {
         var parsedBindings = this._parsedBindings;
         if (this.el && this.el.parentNode) this.el.parentNode.removeChild(this.el);
