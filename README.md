@@ -34,7 +34,7 @@ Note that this is a fork of Backbone's view so most of the public methods/proper
 
 ### extend `AmpersandView.extend([properties])`
 
-Get started with views by creating a custom view class. Ampersand views have a sane default render function, which you don't necessarily have to override, but you probably will wish to specify a [`template`](#ampersand-view-template), your declarative [event handlers](#ampersand-view-events) and your [view bindings](#ampersand-view-bindings).
+Get started with views by creating a custom view class. Ampersand views have a sane default render function, which you don't necessarily have to override, but you probably will wish to specify a [`template`](#ampersand-view-template), your declarative [event handlers](##events-ampersandviewextend-events---events-hash---) and your [view bindings](#bindings).
 
 ```javascript
 var PersonRowView = AmpersandView.extend({
@@ -73,7 +73,7 @@ For more information about creating, and compiling templates, [read the templati
 
 ### autoRender `AmpersandView.extend({ autoRender: true })`
 
-The `.autoRender` property lets you optionally specify that the view should just automatically render with all the defaults. This requires that you at minimum specify a [template](#template) string of function.
+The `.autoRender` property lets you optionally specify that the view should just automatically render with all the defaults. This requires that you at minimum specify a [template](#template-ampersandviewextend-template-divinputdiv-) string of function.
 
 By setting `autoRender: true` the view will simply call `.renderWithTemplate` for you (after your `initialize` method if present). So for simple views, if you've got a few bindings and a template your whole view could just be really and declarative like this:
 
@@ -109,7 +109,7 @@ Using the events hash has a number of benefits over manually binding events duri
 
 * All attached callbacks are bound to the view before being handed off to the event handler, so when the callbacks are invoked, `this` continues to refer to the view object.
 * All event handlers are delegated to the view's root el, meaning elements changed when the view is updated don't need to be unbound and rebound.
-* All events handlers are cleanly remvoed when the view is [removed](#ampersand-view-remove).
+* All events handlers are cleanly remvoed when the view is [removed](#remove-viewremove).
 
 ```
 var DocumentView = AmpersandView.extend({
@@ -144,7 +144,7 @@ var DocumentView = AmpersandView.extend({
 
 The bindings hash gives you a declarative way of specifying which elements in your view should be updated when the view's model is changed.
 
-For a full reference of available binding types see the [ampersand-dom-bindings](#ampersand-dom-bindings) section.
+For a full reference of available binding types see the [ampersand-dom-bindings](#bindings) section.
 
 For example, with a model like this:
 
@@ -247,7 +247,7 @@ var view = new MyView({ foo: 'bar' });
 
 ### render `view.render()`
 
-Render is a part of the [Ampersand View conventions](???). You can override the default view method when extending AmpersandView if you wish, but as part of the conventions, calling render should:
+Render is a part of the [Ampersand View conventions](http://ampersandjs.com/learn/view-conventions). You can override the default view method when extending AmpersandView if you wish, but as part of the conventions, calling render should:
 
 * Create a `this.el` property if the view doesn't already have one, and populate it with your view template
 * or if the view already has a `this.el` attribute, render should either populate it with your view template, or create a new element and replace the existing `this.el` if it's in the DOM tree.
@@ -268,7 +268,7 @@ render: function () {
 * `collection` {Backbone Collection} The instantiated collection we wish to render.
 * `itemViewClass` {View Constructor} The view constructor that will be instantiated for each model in the collection. This view will be instantiated with a reference to the model and collection and the item view's `render` method will be called with an object containing a reference to the containerElement as follows: `.render({containerEl: << element >>})`.
 * `containerEl` {Element} The element that should hold the collection of views.
-* `viewOptions` {Object} [optional] Additional options 
+* `viewOptions` {Object} [optional] Additional options
     * `viewOptions` {Object} Options object that will get passed to the `initialize` method of the individual item views.
     * `filter` {Function} [optional] Function that will be used to determine if a model should be rendered in this collection view. It will get called with a model and you simply return `true` or `false`.
     * `reverse` {Boolean} [optional] Convenience for reversing order in which the items are rendered.
@@ -422,7 +422,7 @@ Removes a view from the DOM, and calls `stopListening` to remove any bound event
 
 ### renderSubview `view.renderSubview(viewInstance, containerEl)`
 
-* viewInstance {Object} Any object with a `.remove()`, `.render()` and an `.el` property that is the DOM element for that view. Typically this is just an instantiated view. 
+* viewInstance {Object} Any object with a `.remove()`, `.render()` and an `.el` property that is the DOM element for that view. Typically this is just an instantiated view.
 * containerEl {Element | String | jQueryElement} This can either be an actual DOM element or a CSS selector string such as `.container`. If a string is passed human view runs `this.$("YOUR STRING")` to try to grab the element that should contain the sub view.
 
 This method is just sugar for the common use case of instantiating a view and putting in an element within the parent.
@@ -458,7 +458,7 @@ var view = AmpersandView.extend({
 
 You can declare subviews that you want to render within a view, much like you would bindings. Useful for cases where the data you need for a subview may not be available on first render. Also, simplifies cases wehre you have lots of subviews.
 
-When the parent view is removed the `remove` method of all subviews will be called as well. 
+When the parent view is removed the `remove` method of all subviews will be called as well.
 
 You declare them as follows:
 
@@ -542,7 +542,7 @@ Open `test/test.html` in a browser to run the QUnit tests.
 
 ## Like this?
 
-Follow [@HenrikJoreteg](http://twitter.com/henrikjoreteg) on twitter and check out my recently released book: [human javascript](http://humanjavascript.com) which includes a full explanation of this as well as a whole bunch of other stuff for building awesome single page apps. 
+Follow [@HenrikJoreteg](http://twitter.com/henrikjoreteg) on twitter and check out my recently released book: [human javascript](http://humanjavascript.com) which includes a full explanation of this as well as a whole bunch of other stuff for building awesome single page apps.
 
 ## license
 
