@@ -34,7 +34,7 @@ Note that this is a fork of Backbone's view so most of the public methods/proper
 
 ### extend `AmpersandView.extend([properties])`
 
-Get started with views by creating a custom view class. Ampersand views have a sane default render function, which you don't necessarily have to override, but you probably will wish to specify a [`template`](#ampersand-view-template), your declarative [event handlers](##events-ampersandviewextend-events---events-hash---) and your [view bindings](#bindings).
+Get started with views by creating a custom view class. Ampersand views have a sane default render function, which you don't necessarily have to override, but you probably will wish to specify a [`template`](#template-ampersandviewextend-template-divinputdiv-), your declarative [event handlers](#events-ampersandviewextend-events---events-hash---) and your [view bindings](#bindings).
 
 ```javascript
 var PersonRowView = AmpersandView.extend({
@@ -109,7 +109,7 @@ Using the events hash has a number of benefits over manually binding events duri
 
 * All attached callbacks are bound to the view before being handed off to the event handler, so when the callbacks are invoked, `this` continues to refer to the view object.
 * All event handlers are delegated to the view's root el, meaning elements changed when the view is updated don't need to be unbound and rebound.
-* All events handlers are cleanly remvoed when the view is [removed](#remove-viewremove).
+* All events handlers are cleanly removed when the view is [removed](#remove-viewremove).
 
 ```
 var DocumentView = AmpersandView.extend({
