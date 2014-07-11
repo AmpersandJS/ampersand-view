@@ -435,7 +435,7 @@ It will:
 4. append it to the container
 5. return the subview
 
-```js
+```javascript
 var view = AmpersandView.extend({
     template: '<li><div class="container"></div></li>',
     render: function () {
@@ -462,7 +462,7 @@ When the parent view is removed the `remove` method of all subviews will be call
 
 You declare them as follows:
 
-```js
+```javascript
 var AmpersandView = require('ampersand-view');
 var CollectionRenderer = require('ampersand-collection-view');
 var ViewSwitcher = require('ampersand-view-switcher');
