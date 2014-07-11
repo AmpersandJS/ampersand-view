@@ -475,7 +475,7 @@ module.exports = AmpersandView.extend({
             container: '[role=collection-container]',
             waitFor: 'model.stuffCollection',
             prepareView: function (el) {
-                new CollectionRenderer({
+                return new CollectionRenderer({
                     el: el,
                     collection: this.model.stuffCollection
                 });
