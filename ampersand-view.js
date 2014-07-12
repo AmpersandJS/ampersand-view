@@ -279,12 +279,12 @@ _.extend(View.prototype, {
     // Either define a `template` property of your view
     // or pass in a template directly.
     // The template can either be a string or a function.
-    // If it's a function it will be passed the `context`
-    // argument.
+    // If it's a function it will be called with `this` set to
+    // the `context` argument.
     renderWithTemplate: function (context, templateArg) {
         var template = templateArg || this.template;
         if (!template) throw new Error('Template string or function needed.');
-        var newDom = _.isString(template) ? template : template(context || this);
+        var newDom = _.isString(template) ? template : template.call(context = (context || this), context);
         if (_.isString(newDom)) newDom = domify(newDom);
         var parent = this.el && this.el.parentNode;
         if (parent) parent.replaceChild(newDom, this.el);
