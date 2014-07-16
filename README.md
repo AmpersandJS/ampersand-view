@@ -217,7 +217,7 @@ document.querySelector('#viewContainer').appendChild(view.el);
 
 The default `AmpersandView` constructor accepts an optional `options` object, and:
 
-* Attaches the following options directly to the instaniated view, overriding the defaults: `model`, `collection`, `el`.
+* Attaches the following options directly to the instantiated view, overriding the defaults: `model`, `collection`, `el`.
 * Sets up event bindings defined in the `events` hash.
 * Sets up the model bindings defined in the `bindings` hash.
 * Initializes any subviews defined in the `subviews` hash.
