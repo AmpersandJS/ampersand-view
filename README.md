@@ -456,7 +456,7 @@ var view = AmpersandView.extend({
 
 ### subviews `view.subviews`
 
-You can declare subviews that you want to render within a view, much like you would bindings. Useful for cases where the data you need for a subview may not be available on first render. Also, simplifies cases wehre you have lots of subviews.
+You can declare subviews that you want to render within a view, much like you would bindings. Useful for cases where the data you need for a subview may not be available on first render. Also, simplifies cases where you have lots of subviews.
 
 When the parent view is removed the `remove` method of all subviews will be called as well. 
 
