@@ -551,6 +551,28 @@ test('declarative subViews basics', function (t) {
     t.end();
 });
 
+test('subview role can include special characters', function (t) {
+    var Sub = AmpersandView.extend({
+        template: '<span></span>'
+    });
+
+    var View = AmpersandView.extend({
+        template: '<div><div role="test.hi-there"></div></div>',
+        autoRender: true,
+        subviews: {
+            sub1: {
+                role: 'test.hi-there',
+                constructor: Sub
+            }
+        }
+    });
+    var view = new View();
+
+    t.equal(view.el.innerHTML, '<span></span>');
+
+    t.end();
+});
+
 test('make sure subviews dont fire until their `waitFor` is done', function (t) {
     var Sub = AmpersandView.extend({
         template: '<span>yes</span>'
