@@ -249,7 +249,7 @@ _.extend(View.prototype, {
     _parseSubview: function (subview, name) {
         var self = this;
         var opts = {
-            selector: subview.container || '[role=' + subview.role + ']',
+            selector: subview.container || '[role="' + subview.role + '"]',
             waitFor: subview.waitFor || '',
             prepareView: subview.prepareView || function (el) {
                 return new subview.constructor({
