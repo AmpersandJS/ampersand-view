@@ -73,7 +73,7 @@ For more information about creating, and compiling templates, [read the templati
 
 ### autoRender `AmpersandView.extend({ autoRender: true })`
 
-The `.autoRender` property lets you optionally specify that the view should just automatically render with all the defaults. This requires that you at minimum specify a [template](#template) string of function.
+The `.autoRender` property lets you optionally specify that the view should just automatically render with all the defaults. This requires that you at minimum specify a [template](#template) string or function.
 
 By setting `autoRender: true` the view will simply call `.renderWithTemplate` for you (after your `initialize` method if present). So for simple views, if you've got a few bindings and a template your whole view could just be really and declarative like this:
 
