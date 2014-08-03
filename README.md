@@ -266,7 +266,7 @@ render: function () {
 ### renderCollection `view.renderCollection(collection, ItemView, containerEl, [viewOptions])`
 
 * `collection` {Backbone Collection} The instantiated collection we wish to render.
-* `itemViewClass` {View Constructor} The view constructor that will be instantiated for each model in the collection. This view will be instantiated with a reference to the model and collection and the item view's `render` method will be called with an object containing a reference to the containerElement as follows: `.render({containerEl: << element >>})`.
+* `ItemView` {View Constructor} or {Function} The view constructor that will be instantiated for each model in the collection or a function that will return an instance of a given constructor. `options` object is passed as a first argument to a function, which can be used to access `options.model` and determine which view should be instantiated. This view will be used with a reference to the model and collection and the item view's `render` method will be called with an object containing a reference to the containerElement as follows: `.render({containerEl: << element >>})`.
 * `containerEl` {Element} The element that should hold the collection of views.
 * `viewOptions` {Object} [optional] Additional options 
     * `viewOptions` {Object} Options object that will get passed to the `initialize` method of the individual item views.
@@ -282,8 +282,9 @@ Each item view will only be `.render()`'ed once (unless you change that within t
 #### Example:
 
 ```javascript
-// some view for individual items in the collection
+// some views for individual items in the collection
 var ItemView = AmpersandView.extend({ ... });
+var AlternativeItemView = AmpersandView.extend({ ... });
 
 // the main view
 var MainView = AmpersandView.extend({
@@ -308,7 +309,23 @@ var MainView = AmpersandView.extend({
         this.renderCollection(this.collection, ItemView, this.$('.itemContainer')[0], opts);
         return this;
     }
-})
+});
+
+// alternative main view
+var AlternativeMainView = AmpersandView.extend({
+    template: '<section class="sidebar"><ul class="itemContainer"></ul></section>',
+    render: function (opts) {
+        this.renderWithTemplate(this);
+        this.renderCollection(this.collection, function (options) {
+            if (options.model.isAlternative) {
+                return new AlternativeMainView(options);
+            }
+
+            return new MainView(options);
+        }, this.$('.itemContainer')[0], opts);
+        return this;
+    }
+});
 ```
 
 ### renderWithTemplate `view.renderWithTemplate([context], [template])`
