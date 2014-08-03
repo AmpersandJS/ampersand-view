@@ -98,7 +98,7 @@ this.renderWithTemplate(this, this.template);
 
 ### events `AmpersandView.extend({ events: { /* ...events hash... */ } })`
 
-The events hash allows you to specify declarative callbacks for DOM events within the view. This is much clearer and less complex than calling `$('selector').on('click', ...)` or `el.addEventListener('click', ...)` everywhere.
+The events hash allows you to specify declarative callbacks for DOM events within the view. This is much clearer and less complex than calling `el.addEventListener('click', ...)` everywhere.
 
 * Events are written in the format `{"event selector": "callback"}`.
 * The callback may either be the name of a method on the view, or an actual function.
@@ -266,7 +266,7 @@ render: function () {
 ### renderCollection `view.renderCollection(collection, ItemView, containerEl, [viewOptions])`
 
 * `collection` {Backbone Collection} The instantiated collection we wish to render.
-* `ItemView` {View Constructor} or {Function} The view constructor that will be instantiated for each model in the collection or a function that will return an instance of a given constructor. `options` object is passed as a first argument to a function, which can be used to access `options.model` and determine which view should be instantiated. This view will be used with a reference to the model and collection and the item view's `render` method will be called with an object containing a reference to the containerElement as follows: `.render({containerEl: << element >>})`.
+* `ItemView` {View Constructor | Function} The view constructor that will be instantiated for each model in the collection or a function that will return an instance of a given constructor. `options` object is passed as a first argument to a function, which can be used to access `options.model` and determine which view should be instantiated. This view will be used with a reference to the model and collection and the item view's `render` method will be called with an object containing a reference to the containerElement as follows: `.render({containerEl: << element >>})`.
 * `containerEl` {Element} The element that should hold the collection of views.
 * `viewOptions` {Object} [optional] Additional options 
     * `viewOptions` {Object} Options object that will get passed to the `initialize` method of the individual item views.
@@ -306,7 +306,7 @@ var MainView = AmpersandView.extend({
         //          // view options object (just gets passed to item view's `initialize` method)
         //          viewOptions: {}
         //      }
-        this.renderCollection(this.collection, ItemView, this.$('.itemContainer')[0], opts);
+        this.renderCollection(this.collection, ItemView, this.el.querySelector('.itemContainer'), opts);
         return this;
     }
 });
@@ -322,7 +322,7 @@ var AlternativeMainView = AmpersandView.extend({
             }
 
             return new MainView(options);
-        }, this.$('.itemContainer')[0], opts);
+        }, this.el.querySelector('.itemContainer'), opts);
         return this;
     }
 });
@@ -440,7 +440,7 @@ Removes a view from the DOM, and calls `stopListening` to remove any bound event
 ### renderSubview `view.renderSubview(viewInstance, containerEl)`
 
 * viewInstance {Object} Any object with a `.remove()`, `.render()` and an `.el` property that is the DOM element for that view. Typically this is just an instantiated view. 
-* containerEl {Element | String | jQueryElement} This can either be an actual DOM element or a CSS selector string such as `.container`. If a string is passed human view runs `this.$("YOUR STRING")` to try to grab the element that should contain the sub view.
+* containerEl {Element | String} This can either be an actual DOM element or a CSS selector string such as `.container`. If a string is passed human view runs `this.get('YOUR STRING')` to try to grab the element that should contain the sub view.
 
 This method is just sugar for the common use case of instantiating a view and putting in an element within the parent.
 
