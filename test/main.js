@@ -622,3 +622,74 @@ test('make sure template can return a dom node', function (t) {
 
     t.end();
 });
+
+test('Should extend superclass for events/bindings/subviews', function (t) {
+    var Base = AmpersandView.extend({
+        template: '<div></div>',
+        events: {
+            'click h1': 'h1Click'
+        },
+        bindings: {
+            'prop1': '[role=prop1]'
+        },
+        subviews: {
+            subview1: {
+                container: '[role=subview1]',
+                constructor: AmpersandView
+            }
+        }
+    });
+
+    var Base2 = Base.extend({
+        events: function () {
+            return {'click h2': 'h2Click'};
+        },
+        bindings: {
+            'prop2': '[role=prop2]'
+        },
+        subviews: {
+            subview2: {
+                container: '[role=subview2]',
+                constructor: AmpersandView
+            }
+        }
+    });
+
+    var Base3 = Base2.extend({
+        events: {
+            'click h3': 'h3Click',
+            'click h1': 'h1ClickChild'
+        },
+        bindings: {
+            'prop3': '[role=prop3]',
+            'prop1': '[role=prop1-child]'
+        },
+        subviews: {
+            subview3: {
+                container: '[role=subview3]',
+                constructor: AmpersandView
+            },
+            subview1: {
+                container: '[role=subview1-child]',
+                constructor: AmpersandView
+            }
+        }
+    });
+
+    var view = new Base3();
+    view.render();
+
+    // Events
+    t.equal(Object.keys(view.events).length, 3);
+    t.equal(view.events['click h1'], 'h1ClickChild');
+
+    // Bindings
+    t.equal(Object.keys(view.bindings).length, 3);
+    t.equal(view.bindings.prop1, '[role=prop1-child]');
+
+    // Subviews
+    t.equal(Object.keys(view.subviews).length, 3);
+    t.equal(view.subviews.subview1.container, '[role=subview1-child]');
+
+    t.end();
+});

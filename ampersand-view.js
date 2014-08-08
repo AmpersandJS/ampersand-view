@@ -77,6 +77,9 @@ var delegateEventSplitter = /^(\S+)\s*(.*)$/;
 // List of view options to be merged as properties.
 var viewOptions = ['model', 'collection', 'el'];
 
+// List of options to merge with superclass when extending
+var mergeSuperOptions = ['events', 'bindings', 'subviews'];
+
 View.prototype = Object.create(BaseState.prototype);
 
 // Set up all inheritable properties and methods.
@@ -353,5 +356,28 @@ _.extend(View.prototype, {
     }
 });
 
-View.extend = BaseState.extend;
+
+View.extend = function () {
+    var child = BaseState.extend.apply(this, arguments);
+    var childProto = child.prototype;
+    var parentProto = child.__super__;
+
+    mergeSuperOptions.forEach(function (propName) {
+        var parentDefs = _.result(parentProto, propName);
+        var childDefs = _.result(childProto, propName);
+
+        if (parentDefs && parentDefs === Object(parentDefs)) {
+            _.each(parentDefs, function (parentDefValue, parentDefKey) {
+                // Only put parent definition onto the child if the key
+                // on the child doesnt exist (child takes precedence)
+                if (typeof childDefs[parentDefKey] === 'undefined') {
+                    childProto[propName][parentDefKey] = parentDefValue;
+                }
+            });
+        }
+    });
+
+    return child;
+};
+
 module.exports = View;
