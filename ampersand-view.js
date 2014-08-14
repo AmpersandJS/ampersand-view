@@ -339,7 +339,7 @@ _.extend(View.prototype, {
     // ## renderCollection
     // Method for rendering a collections with individual views.
     // Just pass it the collection, and the view to use for the items in the
-    // collection.
+    // collection. The collectionView instance is returned.
     renderCollection: function (collection, ViewClass, container, opts) {
         var containerEl = (typeof container === 'string') ? this.get(container) : container;
         var config = _.extend({
@@ -350,6 +350,7 @@ _.extend(View.prototype, {
         var collectionView = new CollectionView(config);
         collectionView.render();
         this.registerSubview(collectionView);
+        return collectionView;
     }
 });
 
