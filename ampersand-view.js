@@ -254,7 +254,9 @@ _.extend(View.prototype, {
             prepareView: subview.prepareView || function (el) {
                 return new subview.constructor({
                     el: el,
-                    parent: self
+                    parent: self,
+                    model: subview.model ? getPath(self, subview.model) : null,
+                    collection: subview.collection ? getPath(self, subview.collection) : null
                 });
             }
         };
