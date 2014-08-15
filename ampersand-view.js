@@ -250,14 +250,18 @@ _.extend(View.prototype, {
         var self = this;
         var opts = {
             selector: subview.container || '[role="' + subview.role + '"]',
-            waitFor: subview.waitFor || '',
+            waitFor: subview.waitFor || subview.model || subview.collection || '',
             prepareView: subview.prepareView || function (el) {
-                return new subview.constructor({
+                
+                var viewOpts = {
                     el: el,
-                    parent: self,
-                    model: subview.model ? getPath(self, subview.model) : null,
-                    collection: subview.collection ? getPath(self, subview.collection) : null
-                });
+                    parent: self
+                };
+                
+                if(subview.model) viewOpts.model = getPath(self, subview.model);
+                if(subview.collection) viewOpts.collection = getPath(self, subview.collection);
+                
+                return new subview.constructor(viewOpts);
             }
         };
         function action() {
