@@ -619,6 +619,53 @@ test('make sure subviews dont fire until their `waitFor` is done', function (t) 
     t.end();
 });
 
+test('set subview model via shorthand', function (t) {
+
+    var User = AmpersandModel.extend({
+        props: {
+            name: 'string'
+        }
+    });
+
+    var UserView = AmpersandView.extend({
+        autoRender: true,
+        template: '<span role="name">noname</span>',
+        bindings : {
+            'model.name': {
+                'type': 'text',
+                'role': 'name'
+            }
+        }
+    });
+
+    var View = AmpersandView.extend({
+        template: '<div><span class="container"></span></div>',
+        autoRender: true,
+        props: {
+            user: 'state',
+        },
+        subviews: {
+            user: {
+                container: '.container',
+                constructor: UserView,
+                model: 'user'
+            }
+        }
+    });
+
+    var view = new View();
+    t.equal(view.el.outerHTML, '<div><span class="container"></span></div>');
+
+
+    var me = new User({
+        name: 'janjarfalk',
+    });
+    view.user = me;
+    t.equal(view.el.outerHTML, '<div><span role="name">janjarfalk</span></div>');
+
+    t.end();
+});
+
 test('make sure template can return a dom node', function (t) {
     var Sub = AmpersandView.extend({
         template: function () {
