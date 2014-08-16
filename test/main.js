@@ -579,10 +579,11 @@ test('make sure subviews dont fire until their `waitFor` is done', function (t) 
     });
 
     var View = AmpersandView.extend({
-        template: '<div><span class="container"></span><span role="sub"></span></div>',
+        template: '<div><span class="container"></span><span role="sub"></span><span role="sub3"></span></div>',
         autoRender: true,
         props: {
-            model2: 'state'
+            model2: 'state',
+            model3: 'state'
         },
         subviews: {
             sub1: {
@@ -594,17 +595,25 @@ test('make sure subviews dont fire until their `waitFor` is done', function (t) 
                 waitFor: 'model2',
                 role: 'sub',
                 constructor: Sub
+            },
+            sub3: {
+                waitFor: ['model2', 'model3'],
+                role: 'sub3',
+                constructor: Sub
             }
         }
     });
     var view = new View();
-    t.equal(view._events.change.length, 2);
-    t.equal(view.el.outerHTML, '<div><span class="container"></span><span role="sub"></span></div>');
+    t.equal(view._events.change.length, 3);
+    t.equal(view.el.outerHTML, '<div><span class="container"></span><span role="sub"></span><span role="sub3"></span></div>');
     view.model = new Model();
-    t.equal(view._events.change.length, 1);
-    t.equal(view.el.outerHTML, '<div><span>yes</span><span role="sub"></span></div>');
+    t.equal(view._events.change.length, 2);
+    t.equal(view.el.outerHTML, '<div><span>yes</span><span role="sub"></span><span role="sub3"></span></div>');
     view.model2 = new Model();
-    t.equal(view.el.outerHTML, '<div><span>yes</span><span>yes</span></div>');
+    t.equal(view.el.outerHTML, '<div><span>yes</span><span>yes</span><span role="sub3"></span></div>');
+    t.equal(view._events.change.length, 1);
+    view.model3 = new Model();
+    t.equal(view.el.outerHTML, '<div><span>yes</span><span>yes</span><span>yes</span></div>');
     t.notOk(view._events.change);
 
     t.end();
