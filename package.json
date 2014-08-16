@@ -1,7 +1,7 @@
 {
   "name": "ampersand-view",
   "description": "A smart base view for Backbone apps, to make it easy to bind collections and properties to the DOM.",
-  "version": "6.0.9",
+  "version": "6.0.10",
   "author": "Henrik Joreteg <henrik@andyet.net>",
   "browser": "./ampersand-view.js",
   "bugs": "https://github.com/ampersandjs/ampersand-view/issues",
@@ -14,7 +14,7 @@
     "events-mixin": "^1.1.0",
     "get-object-path": "^0.0.2",
     "matches-selector": "^1.0.0",
-    "underscore": "^1.6.0"
+    "underscore": "1.6.0"
   },
   "devDependencies": {
     "ampersand-model": "~2.10.6",
