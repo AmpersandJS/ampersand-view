@@ -17,6 +17,9 @@ function View(attrs) {
     this.on('change:el', this._handleElementChange, this);
     this._parsedBindings = bindings(this.bindings);
     this._initializeBindings();
+    if (attrs.el && !this.autoRender) {
+        this._handleElementChange();
+    }
     this._initializeSubviews();
     this.initialize.apply(this, arguments);
     this.set(_.pick(attrs, viewOptions));
