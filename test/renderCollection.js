@@ -51,11 +51,11 @@ var MainView = AmpersandView.extend({
     },
     render: function (opts) {
         this.el.innerHTML = '<ul></ul>';
-        this.renderCollection(this.collection, ItemView, this.get('ul'), opts);
+        this.renderCollection(this.collection, ItemView, this.query('ul'), opts);
         return this;
     },
     numberRendered: function () {
-        return this.getAll('li').length;
+        return this.queryAll('li').length;
     }
 });
 
@@ -119,7 +119,7 @@ test('sort', function (t) {
     view.collection.sort();
     t.equal(view.numberRendered(), view.collection.length);
     var domIds = [];
-    view.getAll('li').forEach(function (el) {
+    view.queryAll('li').forEach(function (el) {
         domIds.push(Number(el.id.slice(1)));
     });
     t.deepEqual(domIds, [5, 2, 4, 1, 3]);
@@ -164,7 +164,7 @@ test('reversed', function (t) {
         reverse: true
     });
     var domIds = [];
-    view.getAll('li').forEach(function (el) {
+    view.queryAll('li').forEach(function (el) {
         domIds.push(Number(el.id.slice(1)));
     });
     t.deepEqual(domIds, [5, 4, 3, 2, 1]);

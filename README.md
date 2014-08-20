@@ -355,9 +355,14 @@ var view = AmpersandView.extend({
 });
 ```
 
-### get `view.get('.classname')`
+### query `view.query('.classname')`
 
 Runs a [`querySelector`](https://developer.mozilla.org/en-US/docs/Web/API/document.querySelector) scoped within the view's current element (`view.el`), returning the first matching element in the dom-tree.
+
+notes: 
+- It will also match agains the root element.
+- It will return the root element if you pass `''` as the selector.
+- If no match is found it returns `undefined`
 
 ```javascript
 var view = AmpersandView.extend({
@@ -366,16 +371,22 @@ var view = AmpersandView.extend({
         this.renderWithTemplate(this);
 
         // cache an element for easy reference by other methods
-        this.imgEl = this.get("[role=avatar]");
+        this.imgEl = this.query(".avatar");
 
         return this;
     }
 });
 ```
 
-### getByRole `view.getByRole('rolename')`
+### queryHook `view.queryHook('rolename')`
 
-A convenience method for retrieving an element from the current view by role. Using the role attribute is a nice way to separate javascript view hooks/bindings from class/id selectors that are being used by css:
+A convenience method for retrieving an element from the current view by it's `data-hook` attribute. Using this approach is a nice way to separate javascript view hooks/bindings from class/id selectors that are being used by CSS.
+
+notes: 
+- It also works if you're using multiple space-separated hooks. So something like `<img data-hook="avatar user-image"/>` would still match for `queryHook('avatar')`.
+- It simply uses `.query()` under the hood. So `.queryHook('avatar')` is equivalent to `.query('[data-hook~=avatar]')` 
+- It will also match to root elements.
+- If no match is found it returns `undefined`.
 
 ```javascript
 var view = AmpersandView.extend({
@@ -384,7 +395,7 @@ var view = AmpersandView.extend({
         this.renderWithTemplate(this);
 
         // cache an element for easy reference by other methods
-        this.imgEl = this.getByRole('avatar');
+        this.imgEl = this.queryHook('avatar');
 
         return this;
     }
@@ -392,9 +403,13 @@ var view = AmpersandView.extend({
 ```
 
 
-### getAll `view.getAll('.classname')`
+### queryAll `view.queryAll('.classname')`
 
-Runs a [`querySelectorAll`](https://developer.mozilla.org/en-US/docs/Web/API/document.querySelectorAll) scoped within the view's current element (`view.el`), returning all the matching elements in the dom-tree.
+Runs a [`querySelectorAll`](https://developer.mozilla.org/en-US/docs/Web/API/document.querySelectorAll) scoped within the view's current element (`view.el`), returning an array of all matching elements in the dom-tree.
+
+notes:
+- It will also include the root element if it matches the selector.
+- It returns a real `Array` not a DOM collection.
 
 
 ### cacheElements `view.cacheElements(hash)`
