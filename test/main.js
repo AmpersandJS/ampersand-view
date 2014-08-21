@@ -622,3 +622,23 @@ test('make sure template can return a dom node', function (t) {
 
     t.end();
 });
+
+test('events are bound if there is an el in the constructor', function (t) {
+    t.plan(1);
+    var event = document.createEvent("MouseEvent");
+    var View = AmpersandView.extend({
+        template: function () {
+            return document.createElement('div');
+        },
+        events: {
+            'click div': 'divClicked'
+        },
+        divClicked: function (e) {
+            t.ok(true, 'event fired');
+            t.end();
+        }
+    });
+    var view = new View({el: document.createElement('div')});
+    event.initMouseEvent('click');
+    view.el.dispatchEvent(event);
+});
