@@ -251,22 +251,51 @@ _.extend(View.prototype, {
     // the `waitFor` if need be.
     _parseSubview: function (subview, name) {
         var self = this;
+
+        // waitFor can be both {array} and {string}, but
+        // internaly it needs to be an {array}
+        var waitFor = typeof subview.waitFor === 'string' ? [subview.waitFor] : subview.waitFor;
+        if(!waitFor) waitFor = [];
+
+        // add subview collection and/or model to waitFor.
+        if(subview.model) waitFor.push(subview.model);
+        if(subview.collection) waitFor.push(subview.collection);
+
         var opts = {
             selector: subview.container || '[role="' + subview.role + '"]',
-            waitFor: subview.waitFor || '',
-            prepareView: subview.prepareView || function (el) {
-                return new subview.constructor({
+            waitFor: waitFor,
+            model: subview.model,
+            collection: subview.collection,
+            prepareView: subview.prepareView || function (el, model, collection) {
+
+                var viewOpts = {
                     el: el,
                     parent: self
-                });
+                };
+
+                if(model) viewOpts.model = getPath(self, model);
+                if(collection) viewOpts.collection = getPath(self, collection);
+
+                return new subview.constructor(viewOpts);
             }
         };
         function action() {
             var el, subview;
             // if not rendered or we can't find our element, stop here.
-            if (!this.el || !(el = this.get(opts.selector))) return;
-            if (!opts.waitFor || getPath(this, opts.waitFor)) {
-                subview = this[name] = opts.prepareView.call(this, el);
+            if (!this.el || !(el = this.get(opts.selector))){
+                return;
+            }
+
+            // Iterate trough waitFor {array} and check if all are loaded i.e. not undefined.
+            var isWaitForLoaded = !_.chain(opts.waitFor)
+                .map(function(str){
+                    return getPath(self, str);
+                })
+                .contains(undefined)
+                .value();
+
+            if (isWaitForLoaded) {
+                subview = this[name] = opts.prepareView.call(this, el, opts.model, opts.collection);
                 subview.render();
                 this.registerSubview(subview);
                 this.off('change', action);
