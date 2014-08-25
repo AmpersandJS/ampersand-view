@@ -84,13 +84,13 @@ View.prototype = Object.create(BaseState.prototype);
 
 // Set up all inheritable properties and methods.
 _.extend(View.prototype, {
-
+    // ## query
     // Get an single element based on CSS selector scoped to this.el
     // if you pass an empty string it return `this.el`.
     // If you pass an element we just return it back.
     // This lets us use `get` to handle cases where users
     // can pass a selector or an already selected element.
-    get: function (selector) {
+    query: function (selector) {
         if (!selector) return this.el;
         if (typeof selector === 'string') {
             if (matches(this.el, selector)) return this.el;
@@ -99,9 +99,11 @@ _.extend(View.prototype, {
         return selector;
     },
 
+    // ## queryAll
     // Returns an array of elements based on CSS selector scoped to this.el
-    // if you pass an empty string it return `this.el`.
-    getAll: function (selector) {
+    // if you pass an empty string it return `this.el`. Also includes root
+    // element.
+    queryAll: function (selector) {
         var res = [];
         if (!this.el) return res;
         if (selector === '') return [this.el];
@@ -109,12 +111,12 @@ _.extend(View.prototype, {
         return res.concat(Array.prototype.slice.call(this.el.querySelectorAll(selector)));
     },
 
-    // ## getByRole
-    // Gets an element within a view by its role attribute.
-    // Also works for the root `el` if it has the right role.
-    getByRole: function (role) {
-        return this.get('[role="' + role + '"]') ||
-            ((this.el.getAttribute('role') === role && this.el) || undefined);
+    // ## queryByHook
+    // Convenience method for fetching element by it's `data-hook` attribute.
+    // Also tries to match against root element.
+    // Also supports matching 'one' of several space separated hooks.
+    queryByHook: function (hook) {
+        return this.query('[data-hook~="' + hook + '"]');
     },
 
     // Initialize is an empty function by default. Override it with your own
@@ -209,7 +211,7 @@ _.extend(View.prototype, {
     // when the parent view is destroyed.
     renderSubview: function (view, container) {
         if (typeof container === 'string') {
-            container = this.get(container);
+            container = this.query(container);
         }
         this.registerSubview(view);
         view.render();
@@ -252,7 +254,7 @@ _.extend(View.prototype, {
     _parseSubview: function (subview, name) {
         var self = this;
         var opts = {
-            selector: subview.container || '[role="' + subview.role + '"]',
+            selector: subview.container || '[data-hook="' + subview.hook + '"]',
             waitFor: subview.waitFor || '',
             prepareView: subview.prepareView || function (el) {
                 return new subview.constructor({
@@ -264,7 +266,7 @@ _.extend(View.prototype, {
         function action() {
             var el, subview;
             // if not rendered or we can't find our element, stop here.
-            if (!this.el || !(el = this.get(opts.selector))) return;
+            if (!this.el || !(el = this.query(opts.selector))) return;
             if (!opts.waitFor || getPath(this, opts.waitFor)) {
                 subview = this[name] = opts.prepareView.call(this, el);
                 subview.render();
@@ -318,7 +320,7 @@ _.extend(View.prototype, {
     // Then later you can access elements by reference like so: `this.pages`, or `this.chat`.
     cacheElements: function (hash) {
         for (var item in hash) {
-            this[item] = this.get(hash[item]);
+            this[item] = this.query(hash[item]);
         }
     },
 
@@ -344,7 +346,7 @@ _.extend(View.prototype, {
     // Just pass it the collection, and the view to use for the items in the
     // collection.
     renderCollection: function (collection, ViewClass, container, opts) {
-        var containerEl = (typeof container === 'string') ? this.get(container) : container;
+        var containerEl = (typeof container === 'string') ? this.query(container) : container;
         var config = _.extend({
             collection: collection,
             el: containerEl,

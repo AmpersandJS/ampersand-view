@@ -56,7 +56,7 @@ test('registerSubview', function (t) {
         render: function () {
             this.renderWithTemplate();
             // all of these should work
-            this.renderSubview(new SubView(), this.get('#parent'));
+            this.renderSubview(new SubView(), this.query('#parent'));
             this.renderSubview(new SubView(), '#parent');
 
             // some other thing with a remove method
@@ -71,7 +71,7 @@ test('registerSubview', function (t) {
     });
 
     main.render();
-    t.equal(main.getAll('.subview').length, 2);
+    t.equal(main.queryAll('.subview').length, 2);
     main.remove();
     t.equal(removeCalled, 3);
     t.end();
@@ -103,9 +103,9 @@ test('text bindings', function (t) {
             'model.name': 'span'
         }
     });
-    t.equal(view.get('span').textContent, '');
+    t.equal(view.query('span').textContent, '');
     view.model.set('name', 'henrik');
-    t.equal(view.get('span').textContent, 'henrik');
+    t.equal(view.query('span').textContent, 'henrik');
     t.end();
 });
 
@@ -119,7 +119,7 @@ test('src bindings', function (t) {
             }
         }
     });
-    var img = view.get('img');
+    var img = view.query('img');
     t.equal(img.getAttribute('src'), '');
     view.model.set('url', 'http://robohash.com/whammo');
     t.equal(img.getAttribute('src'), 'http://robohash.com/whammo');
@@ -155,7 +155,7 @@ test('input bindings', function (t) {
             }
         }
     });
-    var input = view.get('input');
+    var input = view.query('input');
     t.equal(input.value, '');
     view.model.set('something', 'yo');
     t.equal(input.value, 'yo');
@@ -241,16 +241,16 @@ test('renderAndBind with no model', function (t) {
     t.end();
 });
 
-test('getByRole', function (t) {
+test('queryByHook', function (t) {
     var View = AmpersandView.extend({
-        template: '<li role="list-item"><span role="username"></span><img role="user-avatar"/></li>'
+        template: '<li data-hook="list-item"><span data-hook="username"></span><img data-hook="user-avatar"/></li>'
     });
     var view = new View();
     view.renderWithTemplate();
-    t.ok(view.getByRole('username') instanceof Element, 'should find username element');
-    t.ok(view.getByRole('user-avatar') instanceof Element, 'should find username');
-    t.ok(view.getByRole('nothing') === undefined, 'should find username');
-    t.ok(view.getByRole('list-item') instanceof Element, 'should also work for root element');
+    t.ok(view.queryByHook('username') instanceof Element, 'should find username element');
+    t.ok(view.queryByHook('user-avatar') instanceof Element, 'should find username');
+    t.ok(view.queryByHook('nothing') === undefined, 'should find username');
+    t.ok(view.queryByHook('list-item') instanceof Element, 'should also work for root element');
     t.end();
 });
 
@@ -263,13 +263,13 @@ test('throw on multiple root elements', function (t) {
     t.end();
 });
 
-test('getAll should return an array', function (t) {
+test('queryAll should return an array', function (t) {
     var View = AmpersandView.extend({
         autoRender: true,
         template: '<ul><li></li><li></li><li></li></ul>'
     });
     var view = new View();
-    var all = view.getAll('li');
+    var all = view.queryAll('li');
     t.ok(all instanceof Array);
     t.ok(all.forEach);
     t.equal(all.length, 3);
@@ -282,11 +282,11 @@ test('get should return undefined if no match', function (t) {
         template: '<ul></ul>'
     });
     var view = new View();
-    var el = view.get('div');
+    var el = view.query('div');
     t.equal(typeof el, 'undefined');
-    t.strictEqual(view.get(''), view.el);
-    t.strictEqual(view.get(), view.el);
-    t.strictEqual(view.get(view.el), view.el);
+    t.strictEqual(view.query(''), view.el);
+    t.strictEqual(view.query(), view.el);
+    t.strictEqual(view.query(view.el), view.el);
     t.end();
 });
 
@@ -296,23 +296,23 @@ test('get should work for root element too', function (t) {
         template: '<ul></ul>'
     });
     var view = new View();
-    t.equal(view.get('ul'), view.el);
+    t.equal(view.query('ul'), view.el);
     t.end();
 });
 
-test('getAll should include root element if matches', function (t) {
+test('queryAll should include root element if matches', function (t) {
     var View = AmpersandView.extend({
         autoRender: true,
         template: '<div class="test"><div class="test deep"><div class="test deep"></div></div></div>'
     });
     var view = new View();
-    var hasTestClass = view.getAll('.test');
-    var hasDeepClass = view.getAll('.deep');
+    var hasTestClass = view.queryAll('.test');
+    var hasDeepClass = view.queryAll('.deep');
     t.equal(hasTestClass.length, 3);
     t.equal(hasDeepClass.length, 2);
     t.ok(hasTestClass instanceof Array);
     t.ok(hasDeepClass instanceof Array);
-    t.ok(view.getAll('bogus') instanceof Array);
+    t.ok(view.queryAll('bogus') instanceof Array);
     t.end();
 });
 
@@ -551,17 +551,17 @@ test('declarative subViews basics', function (t) {
     t.end();
 });
 
-test('subview role can include special characters', function (t) {
+test('subview hook can include special characters', function (t) {
     var Sub = AmpersandView.extend({
         template: '<span></span>'
     });
 
     var View = AmpersandView.extend({
-        template: '<div><div role="test.hi-there"></div></div>',
+        template: '<div><div data-hook="test.hi-there"></div></div>',
         autoRender: true,
         subviews: {
             sub1: {
-                role: 'test.hi-there',
+                hook: 'test.hi-there',
                 constructor: Sub
             }
         }
@@ -579,7 +579,7 @@ test('make sure subviews dont fire until their `waitFor` is done', function (t) 
     });
 
     var View = AmpersandView.extend({
-        template: '<div><span class="container"></span><span role="sub"></span></div>',
+        template: '<div><span class="container"></span><span data-hook="sub"></span></div>',
         autoRender: true,
         props: {
             model2: 'state'
@@ -592,17 +592,17 @@ test('make sure subviews dont fire until their `waitFor` is done', function (t) 
             },
             sub2: {
                 waitFor: 'model2',
-                role: 'sub',
+                hook: 'sub',
                 constructor: Sub
             }
         }
     });
     var view = new View();
     t.equal(view._events.change.length, 2);
-    t.equal(view.el.outerHTML, '<div><span class="container"></span><span role="sub"></span></div>');
+    t.equal(view.el.outerHTML, '<div><span class="container"></span><span data-hook="sub"></span></div>');
     view.model = new Model();
     t.equal(view._events.change.length, 1);
-    t.equal(view.el.outerHTML, '<div><span>yes</span><span role="sub"></span></div>');
+    t.equal(view.el.outerHTML, '<div><span>yes</span><span data-hook="sub"></span></div>');
     view.model2 = new Model();
     t.equal(view.el.outerHTML, '<div><span>yes</span><span>yes</span></div>');
     t.notOk(view._events.change);

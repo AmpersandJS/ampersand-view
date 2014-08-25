@@ -38,21 +38,21 @@ Get started with views by creating a custom view class. Ampersand views have a s
 
 ```javascript
 var PersonRowView = AmpersandView.extend({
-    template: "<li> <span role='name'></span> <span role='age'></span> <a role='edit'>edit</a> </li>",
+    template: "<li> <span data-hook='name'></span> <span data-hook='age'></span> <a data-hook='edit'>edit</a> </li>",
 
     events: {
-        "click [role=edit]": "edit"
+        "click [data-hook=edit]": "edit"
     },
 
     bindings: {
         "model.name": {
             type: 'text',
-            role: 'name'
+            hook: 'name'
         },
 
         "model.age": {
             type: 'text',
-            role: 'age'
+            hook: 'age'
         }
     },
 
@@ -166,9 +166,9 @@ and a template like this:
 ```html
 <!-- templates.person -->
 <li>
-  <img role="avatar">
-  <span role="name"></span>
-  age: <span role="age"></span>
+  <img data-hook="avatar">
+  <span data-hook="name"></span>
+  age: <span data-hook="age"></span>
 </li>
 ```
 
@@ -181,15 +181,15 @@ var PersonView = AmpersandView.extend({
     bindings: {
         'model.name': {
             type: 'text',
-            role: 'name'
+            hook: 'name'
         },
 
-        'model.age': '[role=age]', //shorthand of the above
+        'model.age': '[data-hook=age]', //shorthand of the above
 
         'model.avatarURL': {
             type: 'attribute',
             name: 'src',
-            role: 'avatar'
+            hook: 'avatar'
         },
 
         //no selector, selects the root element
@@ -355,36 +355,47 @@ var view = AmpersandView.extend({
 });
 ```
 
-### get `view.get('.classname')`
+### query `view.query('.classname')`
 
 Runs a [`querySelector`](https://developer.mozilla.org/en-US/docs/Web/API/document.querySelector) scoped within the view's current element (`view.el`), returning the first matching element in the dom-tree.
 
+notes: 
+- It will also match agains the root element.
+- It will return the root element if you pass `''` as the selector.
+- If no match is found it returns `undefined`
+
 ```javascript
 var view = AmpersandView.extend({
-    template: '<li><img role="avatar" src=""></li>',
+    template: '<li><img data-hook="avatar" src=""></li>',
     render: function () {
         this.renderWithTemplate(this);
 
         // cache an element for easy reference by other methods
-        this.imgEl = this.get("[role=avatar]");
+        this.imgEl = this.query(".avatar");
 
         return this;
     }
 });
 ```
 
-### getByRole `view.getByRole('rolename')`
+### queryByHook `view.queryByHook('hookname')`
 
-A convenience method for retrieving an element from the current view by role. Using the role attribute is a nice way to separate javascript view hooks/bindings from class/id selectors that are being used by css:
+A convenience method for retrieving an element from the current view by it's `data-hook` attribute. Using this approach is a nice way to separate javascript view hooks/bindings from class/id selectors that are being used by CSS.
+
+notes: 
+- It also works if you're using multiple space-separated hooks. So something like `<img data-hook="avatar user-image"/>` would still match for `queryByHook('avatar')`.
+- It simply uses `.query()` under the hood. So `.queryByHook('avatar')` is equivalent to `.query('[data-hook~=avatar]')` 
+- It will also match to root elements.
+- If no match is found it returns `undefined`.
 
 ```javascript
 var view = AmpersandView.extend({
-    template: '<li><img class='avatar-rounded' role="avatar" src=""></li>',
+    template: '<li><img class='avatar-rounded' data-hook="avatar" src=""></li>',
     render: function () {
         this.renderWithTemplate(this);
 
         // cache an element for easy reference by other methods
-        this.imgEl = this.getByRole('avatar');
+        this.imgEl = this.queryByHook('avatar');
 
         return this;
     }
@@ -392,9 +403,13 @@ var view = AmpersandView.extend({
 ```
 
 
-### getAll `view.getAll('.classname')`
+### queryAll `view.queryAll('.classname')`
 
-Runs a [`querySelectorAll`](https://developer.mozilla.org/en-US/docs/Web/API/document.querySelectorAll) scoped within the view's current element (`view.el`), returning all the matching elements in the dom-tree.
+Runs a [`querySelectorAll`](https://developer.mozilla.org/en-US/docs/Web/API/document.querySelectorAll) scoped within the view's current element (`view.el`), returning an array of all matching elements in the dom-tree.
+
+notes:
+- It will also include the root element if it matches the selector.
+- It returns a real `Array` not a DOM collection.
 
 
 ### cacheElements `view.cacheElements(hash)`
@@ -412,7 +427,7 @@ render: function () {
     nav: 'nav#views ul',
     me: '#me',
     cheatSheet: '#cheatSheet',
-    omniBox: '[role=omnibox]'
+    omniBox: '[data-hook=omnibox]'
   });
 
   return this;
@@ -486,10 +501,10 @@ var ViewSwitcher = require('ampersand-view-switcher');
 
 
 module.exports = AmpersandView.extend({
-    template: '<div><div></div><ul role="collection-container"></ul></div>',
+    template: '<div><div></div><ul data-hook="collection-container"></ul></div>',
     subviews: {
         myStuff: {
-            container: '[role=collection-container]',
+            container: '[data-hook=collection-container]',
             waitFor: 'model.stuffCollection',
             prepareView: function (el) {
                 return new CollectionRenderer({
@@ -499,7 +514,7 @@ module.exports = AmpersandView.extend({
             }
         },
         tab: {
-            container: '[role=switcher]',
+            container: '[data-hook=switcher]',
             constructor: ViewSwitcher
         }
     }
@@ -509,7 +524,7 @@ module.exports = AmpersandView.extend({
 subview declarations consist of:
 
 * container {String} Selector that describes the element within the view that should hold the subview.
-* role {String} Alternate method for specifying a container element using its role name. Equivalent to `selector: '[role=some-role]'`.
+* hook {String} Alternate method for specifying a container element using its `data-hook` attribute. Equivalent to `selector: '[data-hook=some-hook]'`.
 * constructor {ViewConstructor} Any [view conventions compliant](http://ampersandjs.com/learn/view-conventions) view constructor. It will be initialized with `{el: [Element grabbed from selector], parent: [reference to parent view instance]}`. So if you don't need to do any custom setup, you can just provide the constructor.
 * waitFor {String} String specifying they "key-path" (i.e. 'model.property') of the view that must be "truthy" before it should consider the subview ready.
 * prepareView {Function} Function that will be called once any `waitFor` condition is met. It will be called with the `this` context of the parent view and with the element that matches the selector as the argument. It should return an instantiated view instance.
@@ -541,6 +556,8 @@ You usually don't need to use this, but may wish to if you have multiple views a
 
 ## Changelog
 
+- 7.0.0 Replacing use of `role` in lieu of `data-hook` for [accessibility reasons discussed here](https://github.com/AmpersandJS/ampersand/issues/21)
+- [insert period of poor changelog management here], this will not happen again now that ampersand is public.
 - 1.6.3 [diff](https://github.com/HenrikJoreteg/ampersand-view/compare/v1.6.2...v1.6.3) - Move throw statment for too many root elements inside non `<body>` case.
 - 1.6.2 [diff](https://github.com/HenrikJoreteg/ampersand-view/compare/v1.6.1...v1.6.2) - Make `getByRole` work even if `role` attribute is on the root element. Throws an error if your view template contains more than one root element.
 - 1.6.1 [diff](https://github.com/HenrikJoreteg/ampersand-view/compare/v1.6.0...v1.6.1) - Make sure renderSubview registers the subview first, so it has a `.parent` before it calls `.render()` on the subview.
