@@ -111,11 +111,11 @@ _.extend(View.prototype, {
         return res.concat(Array.prototype.slice.call(this.el.querySelectorAll(selector)));
     },
 
-    // ## queryHook
+    // ## queryByHook
     // Convenience method for fetching element by it's `data-hook` attribute.
     // Also tries to match against root element.
     // Also supports matching 'one' of several space separated hooks.
-    queryHook: function (hook) {
+    queryByHook: function (hook) {
         return this.query('[data-hook~="' + hook + '"]');
     },
 

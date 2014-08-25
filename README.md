@@ -378,13 +378,13 @@ var view = AmpersandView.extend({
 });
 ```
 
-### queryHook `view.queryHook('hookname')`
+### queryByHook `view.queryByHook('hookname')`
 
 A convenience method for retrieving an element from the current view by it's `data-hook` attribute. Using this approach is a nice way to separate javascript view hooks/bindings from class/id selectors that are being used by CSS.
 
 notes: 
-- It also works if you're using multiple space-separated hooks. So something like `<img data-hook="avatar user-image"/>` would still match for `queryHook('avatar')`.
-- It simply uses `.query()` under the hood. So `.queryHook('avatar')` is equivalent to `.query('[data-hook~=avatar]')` 
+- It also works if you're using multiple space-separated hooks. So something like `<img data-hook="avatar user-image"/>` would still match for `queryByHook('avatar')`.
+- It simply uses `.query()` under the hood. So `.queryByHook('avatar')` is equivalent to `.query('[data-hook~=avatar]')` 
 - It will also match to root elements.
 - If no match is found it returns `undefined`.
 
@@ -395,7 +395,7 @@ var view = AmpersandView.extend({
         this.renderWithTemplate(this);
 
         // cache an element for easy reference by other methods
-        this.imgEl = this.queryHook('avatar');
+        this.imgEl = this.queryByHook('avatar');
 
         return this;
     }

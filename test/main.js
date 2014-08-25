@@ -241,16 +241,16 @@ test('renderAndBind with no model', function (t) {
     t.end();
 });
 
-test('queryHook', function (t) {
+test('queryByHook', function (t) {
     var View = AmpersandView.extend({
         template: '<li data-hook="list-item"><span data-hook="username"></span><img data-hook="user-avatar"/></li>'
     });
     var view = new View();
     view.renderWithTemplate();
-    t.ok(view.queryHook('username') instanceof Element, 'should find username element');
-    t.ok(view.queryHook('user-avatar') instanceof Element, 'should find username');
-    t.ok(view.queryHook('nothing') === undefined, 'should find username');
-    t.ok(view.queryHook('list-item') instanceof Element, 'should also work for root element');
+    t.ok(view.queryByHook('username') instanceof Element, 'should find username element');
+    t.ok(view.queryByHook('user-avatar') instanceof Element, 'should find username');
+    t.ok(view.queryByHook('nothing') === undefined, 'should find username');
+    t.ok(view.queryByHook('list-item') instanceof Element, 'should also work for root element');
     t.end();
 });
 
