@@ -349,8 +349,7 @@ _.extend(View.prototype, {
         }, opts);
         var collectionView = new CollectionView(config);
         collectionView.render();
-        this.registerSubview(collectionView);
-        return collectionView;
+        return this.registerSubview(collectionView);
     }
 });
 
