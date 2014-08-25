@@ -551,17 +551,17 @@ test('declarative subViews basics', function (t) {
     t.end();
 });
 
-test('subview role can include special characters', function (t) {
+test('subview hook can include special characters', function (t) {
     var Sub = AmpersandView.extend({
         template: '<span></span>'
     });
 
     var View = AmpersandView.extend({
-        template: '<div><div role="test.hi-there"></div></div>',
+        template: '<div><div data-hook="test.hi-there"></div></div>',
         autoRender: true,
         subviews: {
             sub1: {
-                role: 'test.hi-there',
+                hook: 'test.hi-there',
                 constructor: Sub
             }
         }
@@ -579,7 +579,7 @@ test('make sure subviews dont fire until their `waitFor` is done', function (t) 
     });
 
     var View = AmpersandView.extend({
-        template: '<div><span class="container"></span><span role="sub"></span></div>',
+        template: '<div><span class="container"></span><span data-hook="sub"></span></div>',
         autoRender: true,
         props: {
             model2: 'state'
@@ -592,17 +592,17 @@ test('make sure subviews dont fire until their `waitFor` is done', function (t) 
             },
             sub2: {
                 waitFor: 'model2',
-                role: 'sub',
+                hook: 'sub',
                 constructor: Sub
             }
         }
     });
     var view = new View();
     t.equal(view._events.change.length, 2);
-    t.equal(view.el.outerHTML, '<div><span class="container"></span><span role="sub"></span></div>');
+    t.equal(view.el.outerHTML, '<div><span class="container"></span><span data-hook="sub"></span></div>');
     view.model = new Model();
     t.equal(view._events.change.length, 1);
-    t.equal(view.el.outerHTML, '<div><span>yes</span><span role="sub"></span></div>');
+    t.equal(view.el.outerHTML, '<div><span>yes</span><span data-hook="sub"></span></div>');
     view.model2 = new Model();
     t.equal(view.el.outerHTML, '<div><span>yes</span><span>yes</span></div>');
     t.notOk(view._events.change);

@@ -115,8 +115,8 @@ _.extend(View.prototype, {
     // Convenience method for fetching element by it's `data-hook` attribute.
     // Also tries to match against root element.
     // Also supports matching 'one' of several space separated hooks.
-    queryHook: function (role) {
-        return this.query('[data-hook~="' + role + '"]');
+    queryHook: function (hook) {
+        return this.query('[data-hook~="' + hook + '"]');
     },
 
     // Initialize is an empty function by default. Override it with your own
@@ -254,7 +254,7 @@ _.extend(View.prototype, {
     _parseSubview: function (subview, name) {
         var self = this;
         var opts = {
-            selector: subview.container || '[role="' + subview.role + '"]',
+            selector: subview.container || '[data-hook="' + subview.hook + '"]',
             waitFor: subview.waitFor || '',
             prepareView: subview.prepareView || function (el) {
                 return new subview.constructor({
