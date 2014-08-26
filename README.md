@@ -454,8 +454,8 @@ Removes a view from the DOM, and calls `stopListening` to remove any bound event
 
 ### renderSubview `view.renderSubview(viewInstance, containerEl)`
 
-* viewInstance {Object} Any object with a `.remove()`, `.render()` and an `.el` property that is the DOM element for that view. Typically this is just an instantiated view. 
-* containerEl {Element | String} This can either be an actual DOM element or a CSS selector string such as `.container`. If a string is passed human view runs `this.get('YOUR STRING')` to try to grab the element that should contain the sub view.
+* viewInstance {Object} Any object with a `.remove()`, `.render()` and an `.el` property that is the DOM element for that view. Typically this is just an instantiated view.
+* containerEl {Element | String} This can either be an actual DOM element or a CSS selector string such as `.container`. If a string is passed human view runs `this.query('YOUR STRING')` to try to grab the element that should contain the sub view.
 
 This method is just sugar for the common use case of instantiating a view and putting in an element within the parent.
 
@@ -570,13 +570,14 @@ You usually don't need to use this, but may wish to if you have multiple views a
 
 ## Test coverage?
 
-Why yes! So glad you asked :)  
+Why yes! So glad you asked :)
 
-Open `test/test.html` in a browser to run the QUnit tests.
+* Run `npm test` to run the tests in a headless phantom browser.
+* Run `npm start` to start a webserver with the test harness, and then visit http://localhost:3000 to open and run the tests in your browser of choice.
 
 ## Like this?
 
-Follow [@HenrikJoreteg](http://twitter.com/henrikjoreteg) on twitter and check out my recently released book: [human javascript](http://humanjavascript.com) which includes a full explanation of this as well as a whole bunch of other stuff for building awesome single page apps. 
+Follow [@HenrikJoreteg](http://twitter.com/henrikjoreteg) on twitter and check out my recently released book: [human javascript](http://humanjavascript.com) which includes a full explanation of this as well as a whole bunch of other stuff for building awesome single page apps.
 
 ## license
 
