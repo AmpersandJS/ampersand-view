@@ -366,7 +366,7 @@ notes:
 
 ```javascript
 var view = AmpersandView.extend({
-    template: '<li><img data-hook="avatar" src=""></li>',
+    template: '<li><img class="avatar" src=""></li>',
     render: function () {
         this.renderWithTemplate(this);
 
