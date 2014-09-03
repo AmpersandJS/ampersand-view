@@ -51,7 +51,7 @@ var MainView = AmpersandView.extend({
     },
     render: function (opts) {
         this.el.innerHTML = '<ul></ul>';
-        this.renderCollection(this.collection, ItemView, this.query('ul'), opts);
+        this.collectionView = this.renderCollection(this.collection, ItemView, this.query('ul'), opts);
         return this;
     },
     numberRendered: function () {
@@ -82,6 +82,14 @@ test('test initial render', function (t) {
     view.render();
     t.equal(view.collection.length, 5);
     t.equal(view.numberRendered(), view.collection.length);
+    t.end();
+});
+
+test('collection view is returned', function (t) {
+    var view = new MainView();
+    view.render();
+    t.equal(typeof view.collectionView, 'object');
+    t.equal(view.collectionView.collection.length, 5);
     t.end();
 });
 

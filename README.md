@@ -279,6 +279,8 @@ Also, when the parent view gets `.remove()`'ed any event handlers registered by 
 
 Each item view will only be `.render()`'ed once (unless you change that within the item view itself).
 
+The collection view instance will be returned from the function.
+
 #### Example:
 
 ```javascript
@@ -306,7 +308,8 @@ var MainView = AmpersandView.extend({
         //          // view options object (just gets passed to item view's `initialize` method)
         //          viewOptions: {}
         //      }
-        this.renderCollection(this.collection, ItemView, this.el.querySelector('.itemContainer'), opts);
+        // returns the collection view instance
+        var collectionView = this.renderCollection(this.collection, ItemView, this.el.querySelector('.itemContainer'), opts);
         return this;
     }
 });
