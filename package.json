@@ -21,6 +21,7 @@
     "ampersand-rest-collection": "^1.0.3",
     "browserify": "~3.41.0",
     "jsdom": "^0.10.6",
+    "phantomjs": "^1.9.7-15",
     "precommit-hook": "0.x.x",
     "run-browser": "~1.2.0",
     "tap-spec": "^0.2.0",
