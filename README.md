@@ -267,7 +267,7 @@ render: function () {
 
 * `collection` {Backbone Collection} The instantiated collection we wish to render.
 * `ItemView` {View Constructor | Function} The view constructor that will be instantiated for each model in the collection or a function that will return an instance of a given constructor. `options` object is passed as a first argument to a function, which can be used to access `options.model` and determine which view should be instantiated. This view will be used with a reference to the model and collection and the item view's `render` method will be called with an object containing a reference to the containerElement as follows: `.render({containerEl: << element >>})`.
-* `containerEl` {Element} The element that should hold the collection of views.
+* containerEl {Element | String} This can either be an actual DOM element or a CSS selector string such as `.container`. If a string is passed ampersand-view runs `this.query('YOUR STRING')` to try to grab the element that should contain the collection of views. If you don't supply a `containerEl` it will default to `this.el`.
 * `viewOptions` {Object} [optional] Additional options 
     * `viewOptions` {Object} Options object that will get passed to the `initialize` method of the individual item views.
     * `filter` {Function} [optional] Function that will be used to determine if a model should be rendered in this collection view. It will get called with a model and you simply return `true` or `false`.
@@ -458,7 +458,7 @@ Removes a view from the DOM, and calls `stopListening` to remove any bound event
 ### renderSubview `view.renderSubview(viewInstance, containerEl)`
 
 * viewInstance {Object} Any object with a `.remove()`, `.render()` and an `.el` property that is the DOM element for that view. Typically this is just an instantiated view.
-* containerEl {Element | String} This can either be an actual DOM element or a CSS selector string such as `.container`. If a string is passed human view runs `this.query('YOUR STRING')` to try to grab the element that should contain the sub view.
+* containerEl {Element | String} This can either be an actual DOM element or a CSS selector string such as `.container`. If a string is passed ampersand-view runs `this.query('YOUR STRING')` to try to grab the element that should contain the sub view. If you don't supply a `containerEl` it will default to `this.el`.
 
 This method is just sugar for the common use case of instantiating a view and putting in an element within the parent.
 
