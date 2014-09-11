@@ -300,7 +300,7 @@ _.extend(View.prototype, {
 
     // ## cacheElements
     // This is a shortcut for adding reference to specific elements within your view for
-    // access later. This is avoids excessive DOM queries and gives makes it easier to update
+    // access later. This avoids excessive DOM queries and makes it easier to update
     // your view if your template changes.
     //
     // In your `render` method. Use it like so:
