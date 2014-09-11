@@ -77,6 +77,39 @@ test('registerSubview', function (t) {
     t.end();
 });
 
+test('registerSubview: default container to this.el', function (t) {
+    var removeCalled = 0;
+    var SubView = AmpersandView.extend({
+        template: '<div></div>',
+        render: function () {
+            this.renderWithTemplate();
+            this.el.className = 'subview';
+        },
+        remove: function () {
+            removeCalled++;
+        }
+    });
+    var View = AmpersandView.extend({
+        template: '<section></section>',
+        render: function () {
+            this.renderWithTemplate();
+            this.renderSubview(new SubView());
+            this.renderSubview(new SubView());
+        }
+    });
+
+    var main = new View({
+        el: document.createElement('div')
+    });
+
+    main.render();
+    t.equal(main.queryAll('.subview').length, 2);
+    t.equal(main.el.childNodes.length, 2);
+    main.remove();
+    t.equal(removeCalled, 2);
+    t.end();
+});
+
 test('listen to and run', function (t) {
     t.plan(1);
     var model = new Model({

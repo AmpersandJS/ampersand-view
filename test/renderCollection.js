@@ -59,6 +59,17 @@ var MainView = AmpersandView.extend({
     }
 });
 
+var MainViewUl = MainView.extend({
+    initialize: function () {
+        this.el = document.createElement('ul');
+        this.collection = new Collection(getModelData());
+    },
+    render: function (opts) {
+        this.collectionView = this.renderCollection(this.collection, ItemView);
+        return this;
+    }
+});
+
 function getModelData() {
     return [
         'Henrik Joreteg',
@@ -90,6 +101,14 @@ test('collection view is returned', function (t) {
     view.render();
     t.equal(typeof view.collectionView, 'object');
     t.equal(view.collectionView.collection.length, 5);
+    t.end();
+});
+
+test('this.el is default', function (t) {
+    var view = new MainViewUl();
+    view.render();
+    t.equal(view.collection.length, 5);
+    t.equal(view.numberRendered(), view.collection.length);
     t.end();
 });
 

@@ -215,7 +215,7 @@ _.extend(View.prototype, {
         }
         this.registerSubview(view);
         view.render();
-        container.appendChild(view.el);
+        (container || this.el).appendChild(view.el);
         return view;
     },
 
@@ -349,7 +349,7 @@ _.extend(View.prototype, {
         var containerEl = (typeof container === 'string') ? this.query(container) : container;
         var config = _.extend({
             collection: collection,
-            el: containerEl,
+            el: containerEl || this.el,
             view: ViewClass
         }, opts);
         var collectionView = new CollectionView(config);
