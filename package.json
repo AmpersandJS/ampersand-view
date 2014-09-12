@@ -17,16 +17,16 @@
     "underscore": "1.6.0"
   },
   "devDependencies": {
-    "ampersand-model": "~2.10.6",
-    "ampersand-rest-collection": "^1.0.3",
-    "browserify": "~3.41.0",
+    "ampersand-model": "~4.0.2",
+    "ampersand-rest-collection": "^2.0.3",
+    "browserify": "~5.11.2",
     "jsdom": "^0.10.6",
     "phantomjs": "^1.9.7-15",
     "precommit-hook": "0.x.x",
     "run-browser": "~1.2.0",
     "tap-spec": "^0.2.0",
     "tape": "^2.14.0",
-    "tape-run": "~0.1.1"
+    "tape-run": "~0.3.0"
   },
   "homepage": "https://github.com/ampersandjs/ampersand-view",
   "keywords": [
