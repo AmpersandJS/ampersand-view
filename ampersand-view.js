@@ -350,7 +350,11 @@ _.extend(View.prototype, {
         var config = _.extend({
             collection: collection,
             el: containerEl || this.el,
-            view: ViewClass
+            view: ViewClass,
+            parent: this,
+            viewOptions: {
+                parent: this
+            }
         }, opts);
         var collectionView = new CollectionView(config);
         collectionView.render();

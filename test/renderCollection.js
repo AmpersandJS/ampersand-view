@@ -223,3 +223,27 @@ test('child view can choose to insert self', function (t) {
     view.remove();
     t.end();
 });
+
+test('child view `parent` should be parent view not collection view, when using `renderCollection()`', function (t) {
+    var Child = AmpersandView.extend({
+        template: '<li></li>',
+        initialize: function () {
+            t.equal(this.parent, view);
+            t.end();
+        }
+    });
+
+    var View = AmpersandView.extend({
+        initialize: function () {
+            this.el = document.createElement('div');
+            this.collection = new Collection([{id: 9}]);
+        },
+        render: function (opts) {
+            this.el.innerHTML = '<ul></ul>';
+            this.collectionView = this.renderCollection(this.collection, Child, this.query('ul'), {parent: this});
+        }
+    });
+
+    var view = new View();
+    view.render();
+});
