@@ -307,7 +307,7 @@ _.extend(View.prototype, {
     //
     //     render: function () {
     //       this.basicRender();
-    //       this.cacheElements({
+    //       return this.cacheElements({
     //         pages: '#pages',
     //         chat: '#teamChat',
     //         nav: 'nav#views ul',
@@ -322,6 +322,7 @@ _.extend(View.prototype, {
         for (var item in hash) {
             this[item] = this.query(hash[item]);
         }
+        return this;
     },
 
     // ## listenToAndRun

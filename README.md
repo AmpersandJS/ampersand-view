@@ -416,7 +416,7 @@ notes:
 
 
 ### cacheElements `view.cacheElements(hash)`
-A shortcut for adding reference to specific elements within your view for access later. This is avoids excessive DOM queries and makes it easier to update your view if your template changes.
+A shortcut for adding reference to specific elements within your view for access later. This is avoids excessive DOM queries and makes it easier to update your view if your template changes.  It returns `this`.
 
 In your `render` method. Use it like so:
 
@@ -424,7 +424,7 @@ In your `render` method. Use it like so:
 render: function () {
   this.renderWithTemplate(this);
 
-  this.cacheElements({
+  return this.cacheElements({
     pages: '#pages',
     chat: '#teamChat',
     nav: 'nav#views ul',
@@ -433,7 +433,6 @@ render: function () {
     omniBox: '[data-hook=omnibox]'
   });
 
-  return this;
 }
 ```
 
