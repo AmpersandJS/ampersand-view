@@ -90,7 +90,7 @@ module.exports = AmpersandView.extend({
 });
 ```
 
-**Note:** if you are using a template function (and not a string) the template function will get called with a context argument that looks like this, giving you access to `.model`, `.collection` and any other props you have defined on the view from the template.
+**Note:** if you are using a template function (and not a string) the template function will get called with a context argument that looks as follows, giving you access to `.model`, `.collection` and any other props you have defined on the view from the template.
 
 ```javascript
 this.renderWithTemplate(this, this.template);
@@ -192,10 +192,31 @@ var PersonView = AmpersandView.extend({
             hook: 'avatar'
         },
 
-        //no selector, selects the root element
+        // no selector or '' (empty string) selects the root element
         'model.selected': {
             type: 'booleanClass',
             name: 'active' //class to toggle
+        },
+
+        // you can also pass an array if you wish to do multiple bindings
+        // for a single property
+        'model.username': [
+            {
+                type: 'text',
+                hook: 'username'    
+            },
+            {
+                type: 'attribute',
+                name: 'data-username',
+                hook: 'username-tag'
+            }
+        ],
+
+        // if you use a CSS selector that matches multiple elements
+        // all of them will get the binding
+        'model.active': {
+            type: 'booleanClass',
+            selector: 'a, li'
         }
     }
 });
@@ -517,8 +538,15 @@ module.exports = AmpersandView.extend({
             }
         },
         tab: {
+            // note this will also get it's parent view's
+            // model and collection if present
             container: '[data-hook=switcher]',
             constructor: ViewSwitcher
+        },
+        otherThing: {
+            hook: 'other',
+            constructor: OtherView,
+            arbitraryPath: 'model.submodel'
         }
     }
 });
@@ -530,7 +558,8 @@ subview declarations consist of:
 * hook {String} Alternate method for specifying a container element using its `data-hook` attribute. Equivalent to `selector: '[data-hook=some-hook]'`.
 * constructor {ViewConstructor} Any [view conventions compliant](http://ampersandjs.com/learn/view-conventions) view constructor. It will be initialized with `{el: [Element grabbed from selector], parent: [reference to parent view instance]}`. So if you don't need to do any custom setup, you can just provide the constructor.
 * waitFor {String} String specifying they "key-path" (i.e. 'model.property') of the view that must be "truthy" before it should consider the subview ready.
-* prepareView {Function} Function that will be called once any `waitFor` condition is met. It will be called with the `this` context of the parent view and with the element that matches the selector as the argument. It should return an instantiated view instance.
+* other arbitrary object paths {String} Any other keys you include (i.e. 'model.submodel.name') will get resolved and passed through to the subview constructor. Note that the parent's `model` and `collection` will get passed through by default.
+* prepareView {Function} If you want total control of how your subview gets instantiated, use this. It will get called once any `waitFor` condition is met. It will be called with the `this` context of the parent view and with the element that matches the selector as the first argument. Your function should return an instantiated view instance. Note that in this case you're controlling how the subview instantiates, therefore nothing from the parent will get passed through to the subview unless you do it here.
 
 
 ### delegateEvents `view.delegateEvents([events])`
@@ -559,6 +588,7 @@ You usually don't need to use this, but may wish to if you have multiple views a
 
 ## Changelog
 
+- 7.2.0 Adding support for shorthand subviews and passing through `model` and `collection` to declared subviews from parent by default. [issue #24](https://github.com/AmpersandJS/ampersand/issues/24)
 - 7.0.0 Replacing use of `role` in lieu of `data-hook` for [accessibility reasons discussed here](https://github.com/AmpersandJS/ampersand/issues/21)
 - [insert period of poor changelog management here], this will not happen again now that ampersand is public.
 - 1.6.3 [diff](https://github.com/HenrikJoreteg/ampersand-view/compare/v1.6.2...v1.6.3) - Move throw statment for too many root elements inside non `<body>` case.
