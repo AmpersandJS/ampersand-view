@@ -135,7 +135,7 @@ _.extend(View.prototype, {
     remove: function () {
         var parsedBindings = this._parsedBindings;
         if (this.el && this.el.parentNode) this.el.parentNode.removeChild(this.el);
-        _.chain(this._subviews).flatten().invoke('remove');
+        if (this._subviews) _.chain(this._subviews).flatten().invoke('remove');
         this.stopListening();
         // TODO: Not sure if this is actually necessary.
         // Just trying to de-reference this potentially large
