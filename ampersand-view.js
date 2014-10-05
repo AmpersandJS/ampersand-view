@@ -1,12 +1,22 @@
 var State = require('ampersand-state');
 var CollectionView = require('ampersand-collection-view');
 var domify = require('domify');
-var _ = require('underscore');
+var _ = {
+    bind: require('lodash.bind'),
+    each: require('lodash.foreach'),
+    extend: require('lodash.assign'),
+    flatten: require('lodash.flatten'),
+    invoke: require('lodash.invoke'),
+    isString: require('lodash.isstring'),
+    last: require('lodash.last'),
+    pick: require('lodash.pick'),
+    result: require('lodash.result'),
+    uniqueId: require('lodash.uniqueid'),
+};
 var events = require('events-mixin');
 var matches = require('matches-selector');
 var bindings = require('ampersand-dom-bindings');
 var getPath = require('get-object-path');
-
 
 function View(attrs) {
     this.cid = _.uniqueId('view');
@@ -135,7 +145,7 @@ _.extend(View.prototype, {
     remove: function () {
         var parsedBindings = this._parsedBindings;
         if (this.el && this.el.parentNode) this.el.parentNode.removeChild(this.el);
-        if (this._subviews) _.chain(this._subviews).flatten().invoke('remove');
+        if (this._subviews) _.invoke(_.flatten(this._subviews), 'remove');
         this.stopListening();
         // TODO: Not sure if this is actually necessary.
         // Just trying to de-reference this potentially large
