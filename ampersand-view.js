@@ -15,7 +15,7 @@ function View(attrs) {
     delete attrs.parent;
     BaseState.call(this, attrs, {init: false, parent: parent});
     this.on('change:el', this._handleElementChange, this);
-    this._parsedBindings = bindings(this.bindings);
+    this._parsedBindings = bindings(this.bindings, this);
     this._initializeBindings();
     if (attrs.el && !this.autoRender) {
         this._handleElementChange();
