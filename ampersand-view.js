@@ -1,3 +1,4 @@
+/*$AMPERSAND_VERSION*/
 var State = require('ampersand-state');
 var CollectionView = require('ampersand-collection-view');
 var domify = require('domify');
