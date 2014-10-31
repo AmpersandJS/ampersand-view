@@ -19,8 +19,17 @@
     "domify": "^1.0.0",
     "events-mixin": "^1.1.0",
     "get-object-path": "^0.0.2",
-    "matches-selector": "^1.0.0",
-    "underscore": "1.6.0"
+    "lodash.assign": "^2.4.1",
+    "lodash.bind": "^2.4.1",
+    "lodash.flatten": "^2.4.1",
+    "lodash.foreach": "^2.4.1",
+    "lodash.invoke": "^2.4.1",
+    "lodash.isstring": "^2.4.1",
+    "lodash.last": "^2.4.1",
+    "lodash.pick": "^2.4.1",
+    "lodash.result": "^2.4.1",
+    "lodash.uniqueid": "^2.4.1",
+    "matches-selector": "^1.0.0"
   },
   "devDependencies": {
     "ampersand-model": "~4.0.2",
