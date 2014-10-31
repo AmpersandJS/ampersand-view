@@ -23,7 +23,6 @@ function View(attrs) {
     }
     this._initializeSubviews();
     this.initialize.apply(this, arguments);
-    this.set(_.pick(attrs, viewOptions));
     if (this.autoRender && this.template) {
         this.render();
     }
@@ -77,9 +76,7 @@ var BaseState = State.extend({
 
 // Cached regex to split keys for `delegate`.
 var delegateEventSplitter = /^(\S+)\s*(.*)$/;
-
-// List of view options to be merged as properties.
-var viewOptions = ['model', 'collection', 'el'];
+var excludedSubviewOpts = ['container', 'hook', 'waitFor'];
 
 View.prototype = Object.create(BaseState.prototype);
 
@@ -258,10 +255,20 @@ _.extend(View.prototype, {
             selector: subview.container || '[data-hook="' + subview.hook + '"]',
             waitFor: subview.waitFor || '',
             prepareView: subview.prepareView || function (el) {
-                return new subview.constructor({
+                var opts = {
                     el: el,
                     parent: self
-                });
+                };
+                // pass in parent's model/collection by default
+                opts.model = self.model;
+                opts.collection = self.collection;
+                // allow arbitrary paths to be passed through to child
+                for (var key in subview) {
+                    if (!_.contains(excludedSubviewOpts, key) && typeof subview[key] === 'string') {
+                        opts[key] = getPath(this, subview[key]);
+                    }
+                }
+                return new subview.constructor(opts);
             }
         };
         function action() {

@@ -580,6 +580,35 @@ test('declarative subViews basics', function (t) {
     var view = new View();
 
     t.equal(view.el.innerHTML, '<span></span>');
+    t.equal(view.sub1.parent, view, 'subview should have parent reference');
+
+    t.end();
+});
+
+test('subviews should support passing object paths for things like model/collection', function (t) {
+    var Sub = AmpersandView.extend({
+        template: '<span></span>',
+        props: {
+            fireDanger: 'string'
+        }
+    });
+
+    var View = AmpersandView.extend({
+        template: '<div><div class="container"></div></div>',
+        autoRender: true,
+        subviews: {
+            sub1: {
+                container: '.container',
+                constructor: Sub,
+                something: 'model.fireDanger'
+            }
+        }
+    });
+    var model = new Model();
+    var view = new View({model: model});
+
+    t.equal(view.el.innerHTML, '<span></span>');
+    t.equal(view.sub1.model, model, 'Subview should have property from model set directly');
 
     t.end();
 });
