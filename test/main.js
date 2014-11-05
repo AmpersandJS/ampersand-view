@@ -656,6 +656,22 @@ test('make sure template can return a dom node', function (t) {
     t.end();
 });
 
+test('template can be passed as viewOption', function (t) {
+    t.plan(1);
+
+    var View = AmpersandView.extend({
+        autoRender: true
+    });
+
+    var view = new View({
+        template: '<span></span>'
+    });
+
+    t.equal(view.el.outerHTML, '<span></span>');
+
+    t.end();
+});
+
 test('events are bound if there is an el in the constructor', function (t) {
     t.plan(1);
     var event = document.createEvent("MouseEvent");
