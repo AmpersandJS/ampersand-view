@@ -140,6 +140,16 @@ var DocumentView = AmpersandView.extend({
 });
 ```
 
+Note that the `events` definition is not merged with the superclass definition. If you want to merge
+`events` from a superclass, you have to do it explicitly:
+```
+var SuperheroRowView = PersonRowView.extend({
+  events: _.extend(PersonRowView.prototype.events, {
+    'click [data-hook=edit-secret-identitiy]': 'editSecretIdentity'
+  })
+});
+```
+
 ### bindings
 
 The bindings hash gives you a declarative way of specifying which elements in your view should be updated when the view's model is changed.
@@ -201,6 +211,16 @@ var PersonView = AmpersandView.extend({
 });
 ```
 
+Note that the `bindings` definition is not merged with the superclass definition. If you want to merge
+`bindings` from a superclass, you have to do it explicitly:
+```
+var SuperheroRowView = PersonRowView.extend({
+  bindings: _.extend(PersonRowView.prototype.bindings, {
+    'model.secretIdentity': '[data-hook=secret-identity]'
+  })
+});
+```
+
 ### el `view.el`
 
 All rendered views have a single DOM node which they manage, which is acessible from the `.el` property on the view. Allowing you to insert it into the DOM from the parent context.
@@ -244,6 +264,17 @@ var view = new MyView({ foo: 'bar' });
 //=> logs 'The options are: {foo: "bar"}'
 ```
 
+If you want to extend the `initialize` function of a superclass instead of redefining it completely, you can 
+explicitly call the `initialize` of the superclass at the right time:
+```
+var SuperheroRowView = PersonRowView.extend({
+  initialize: function () {
+    PersonRowView.prototype.initialize.call(this);
+    doSomeOtherStuffHere();
+  })
+});
+```
+
 
 ### render `view.render()`
 
@@ -261,6 +292,17 @@ render: function () {
     this.renderWithTemplate(this);
     return this;
 }
+```
+
+If you want to extend the `render` function of a superclass instead of redefining it completely, you can 
+explicitly call the `render` of the superclass at the right time:
+```
+var SuperheroRowView = PersonRowView.extend({
+  render: function () {
+    PersonRowView.prototype.render.call(this);
+    doSomeOtherStuffHere();
+  })
+});
 ```
 
 ### renderCollection `view.renderCollection(collection, ItemView, containerEl, [viewOptions])`
