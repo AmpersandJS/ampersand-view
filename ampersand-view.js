@@ -290,7 +290,7 @@ _.extend(View.prototype, {
     renderWithTemplate: function (context, templateArg) {
         var template = templateArg || this.template;
         if (!template) throw new Error('Template string or function needed.');
-        var newDom = _.isString(template) ? template : template(context || this);
+        var newDom = _.isString(template) ? template : template.call(this, context || this);
         if (_.isString(newDom)) newDom = domify(newDom);
         var parent = this.el && this.el.parentNode;
         if (parent) parent.replaceChild(newDom, this.el);
