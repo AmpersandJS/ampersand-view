@@ -269,7 +269,7 @@ explicitly call the `initialize` of the superclass at the right time:
 ```
 var SuperheroRowView = PersonRowView.extend({
   initialize: function () {
-    PersonRowView.prototype.initialize.call(this, arguments);
+    PersonRowView.prototype.initialize.apply(this, arguments);
     doSomeOtherStuffHere();
   })
 });
@@ -299,7 +299,7 @@ explicitly call the `render` of the superclass at the right time:
 ```
 var SuperheroRowView = PersonRowView.extend({
   render: function () {
-    PersonRowView.prototype.render.call(this, arguments);
+    PersonRowView.prototype.render.apply(this, arguments);
     doSomeOtherStuffHere();
   })
 });
