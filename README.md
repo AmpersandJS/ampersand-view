@@ -363,10 +363,10 @@ var AlternativeMainView = AmpersandView.extend({
         this.renderWithTemplate(this);
         this.renderCollection(this.collection, function (options) {
             if (options.model.isAlternative) {
-                return new AlternativeMainView(options);
+                return new AlternativeItemView(options);
             }
 
-            return new MainView(options);
+            return new ItemView(options);
         }, this.el.querySelector('.itemContainer'), opts);
         return this;
     }
