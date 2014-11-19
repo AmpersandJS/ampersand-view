@@ -144,7 +144,7 @@ Note that the `events` definition is not merged with the superclass definition. 
 `events` from a superclass, you have to do it explicitly:
 ```
 var SuperheroRowView = PersonRowView.extend({
-  events: _.extend(PersonRowView.prototype.events, {
+  events: _.extend({}, PersonRowView.prototype.events, {
     'click [data-hook=edit-secret-identitiy]': 'editSecretIdentity'
   })
 });
@@ -215,7 +215,7 @@ Note that the `bindings` definition is not merged with the superclass definition
 `bindings` from a superclass, you have to do it explicitly:
 ```
 var SuperheroRowView = PersonRowView.extend({
-  bindings: _.extend(PersonRowView.prototype.bindings, {
+  bindings: _.extend({}, PersonRowView.prototype.bindings, {
     'model.secretIdentity': '[data-hook=secret-identity]'
   })
 });
