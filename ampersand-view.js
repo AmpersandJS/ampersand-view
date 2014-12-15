@@ -121,6 +121,12 @@ _.extend(View.prototype, {
         return this.query('[data-hook~="' + hook + '"]');
     },
 
+    // ## queryAllByHook
+    // Convenience method for fetching all elements by their's `data-hook` attribute.
+    queryAllByHook: function (hook) {
+        return this.queryAll('[data-hook~="' + hook + '"]');
+    },
+
     // Initialize is an empty function by default. Override it with your own
     // initialization logic.
     initialize: function () {},
