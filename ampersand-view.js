@@ -1,12 +1,18 @@
 /*$AMPERSAND_VERSION*/
 var State = require('ampersand-state');
 var CollectionView = require('ampersand-collection-view');
-var domify = require('domify');
 var _ = require('underscore');
-var events = require('events-mixin');
-var matches = require('matches-selector');
-var bindings = require('ampersand-dom-bindings');
 var getPath = require('get-object-path');
+var isBrowser = require('is-browser');
+
+var domify, events, matches, bindings;
+
+if (isBrowser) {
+    domify = require('domify');
+    events = require('events-mixin');
+    matches = require('matches-selector');
+    bindings = require('ampersand-dom-bindings');
+}
 
 
 function View(attrs) {
@@ -15,11 +21,13 @@ function View(attrs) {
     var parent = attrs.parent;
     delete attrs.parent;
     BaseState.call(this, attrs, {init: false, parent: parent});
-    this.on('change:el', this._handleElementChange, this);
-    this._parsedBindings = bindings(this.bindings, this);
-    this._initializeBindings();
-    if (attrs.el && !this.autoRender) {
-        this._handleElementChange();
+    if (isBrowser) {
+        this.on('change:el', this._handleElementChange, this);
+        this._parsedBindings = bindings(this.bindings, this);
+        this._initializeBindings();
+        if (attrs.el && !this.autoRender) {
+            this._handleElementChange();
+        }
     }
     this._initializeSubviews();
     this.template = attrs.template || this.template;
@@ -34,10 +42,17 @@ var BaseState = State.extend({
     dataTypes: {
         element: {
             set: function (newVal) {
-                return {
-                    val: newVal,
-                    type: newVal instanceof Element ? 'element' : typeof newVal
-                };
+                if (isBrowser) {
+                    return {
+                        val: newVal,
+                        type: newVal instanceof Element ? 'element' : typeof newVal
+                    };
+                } else {
+                    return {
+                        val: newVal,
+                        type: 'element'
+                    };
+                }
             },
             compare: function (el1, el2) {
                 return el1 === el2;
@@ -93,6 +108,7 @@ _.extend(View.prototype, {
     // This lets us use `get` to handle cases where users
     // can pass a selector or an already selected element.
     query: function (selector) {
+        if (!isBrowser) return undefined;
         if (!selector) return this.el;
         if (typeof selector === 'string') {
             if (matches(this.el, selector)) return this.el;
@@ -106,6 +122,7 @@ _.extend(View.prototype, {
     // if you pass an empty string it return `this.el`. Also includes root
     // element.
     queryAll: function (selector) {
+        if (!isBrowser) throw "Cannot do this on the server";
         var res = [];
         if (!this.el) return res;
         if (selector === '') return [this.el];
@@ -118,6 +135,7 @@ _.extend(View.prototype, {
     // Also tries to match against root element.
     // Also supports matching 'one' of several space separated hooks.
     queryByHook: function (hook) {
+        if (!isBrowser) throw "Cannot do this on the server";
         return this.query('[data-hook~="' + hook + '"]');
     },
 
@@ -155,10 +173,12 @@ _.extend(View.prototype, {
     // Change the view's element (`this.el` property), including event
     // re-delegation.
     _handleElementChange: function (element, delegate) {
-        if (this.eventManager) this.eventManager.unbind();
-        this.eventManager = events(this.el, this);
-        this.delegateEvents();
-        this._applyBindingsForKey();
+        if (isBrowser) {
+            if (this.eventManager) this.eventManager.unbind();
+            this.eventManager = events(this.el, this);
+            this.delegateEvents();
+            this._applyBindingsForKey();
+        }
         return this;
     },
 
