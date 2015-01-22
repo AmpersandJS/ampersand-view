@@ -30,7 +30,7 @@ npm install ampersand-view
 
 ## API Reference
 
-Note that this is a fork of Backbone's view so most of the public methods/properties here still exist: [http://backbonejs.org/#View](http://backbonejs.org/#View).
+Note that this is a fork of Backbone's view so most of the public methods/properties here still exist: [http://backbonejs.org/#View](http://backbonejs.org/#View).`AmpersandView` extends [`AmpersandState`](https://github.com/ampersandjs/ampersand-state) so it can have it's own `props` values for example and can be bound directly to the template without a backing model object.
 
 ### extend `AmpersandView.extend([properties])`
 
