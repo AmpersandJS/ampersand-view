@@ -23,8 +23,8 @@ function View(attrs) {
     }
     this._initializeSubviews();
     this.template = attrs.template || this.template;
-    this.initialize.apply(this, arguments);
     this.set(_.pick(attrs, viewOptions));
+    this.initialize.apply(this, arguments);
     if (this.autoRender && this.template) {
         this.render();
     }
