@@ -2,7 +2,16 @@
 var State = require('ampersand-state');
 var CollectionView = require('ampersand-collection-view');
 var domify = require('domify');
-var _ = require('underscore');
+var uniqueId = require("lodash.uniqueid");
+var pick = require("lodash.pick");
+var assign = require("lodash.assign");
+var forEach = require("lodash.foreach");
+var result = require("lodash.result");
+var last = require("lodash.last");
+var isString = require("lodash.isstring");
+var bind = require("lodash.bind");
+var flatten = require("lodash.flatten");
+var invoke = require("lodash.invoke");
 var events = require('events-mixin');
 var matches = require('matches-selector');
 var bindings = require('ampersand-dom-bindings');
@@ -10,7 +19,7 @@ var getPath = require('get-object-path');
 
 
 function View(attrs) {
-    this.cid = _.uniqueId('view');
+    this.cid = uniqueId('view');
     attrs || (attrs = {});
     var parent = attrs.parent;
     delete attrs.parent;
@@ -24,7 +33,7 @@ function View(attrs) {
     this._initializeSubviews();
     this.template = attrs.template || this.template;
     this.initialize.apply(this, arguments);
-    this.set(_.pick(attrs, viewOptions));
+    this.set(pick(attrs, viewOptions));
     if (this.autoRender && this.template) {
         this.render();
     }
@@ -85,7 +94,7 @@ var viewOptions = ['model', 'collection', 'el'];
 View.prototype = Object.create(BaseState.prototype);
 
 // Set up all inheritable properties and methods.
-_.extend(View.prototype, {
+assign(View.prototype, {
     // ## query
     // Get an single element based on CSS selector scoped to this.el
     // if you pass an empty string it return `this.el`.
@@ -137,13 +146,13 @@ _.extend(View.prototype, {
     remove: function () {
         var parsedBindings = this._parsedBindings;
         if (this.el && this.el.parentNode) this.el.parentNode.removeChild(this.el);
-        if (this._subviews) _.chain(this._subviews).flatten().invoke('remove');
+        if (this._subviews) invoke(flatten(this._subviews), 'remove');
         this.stopListening();
         // TODO: Not sure if this is actually necessary.
         // Just trying to de-reference this potentially large
         // amount of generated functions to avoid memory leaks.
-        _.each(parsedBindings, function (properties, modelName) {
-            _.each(properties, function (value, key) {
+        forEach(parsedBindings, function (properties, modelName) {
+            forEach(properties, function (value, key) {
                 delete parsedBindings[modelName][key];
             });
             delete parsedBindings[modelName];
@@ -178,7 +187,7 @@ _.extend(View.prototype, {
     // This only works for delegate-able events: not `focus`, `blur`, and
     // not `change`, `submit`, and `reset` in Internet Explorer.
     delegateEvents: function (events) {
-        if (!(events || (events = _.result(this, 'events')))) return this;
+        if (!(events || (events = result(this, 'events')))) return this;
         this.undelegateEvents();
         for (var key in events) {
             this.eventManager.bind(key, events[key]);
@@ -227,7 +236,7 @@ _.extend(View.prototype, {
         var item;
         for (item in fns) {
             fns[item].forEach(function (fn) {
-                fn(this.el, getPath(this, item), _.last(item.split('.')));
+                fn(this.el, getPath(this, item), last(item.split('.')));
             }, this);
         }
     },
@@ -291,8 +300,8 @@ _.extend(View.prototype, {
     renderWithTemplate: function (context, templateArg) {
         var template = templateArg || this.template;
         if (!template) throw new Error('Template string or function needed.');
-        var newDom = _.isString(template) ? template : template.call(this, context || this);
-        if (_.isString(newDom)) newDom = domify(newDom);
+        var newDom = isString(template) ? template : template.call(this, context || this);
+        if (isString(newDom)) newDom = domify(newDom);
         var parent = this.el && this.el.parentNode;
         if (parent) parent.replaceChild(newDom, this.el);
         if (newDom.nodeName === '#document-fragment') throw new Error('Views can only have one root element.');
@@ -330,7 +339,7 @@ _.extend(View.prototype, {
     // Shortcut for registering a listener for a model
     // and also triggering it right away.
     listenToAndRun: function (object, events, handler) {
-        var bound = _.bind(handler, this);
+        var bound = bind(handler, this);
         this.listenTo(object, events, bound);
         bound();
     },
@@ -349,7 +358,7 @@ _.extend(View.prototype, {
     // collection. The collectionView is returned.
     renderCollection: function (collection, ViewClass, container, opts) {
         var containerEl = (typeof container === 'string') ? this.query(container) : container;
-        var config = _.extend({
+        var config = assign({
             collection: collection,
             el: containerEl || this.el,
             view: ViewClass,
