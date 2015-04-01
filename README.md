@@ -458,7 +458,7 @@ notes:
 
 
 ### cacheElements `view.cacheElements(hash)`
-A shortcut for adding reference to specific elements within your view for access later. This is avoids excessive DOM queries and makes it easier to update your view if your template changes.
+A shortcut for adding reference to specific elements within your view for access later. This is avoids excessive DOM queries and makes it easier to update your view if your template changes.  It returns `this`.
 
 In your `render` method. Use it like so:
 

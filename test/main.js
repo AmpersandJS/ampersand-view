@@ -110,6 +110,21 @@ test('registerSubview: default container to this.el', function (t) {
     t.end();
 });
 
+test('caching elements', function(t) {
+  var View = AmpersandView.extend({
+    template: '<p><span></span></p>',
+    render: function () {
+      this.renderWithTemplate();
+      return this.cacheElements(({span:'span'}));
+    }
+  });
+  var instance = new View(),
+     rendered  = instance.render();
+  t.equal(instance, rendered);
+  t.equal(typeof rendered.span, 'object');
+  t.end();
+});
+
 test('listen to and run', function (t) {
     t.plan(1);
     var model = new Model({

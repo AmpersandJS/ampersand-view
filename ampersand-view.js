@@ -333,6 +333,7 @@ assign(View.prototype, {
         for (var item in hash) {
             this[item] = this.query(hash[item]);
         }
+        return this;
     },
 
     // ## listenToAndRun
