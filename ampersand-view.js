@@ -307,7 +307,7 @@ _.extend(View.prototype, {
     //
     //     render: function () {
     //       this.basicRender();
-    //       return this.cacheElements({
+    //       this.cacheElements({
     //         pages: '#pages',
     //         chat: '#teamChat',
     //         nav: 'nav#views ul',

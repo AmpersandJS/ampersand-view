@@ -424,7 +424,7 @@ In your `render` method. Use it like so:
 render: function () {
   this.renderWithTemplate(this);
 
-  return this.cacheElements({
+  this.cacheElements({
     pages: '#pages',
     chat: '#teamChat',
     nav: 'nav#views ul',
@@ -433,6 +433,7 @@ render: function () {
     omniBox: '[data-hook=omnibox]'
   });
 
+  return this;
 }
 ```
 
