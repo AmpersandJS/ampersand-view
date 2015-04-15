@@ -209,10 +209,8 @@ assign(View.prototype, {
         // Storage for our subviews.
         this._subviews || (this._subviews = []);
         this._subviews.push(view);
-        // If view has an 'el' it's a single view not
-        // an array of views registered by renderCollection
-        // so we store a reference to the parent view.
-        if (view.el) view.parent = this;
+        // set the parent reference if it has not been set
+        if (!view.parent) view.parent = this;
         return view;
     },
 
