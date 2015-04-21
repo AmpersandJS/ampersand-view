@@ -39,6 +39,20 @@ function getView(bindings, model) {
     return view.renderWithTemplate();
 }
 
+test('rendered attr behavior', function (t) {
+    var detachedEl = document.createElement('div');
+    var view = new AmpersandView({
+        template: '<span></span>',
+        el: detachedEl
+    });
+    t.notOk(view.rendered, 'view not rendered prior to render call');
+    view.render();
+    t.notOk(view.rendered, 'view not rendered when `el` not in document');
+    document.body.appendChild(view.el);
+    t.ok(view.rendered, 'view rendered when put on DOM');
+    t.end();
+});
+
 test('registerSubview', function (t) {
     var removeCalled = 0;
     var SubView = AmpersandView.extend({

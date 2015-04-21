@@ -71,10 +71,10 @@ var BaseState = State.extend({
     },
     derived: {
         rendered: {
-            deps: ['el'],
             fn: function () {
-                return !!this.el;
-            }
+                return document.body.contains(this.el);
+            },
+            cache: false
         },
         hasData: {
             deps: ['model'],
