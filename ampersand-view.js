@@ -262,8 +262,12 @@ assign(View.prototype, {
     // the `waitFor` if need be.
     _parseSubview: function (subview, name) {
         var self = this;
+        //backwards compatibility with older versions, when `container` was a valid property (#114)
+        if (subview.container) {
+            subview.selector = subview.container;
+        }
         var opts = {
-            selector: subview.container || '[data-hook="' + subview.hook + '"]',
+            selector: subview.selector || '[data-hook="' + subview.hook + '"]',
             waitFor: subview.waitFor || '',
             prepareView: subview.prepareView || function (el) {
                 return new subview.constructor({
@@ -286,7 +290,6 @@ assign(View.prototype, {
         // we listen for main `change` items
         this.on('change', action, this);
     },
-
 
     // Shortcut for doing everything we need to do to
     // render and fully replace current root element.
