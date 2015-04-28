@@ -559,7 +559,7 @@ module.exports = AmpersandView.extend({
             }
         },
         tab: {
-            hook: '[data-hook=switcher]',
+            hook: 'switcher',
             constructor: ViewSwitcher
         }
     }
