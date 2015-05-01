@@ -67,15 +67,14 @@ var BaseState = State.extend({
     props: {
         model: 'state',
         el: 'element',
-        collection: 'collection'
+        collection: 'collection',
+        rendered: {
+            type: 'boolean',
+            required: true,
+            default: false
+        }
     },
     derived: {
-        rendered: {
-            fn: function () {
-                return document.body.contains(this.el);
-            },
-            cache: false
-        },
         hasData: {
             deps: ['model'],
             fn: function () {
@@ -138,6 +137,7 @@ assign(View.prototype, {
     // to populate its element (`this.el`), with the appropriate HTML.
     render: function () {
         this.renderWithTemplate(this);
+        this.rendered = true;
         return this;
     },
 
@@ -158,6 +158,7 @@ assign(View.prototype, {
             delete parsedBindings[modelName];
         });
         this.trigger('remove', this);
+        this.rendered = false;
         return this;
     },
 

@@ -40,16 +40,23 @@ function getView(bindings, model) {
 }
 
 test('rendered attr behavior', function (t) {
+    var caughtRenderEvt = false;
     var detachedEl = document.createElement('div');
     var view = new AmpersandView({
         template: '<span></span>',
         el: detachedEl
     });
-    t.notOk(view.rendered, 'view not rendered prior to render call');
+    view.on('change:rendered', function() {
+        caughtRenderEvt = !caughtRenderEvt;
+    });
+    t.notOk(view.rendered, 'view not `rendered` prior to `render` call');
     view.render();
-    t.notOk(view.rendered, 'view not rendered when `el` not in document');
-    document.body.appendChild(view.el);
-    t.ok(view.rendered, 'view rendered when put on DOM');
+    t.ok(view.rendered, 'view `rendered` post `render` call');
+    t.ok(caughtRenderEvt, 'view `rendered` evt observed on render');
+    view.remove();
+    t.notOk(caughtRenderEvt, 'view `rendered` evt observed on remove');
+    t.notOk(view.rendered, 'view not `rendered` opst to `remove` call');
+
     t.end();
 });
 
