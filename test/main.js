@@ -56,7 +56,6 @@ test('rendered attr behavior', function (t) {
     view.remove();
     t.notOk(caughtRenderEvt, 'view `rendered` evt observed on remove');
     t.notOk(view.rendered, 'view not `rendered` opst to `remove` call');
-
     t.end();
 });
 
