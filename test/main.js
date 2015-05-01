@@ -609,7 +609,7 @@ test('subViews declaraction can accept a CSS selector string via `container` pro
         autoRender: true,
         subviews: {
             sub1: {
-                selector: '.container',
+                container: '.container',
                 constructor: Sub
             }
         }
