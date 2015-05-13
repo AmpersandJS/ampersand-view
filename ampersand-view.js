@@ -67,15 +67,14 @@ var BaseState = State.extend({
     props: {
         model: 'state',
         el: 'element',
-        collection: 'collection'
+        collection: 'collection',
+        rendered: {
+            type: 'boolean',
+            required: true,
+            default: false
+        }
     },
     derived: {
-        rendered: {
-            deps: ['el'],
-            fn: function () {
-                return !!this.el;
-            }
-        },
         hasData: {
             deps: ['model'],
             fn: function () {
@@ -134,16 +133,25 @@ assign(View.prototype, {
     // initialization logic.
     initialize: function () {},
 
-    // **render** is the core function that your view can override, its job is
-    // to populate its element (`this.el`), with the appropriate HTML.
-    render: function () {
+    // **render** is the core function that your view can override. Its job is
+    // to populate its element (`this.el`), with the appropriate HTML. __render
+    // is overriden by any user-defined render.  Each call to `render()` actually
+    // executes `__render()` && `_render()`
+    __render: function () {
         this.renderWithTemplate(this);
+        this._render();
+        return this;
+    },
+
+    // called on every `render()` call, regardless if user overrides render()
+    _render: function() {
+        this.rendered = true;
         return this;
     },
 
     // Remove this view by taking the element out of the DOM, and removing any
     // applicable events listeners.
-    remove: function () {
+    __remove: function () {
         var parsedBindings = this._parsedBindings;
         if (this.el && this.el.parentNode) this.el.parentNode.removeChild(this.el);
         if (this._subviews) invoke(flatten(this._subviews), 'remove');
@@ -157,7 +165,14 @@ assign(View.prototype, {
             });
             delete parsedBindings[modelName];
         });
+        this._remove();
         this.trigger('remove', this);
+        return this;
+    },
+
+    // called on every remove, regardless if user overrides
+    _remove: function() {
+        this.rendered = false;
         return this;
     },
 
@@ -247,6 +262,7 @@ assign(View.prototype, {
             }
         }, this);
     },
+
 
     // ## _initializeSubviews
     // this is called at setup and grabs declared subviews
@@ -369,8 +385,46 @@ assign(View.prototype, {
         var collectionView = new CollectionView(config);
         collectionView.render();
         return this.registerSubview(collectionView);
+    },
+
+    _setRender: function(obj) {
+        Object.defineProperty(obj, 'render', {
+            get: function() {
+                return this.__render;
+            },
+            set: function(fn) {
+                if (typeof fn !== 'function') {
+                    throw new ReferenceError('render() must be a function. ' +
+                        'received: ' + fn.toString());
+                }
+                this.__render = function() {
+                    fn.apply(this, arguments);
+                    return this._render();
+                };
+            }
+        });
+    },
+
+    _setRemove: function(obj) {
+        Object.defineProperty(obj, 'remove', {
+            get: function() {
+                return this.__remove;
+            },
+            set: function(fn) {
+                if (typeof fn !== 'function') {
+                    throw new ReferenceError('remove() must be a function. ' +
+                        'received: ' + fn.toString());
+                }
+                this.__remove = function() {
+                    fn.apply(this, arguments);
+                    return this._remove();
+                };
+            }
+        });
     }
 });
 
+View.prototype._setRender(View.prototype);
+View.prototype._setRemove(View.prototype);
 View.extend = BaseState.extend;
 module.exports = View;
