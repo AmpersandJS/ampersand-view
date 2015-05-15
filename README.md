@@ -62,7 +62,6 @@ var PersonRowView = AmpersandView.extend({
 });
 ```
 
-
 ### template `AmpersandView.extend({ template: "<div><input></div>" })`
 
 The `.template` is a property for the view prototype. It should either be a string of HTML or a function that returns a string of HTML or a DOM element. It isn't required, but it is used as a default for calling `renderWithTemplate`.
@@ -232,7 +231,6 @@ view.render();
 document.querySelector('#viewContainer').appendChild(view.el);
 ```
 
-
 ### constructor `new AmpersandView([options])`
 
 The default `AmpersandView` constructor accepts an optional `options` object, and:
@@ -247,7 +245,6 @@ The default `AmpersandView` constructor accepts an optional `options` object, an
 Typical use-cases for the options hash:
 * To initialize a view with an `el` _already_ in the DOM, pass it as an option: `new AmpersandView({ el: existingElement })`.
 * To perform extra work when initializing a new view, override the `initialize` function in the extend call, rather than modifying the constructor, it's easier.
-
 
 ### initialize `new AmpersandView([options])`
 
@@ -274,7 +271,6 @@ var SuperheroRowView = PersonRowView.extend({
   })
 });
 ```
-
 
 ### render `view.render()`
 
@@ -447,7 +443,6 @@ var view = AmpersandView.extend({
 });
 ```
 
-
 ### queryAll `view.queryAll('.classname')`
 
 Runs a [`querySelectorAll`](https://developer.mozilla.org/en-US/docs/Web/API/document.querySelectorAll) scoped within the view's current element (`view.el`), returning an array of all matching elements in the dom-tree.
@@ -456,6 +451,9 @@ notes:
 - It will also include the root element if it matches the selector.
 - It returns a real `Array` not a DOM collection.
 
+### queryAllByHook `view.queryAllByHook('hookname')`
+
+Uses `queryAll` method with a given `data-hook` attribute to retrieve all matching elements scoped within the view's current element (`view.el`), returning an array of all matching elements in the dom-tree or an empty array if no results has been found.
 
 ### cacheElements `view.cacheElements(hash)`
 A shortcut for adding reference to specific elements within your view for access later. This is avoids excessive DOM queries and makes it easier to update your view if your template changes.  It returns `this`.
@@ -481,7 +479,6 @@ render: function () {
 
 Then later you can access elements by reference like so: `this.pages`, or `this.chat`.
 
-
 ### listenToAndRun `view.listenToAndRun(object, eventsString, callback)`
 Shortcut for registering a listener for a model and also triggering it right away.
 
@@ -490,12 +487,9 @@ Shortcut for registering a listener for a model and also triggering it right awa
 
 Removes a view from the DOM, and calls `stopListening` to remove any bound events that the view has `listenTo`'d.
 
-
-
 ### registerSubview `view.registerSubview(viewInstance)`
 
 * viewInstance {Object} Any object with a "remove" method, typically an instantiated view. But doesn't have to be, it can be anything with a remove method. The remove method doesn't have to actually remove itself from the DOM (since the parent view is being removed anyway), it is generally just used for unregistering any handler that it set up.
-
 
 ### renderSubview `view.renderSubview(viewInstance, containerEl)`
 
@@ -574,7 +568,6 @@ subview declarations consist of:
 * waitFor {String} String specifying they "key-path" (i.e. 'model.property') of the view that must be "truthy" before it should consider the subview ready.
 * prepareView {Function} Function that will be called once any `waitFor` condition is met. It will be called with the `this` context of the parent view and with the element that matches the selector as the argument. It should return an instantiated view instance.
 
-
 ### delegateEvents `view.delegateEvents([events])`
 
 Creates delegated DOM event handlers for view elements on `this.el`. If `events` is omitted, will use the `events` property on the view.
@@ -597,7 +590,6 @@ Will unbind existing events by calling `undelegateEvents` before binding new one
 
 Clears all callbacks previously bound to the view with `delegateEvents`.
 You usually don't need to use this, but may wish to if you have multiple views attached to the same DOM element.
-
 
 ## Changelog
 
