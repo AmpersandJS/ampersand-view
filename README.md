@@ -485,7 +485,20 @@ Shortcut for registering a listener for a model and also triggering it right awa
 
 ### remove `view.remove()`
 
-Removes a view from the DOM, and calls `stopListening` to remove any bound events that the view has `listenTo`'d.
+Removes a view from the DOM, and calls `stopListening` to remove any bound events that the view has `listenTo`'d.  This method also triggers a `remove` event on the view, allowing for listeners (or the view itself) to listen to it and do some action, like cleanup some other resources being used.  
+
+```javascript
+initialize : function() {
+  this.listenTo(this,'remove',this.cleanup);
+  // OR this, either statements will call 'cleanup' when `remove` is called
+  this.once('remove',this.cleanup, this);
+},
+
+cleanup : function(){
+  // do cleanup
+}
+
+```
 
 ### registerSubview `view.registerSubview(viewInstance)`
 
