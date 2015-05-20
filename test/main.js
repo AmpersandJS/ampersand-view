@@ -578,13 +578,27 @@ test('Should be able to re-render and maintain bindings', function (t) {
     t.end();
 });
 
-test('trigger `remove` when view is removed', function (t) {
+test('trigger `remove` when view is removed using on', function (t) {
     var View = AmpersandView.extend({
         template: '<div></div>',
         autoRender: true
     });
     var view = new View();
     view.on('remove', function () {
+        t.pass('remove fired');
+        t.end();
+    });
+    view.remove();
+});
+
+test('trigger `remove` when view is removed using listenTo', function(t){
+   
+    var View = AmpersandView.extend({
+        template: '<div></div>',
+        autoRender: true
+    });
+    var view = new View();
+    view.listenTo(view,'remove', function() {
         t.pass('remove fired');
         t.end();
     });

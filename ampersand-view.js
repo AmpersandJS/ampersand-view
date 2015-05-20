@@ -153,6 +153,7 @@ assign(View.prototype, {
         var parsedBindings = this._parsedBindings;
         if (this.el && this.el.parentNode) this.el.parentNode.removeChild(this.el);
         if (this._subviews) invoke(flatten(this._subviews), 'remove');
+        this.trigger('remove', this);
         this.stopListening();
         // TODO: Not sure if this is actually necessary.
         // Just trying to de-reference this potentially large
@@ -163,7 +164,6 @@ assign(View.prototype, {
             });
             delete parsedBindings[modelName];
         });
-        this.trigger('remove', this);
         return this;
     },
 
