@@ -33,7 +33,7 @@ function View(attrs) {
     this._initializeSubviews();
     this.template = attrs.template || this.template;
     this.initialize.apply(this, arguments);
-    this.set(pick(attrs, viewOptions));
+    this.set(pick(attrs, result(this, 'viewOptions')));
     if (this.autoRender && this.template) {
         this.render();
     }
@@ -88,13 +88,13 @@ var BaseState = State.extend({
 // Cached regex to split keys for `delegate`.
 var delegateEventSplitter = /^(\S+)\s*(.*)$/;
 
-// List of view options to be merged as properties.
-var viewOptions = ['model', 'collection', 'el'];
-
 View.prototype = Object.create(BaseState.prototype);
 
 // Set up all inheritable properties and methods.
 assign(View.prototype, {
+    // List of view options to be merged as properties.
+    viewOptions: ['model', 'collection', 'el'],
+
     // ## query
     // Get an single element based on CSS selector scoped to this.el
     // if you pass an empty string it return `this.el`.
