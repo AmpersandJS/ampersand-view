@@ -14,14 +14,6 @@ What does it do?
 Part of the [Ampersand.js toolkit](http://ampersandjs.com) for building clientside applications.
 <!-- endhide -->
 
-<!-- starthide -->
-
-## Browser support
-
-[![browser support](https://ci.testling.com/ampersandjs/ampersand-view.png)
-](https://ci.testling.com/ampersandjs/ampersand-view)
-<!-- endhide -->
-
 ## Install
 
 ```
@@ -261,7 +253,7 @@ var view = new MyView({ foo: 'bar' });
 //=> logs 'The options are: {foo: "bar"}'
 ```
 
-If you want to extend the `initialize` function of a superclass instead of redefining it completely, you can 
+If you want to extend the `initialize` function of a superclass instead of redefining it completely, you can
 explicitly call the `initialize` of the superclass at the right time:
 ```
 var SuperheroRowView = PersonRowView.extend({
@@ -290,7 +282,7 @@ render: function () {
 }
 ```
 
-If you want to extend the `render` function of a superclass instead of redefining it completely, you can 
+If you want to extend the `render` function of a superclass instead of redefining it completely, you can
 explicitly call the `render` of the superclass at the right time:
 ```
 var SuperheroRowView = PersonRowView.extend({
@@ -306,7 +298,7 @@ var SuperheroRowView = PersonRowView.extend({
 * `collection` {Backbone Collection} The instantiated collection we wish to render.
 * `ItemView` {View Constructor | Function} The view constructor that will be instantiated for each model in the collection or a function that will return an instance of a given constructor. `options` object is passed as a first argument to a function, which can be used to access `options.model` and determine which view should be instantiated. This view will be used with a reference to the model and collection and the item view's `render` method will be called with an object containing a reference to the containerElement as follows: `.render({containerEl: << element >>})`.
 * containerEl {Element | String} This can either be an actual DOM element or a CSS selector string such as `.container`. If a string is passed ampersand-view runs `this.query('YOUR STRING')` to try to grab the element that should contain the collection of views. If you don't supply a `containerEl` it will default to `this.el`.
-* `viewOptions` {Object} [optional] Additional options 
+* `viewOptions` {Object} [optional] Additional options
     * `viewOptions` {Object} Options object that will get passed to the `initialize` method of the individual item views.
     * `filter` {Function} [optional] Function that will be used to determine if a model should be rendered in this collection view. It will get called with a model and you simply return `true` or `false`.
     * `reverse` {Boolean} [optional] Convenience for reversing order in which the items are rendered.
@@ -400,7 +392,7 @@ var view = AmpersandView.extend({
 
 Runs a [`querySelector`](https://developer.mozilla.org/en-US/docs/Web/API/document.querySelector) scoped within the view's current element (`view.el`), returning the first matching element in the dom-tree.
 
-notes: 
+notes:
 - It will also match agains the root element.
 - It will return the root element if you pass `''` as the selector.
 - If no match is found it returns `undefined`
@@ -423,9 +415,9 @@ var view = AmpersandView.extend({
 
 A convenience method for retrieving an element from the current view by it's `data-hook` attribute. Using this approach is a nice way to separate javascript view hooks/bindings from class/id selectors that are being used by CSS.
 
-notes: 
+notes:
 - It also works if you're using multiple space-separated hooks. So something like `<img data-hook="avatar user-image"/>` would still match for `queryByHook('avatar')`.
-- It simply uses `.query()` under the hood. So `.queryByHook('avatar')` is equivalent to `.query('[data-hook~=avatar]')` 
+- It simply uses `.query()` under the hood. So `.queryByHook('avatar')` is equivalent to `.query('[data-hook~=avatar]')`
 - It will also match to root elements.
 - If no match is found it returns `undefined`.
 
@@ -485,7 +477,7 @@ Shortcut for registering a listener for a model and also triggering it right awa
 
 ### remove `view.remove()`
 
-Removes a view from the DOM, and calls `stopListening` to remove any bound events that the view has `listenTo`'d.  This method also triggers a `remove` event on the view, allowing for listeners (or the view itself) to listen to it and do some action, like cleanup some other resources being used.  
+Removes a view from the DOM, and calls `stopListening` to remove any bound events that the view has `listenTo`'d.  This method also triggers a `remove` event on the view, allowing for listeners (or the view itself) to listen to it and do some action, like cleanup some other resources being used.
 
 ```javascript
 initialize : function() {
