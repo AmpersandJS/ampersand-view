@@ -129,6 +129,12 @@ assign(View.prototype, {
         return this.query('[data-hook~="' + hook + '"]');
     },
 
+    // ## queryAllByHook
+    // Convenience method for fetching all elements by their's `data-hook` attribute.
+    queryAllByHook: function (hook) {
+        return this.queryAll('[data-hook~="' + hook + '"]');
+    },
+
     // Initialize is an empty function by default. Override it with your own
     // initialization logic.
     initialize: function () {},
@@ -149,12 +155,15 @@ assign(View.prototype, {
         return this;
     },
 
-    // Remove this view by taking the element out of the DOM, and removing any
-    // applicable events listeners.
+    // Removes this view by taking the element out of the DOM, and removing any
+    // applicable events listeners.  This method will be overriden by any user
+    // provided `remove()` function. `_remove()` will be called even if a custom
+    // `remove` function is provided
     __remove: function () {
         var parsedBindings = this._parsedBindings;
         if (this.el && this.el.parentNode) this.el.parentNode.removeChild(this.el);
         if (this._subviews) invoke(flatten(this._subviews), 'remove');
+        this.trigger('remove', this);
         this.stopListening();
         // TODO: Not sure if this is actually necessary.
         // Just trying to de-reference this potentially large
@@ -166,7 +175,6 @@ assign(View.prototype, {
             delete parsedBindings[modelName];
         });
         this._remove();
-        this.trigger('remove', this);
         return this;
     },
 

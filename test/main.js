@@ -30,7 +30,7 @@ var Model = AmpersandModel.extend({
 
 function getView(bindings, model) {
     if (!bindings.template) {
-        bindings.template = '<li><span></span><img/></li>';
+        bindings.template = '<li><span></span><img></li>';
     }
     var View = AmpersandView.extend(bindings);
     var view = new View({
@@ -235,7 +235,7 @@ test('href bindings', function (t) {
 
 test('input bindings', function (t) {
     var view = getView({
-        template: '<li><input/></li>',
+        template: '<li><input></li>',
         bindings: {
             'model.something': {
                 type: 'attribute',
@@ -323,7 +323,7 @@ test('nested binding definitions', function (t) {
 
 test('renderAndBind with no model', function (t) {
     var View = AmpersandView.extend({
-        template: '<li><span></span><img/></li>'
+        template: '<li><span></span><img></li>'
     });
     var view = new View();
     t.ok(view.renderWithTemplate()); //Should not throw error
@@ -332,7 +332,7 @@ test('renderAndBind with no model', function (t) {
 
 test('queryByHook', function (t) {
     var View = AmpersandView.extend({
-        template: '<li data-hook="list-item"><span data-hook="username"></span><img data-hook="user-avatar"/></li>'
+        template: '<li data-hook="list-item"><span data-hook="username"></span><img data-hook="user-avatar"></li>'
     });
     var view = new View();
     view.renderWithTemplate();
@@ -340,6 +340,20 @@ test('queryByHook', function (t) {
     t.ok(view.queryByHook('user-avatar') instanceof Element, 'should find username');
     t.ok(view.queryByHook('nothing') === undefined, 'should find username');
     t.ok(view.queryByHook('list-item') instanceof Element, 'should also work for root element');
+    t.end();
+});
+
+test('queryAllByHook', function (t) {
+    var View = AmpersandView.extend({
+        template: '<li data-hook="list-item"><span data-hook="username info"></span><img data-hook="user-avatar info"></li>'
+    });
+    var view = new View();
+    view.renderWithTemplate();
+    t.ok(view.queryAllByHook('info') instanceof Array, 'should return array of results');
+    t.equal(view.queryAllByHook('info').length, 2, 'should find all relevant elements');
+    t.ok(view.queryAllByHook('info')[0] instanceof Element, 'should be able to access found elements');
+    t.ok(view.queryAllByHook('info')[1] instanceof Element, 'should be able to access found elements');
+    t.deepEqual(view.queryAllByHook('nothing'), [], 'should return empty array if no results found');
     t.end();
 });
 
@@ -414,7 +428,7 @@ test('queryAll should include root element if matches', function (t) {
 //            'blur #thing': 'handleBlur'
 //        },
 //        autoRender: true,
-//        template: '<div><input id="thing"/></div></div>',
+//        template: '<div><input id="thing"></div></div>',
 //        handleFocus: function () {
 //            t.pass('focus called');
 //        },
@@ -605,13 +619,27 @@ test('Should be able to re-render and maintain bindings', function (t) {
     t.end();
 });
 
-test('trigger `remove` when view is removed', function (t) {
+test('trigger `remove` event when view is removed', function (t) {
     var View = AmpersandView.extend({
         template: '<div></div>',
         autoRender: true
     });
     var view = new View();
     view.on('remove', function () {
+        t.pass('remove fired');
+        t.end();
+    });
+    view.remove();
+});
+
+test('trigger `remove` when view is removed using listenTo', function(t){
+
+    var View = AmpersandView.extend({
+        template: '<div></div>',
+        autoRender: true
+    });
+    var view = new View();
+    view.listenTo(view,'remove', function() {
         t.pass('remove fired');
         t.end();
     });
