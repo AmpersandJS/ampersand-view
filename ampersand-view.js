@@ -316,7 +316,7 @@ assign(View.prototype, {
         if (isString(newDom)) newDom = domify(newDom);
         var parent = this.el && this.el.parentNode;
         if (parent) parent.replaceChild(newDom, this.el);
-        if (newDom.nodeName === '#document-fragment') throw new Error('Views can only have one root element.');
+        if (newDom.nodeName === '#document-fragment') throw new Error('Views can only have one root element, including comment nodes.');
         this.el = newDom;
         return this;
     },
