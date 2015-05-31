@@ -1,6 +1,6 @@
 var test = require('tape');
 var AmpersandModel = require('ampersand-model');
-var AmpersandView = require('../ampersand-view');
+var AmpersandView = require('../ampersand-view.js');
 
 var contains = function (str1, str2) {
     return str1.indexOf(str2) !== -1;
@@ -38,6 +38,37 @@ function getView(bindings, model) {
     });
     return view.renderWithTemplate();
 }
+
+test('event behavior with over-ridden `render` & `remove` fns', function (t) {
+    var renderCount = 0;
+    t.plan(4);
+    var ChildView = AmpersandView.extend({
+        render: function() {
+            AmpersandView.prototype.render.call(this);
+            t.ok(true, 'child view render called');
+        }
+    });
+    var GrandChildView = AmpersandView.extend({
+        render: function() {
+            ChildView.prototype.render.call(this);
+            t.ok(true, 'grand child view render called');
+        }
+    });
+    var detachedEl = document.createElement('div');
+    var view = new GrandChildView({
+        template: '<span></span>',
+        el: detachedEl
+    });
+    view.on('render', function(view, value) {
+        ++renderCount;
+        t.ok(true, 'view `render` event happened on `render()`');
+    });
+    view.render();
+    view.remove();
+    t.equal(1, renderCount, 'over-ridden `render` triggered render just once');
+    t.end();
+});
+
 
 test('standard `rendered` attr behavior', function (t) {
     var caughtRenderEvt = false;
@@ -160,7 +191,7 @@ test('caching elements', function(t) {
     }
   });
   var instance = new View(),
-     rendered  = instance.render();
+      rendered = instance.render();
   t.equal(instance, rendered);
   t.equal(typeof rendered.span, 'object');
   t.end();
@@ -632,14 +663,13 @@ test('trigger `remove` event when view is removed', function (t) {
     view.remove();
 });
 
-test('trigger `remove` when view is removed using listenTo', function(t){
-
+test('trigger `remove` when view is removed using listenTo', function (t) {
     var View = AmpersandView.extend({
         template: '<div></div>',
         autoRender: true
     });
     var view = new View();
-    view.listenTo(view,'remove', function() {
+    view.listenTo(view, 'remove', function() {
         t.pass('remove fired');
         t.end();
     });

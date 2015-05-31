@@ -17,7 +17,6 @@ var matches = require('matches-selector');
 var bindings = require('ampersand-dom-bindings');
 var getPath = require('get-object-path');
 
-
 function View(attrs) {
     this.cid = uniqueId('view');
     attrs || (attrs = {});
@@ -68,17 +67,26 @@ var BaseState = State.extend({
         model: 'state',
         el: 'element',
         collection: 'collection',
-        rendered: {
-            type: 'boolean',
-            required: true,
-            default: false
-        }
+    },
+    session: {
+        _rendered: ['boolean', true, false]
     },
     derived: {
         hasData: {
             deps: ['model'],
             fn: function () {
                 return !!this.model;
+            }
+        },
+        rendered: {
+            deps: ['_rendered'],
+            fn: function() {
+                if (this._rendered) {
+                    this.trigger('render', this);
+                    return true;
+                }
+                this.trigger('remove', this);
+                return false;
             }
         }
     }
@@ -140,30 +148,20 @@ assign(View.prototype, {
     initialize: function () {},
 
     // **render** is the core function that your view can override. Its job is
-    // to populate its element (`this.el`), with the appropriate HTML. __render
-    // is overriden by any user-defined render.  Each call to `render()` actually
-    // executes `__render()` && `_render()`
-    __render: function () {
+    // to populate its element (`this.el`), with the appropriate HTML.
+    _render: function () {
         this.renderWithTemplate(this);
-        this._render();
-        return this;
-    },
-
-    // called on every `render()` call, regardless if user overrides render()
-    _render: function() {
-        this.rendered = true;
+        this._rendered = true;
         return this;
     },
 
     // Removes this view by taking the element out of the DOM, and removing any
-    // applicable events listeners.  This method will be overriden by any user
-    // provided `remove()` function. `_remove()` will be called even if a custom
-    // `remove` function is provided
-    __remove: function () {
+    // applicable events listeners.
+    _remove: function () {
         var parsedBindings = this._parsedBindings;
         if (this.el && this.el.parentNode) this.el.parentNode.removeChild(this.el);
+        this._rendered = false;
         if (this._subviews) invoke(flatten(this._subviews), 'remove');
-        this.trigger('remove', this);
         this.stopListening();
         // TODO: Not sure if this is actually necessary.
         // Just trying to de-reference this potentially large
@@ -174,13 +172,6 @@ assign(View.prototype, {
             });
             delete parsedBindings[modelName];
         });
-        this._remove();
-        return this;
-    },
-
-    // called on every remove, regardless if user overrides
-    _remove: function() {
-        this.rendered = false;
         return this;
     },
 
@@ -398,16 +389,13 @@ assign(View.prototype, {
     _setRender: function(obj) {
         Object.defineProperty(obj, 'render', {
             get: function() {
-                return this.__render;
+                return this._render;
             },
             set: function(fn) {
-                if (typeof fn !== 'function') {
-                    throw new ReferenceError('render() must be a function. ' +
-                        'received: ' + fn.toString());
-                }
-                this.__render = function() {
+                this._render = function() {
                     fn.apply(this, arguments);
-                    return this._render();
+                    this._rendered = true;
+                    return this;
                 };
             }
         });
@@ -416,16 +404,13 @@ assign(View.prototype, {
     _setRemove: function(obj) {
         Object.defineProperty(obj, 'remove', {
             get: function() {
-                return this.__remove;
+                return this._remove;
             },
             set: function(fn) {
-                if (typeof fn !== 'function') {
-                    throw new ReferenceError('remove() must be a function. ' +
-                        'received: ' + fn.toString());
-                }
-                this.__remove = function() {
+                this._remove = function() {
                     fn.apply(this, arguments);
-                    return this._remove();
+                    this._rendered = false;
+                    return this;
                 };
             }
         });
