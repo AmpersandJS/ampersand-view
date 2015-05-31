@@ -1,6 +1,6 @@
 var test = require('tape');
 var AmpersandModel = require('ampersand-model');
-var AmpersandView = require('../ampersand-view.js');
+var AmpersandView = require('../ampersand-view');
 
 var contains = function (str1, str2) {
     return str1.indexOf(str2) !== -1;
@@ -191,7 +191,7 @@ test('caching elements', function(t) {
     }
   });
   var instance = new View(),
-      rendered = instance.render();
+     rendered = instance.render();
   t.equal(instance, rendered);
   t.equal(typeof rendered.span, 'object');
   t.end();

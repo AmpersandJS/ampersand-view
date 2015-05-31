@@ -600,7 +600,7 @@ You usually don't need to use this, but may wish to if you have multiple views a
 
 ## Changelog
 
-- 8.0.0 Improve `rendered` property behavior.  `rendered` now set as consquence of calling render()/remove() fns, vs. presence of an view element
+- 8.0.0 Improve `rendered` property behavior.  `rendered` now set after calling render()/remove() fns, vs. old strategy which simply checked for `view.el`
 - 7.0.0 Replacing use of `role` in lieu of `data-hook` for [accessibility reasons discussed here](https://github.com/AmpersandJS/ampersand/issues/21)
 - [insert period of poor changelog management here], this will not happen again now that ampersand is public.
 - 1.6.3 [diff](https://github.com/HenrikJoreteg/ampersand-view/compare/v1.6.2...v1.6.3) - Move throw statment for too many root elements inside non `<body>` case.

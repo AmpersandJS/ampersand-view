@@ -262,7 +262,6 @@ assign(View.prototype, {
         }, this);
     },
 
-
     // ## _initializeSubviews
     // this is called at setup and grabs declared subviews
     _initializeSubviews: function () {
