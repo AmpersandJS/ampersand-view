@@ -33,6 +33,7 @@ function View(attrs) {
     this.template = attrs.template || this.template;
     this.initialize.apply(this, arguments);
     this.set(pick(attrs, viewOptions));
+    this._rendered = this.rendered; // prep `rendered` derived cache immediately
     if (this.autoRender && this.template) {
         this.render();
     }
