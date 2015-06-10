@@ -592,7 +592,7 @@ test('trigger `remove` when view is removed using on', function (t) {
 });
 
 test('trigger `remove` when view is removed using listenTo', function(t){
-   
+
     var View = AmpersandView.extend({
         template: '<div></div>',
         autoRender: true
@@ -733,4 +733,30 @@ test('events are bound if there is an el in the constructor', function (t) {
     var view = new View({el: document.createElement('div')});
     event.initMouseEvent('click');
     view.el.dispatchEvent(event);
+});
+
+// https://github.com/AmpersandJS/ampersand-view/issues/96
+test('Provide namespace collision errors on subviews property', function (t) {
+    var Sub = AmpersandView.extend({
+        template: '<span></span>',
+    });
+
+    var View = AmpersandView.extend({
+        template: '<div><div class="container"></div></div>',
+        autoRender: true,
+        props: {
+            thing: 'boolean'
+        },
+        subviews: {
+            thing: {
+                container: '.container',
+                constructor: Sub
+            }
+        }
+    });
+
+    t.throws(function () {
+        var view = new View();
+    }, Error, 'Throws collision error');
+    t.end();
 });
