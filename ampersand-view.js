@@ -17,6 +17,13 @@ var matches = require('matches-selector');
 var bindings = require('ampersand-dom-bindings');
 var getPath = require('get-object-path');
 
+function safeSet(context, property, value) {
+    if (property in context) {
+        throw new Error('Encountered a namespace collision while setting property `' + property + '`');
+    }
+    context[property] = value;
+    return context;
+}
 
 function View(attrs) {
     this.cid = uniqueId('view');
@@ -283,7 +290,8 @@ assign(View.prototype, {
             // if not rendered or we can't find our element, stop here.
             if (!this.el || !(el = this.query(opts.selector))) return;
             if (!opts.waitFor || getPath(this, opts.waitFor)) {
-                subview = this[name] = opts.prepareView.call(this, el);
+                subview = opts.prepareView.call(this, el);
+                safeSet(this, name, subview);
                 subview.render();
                 this.registerSubview(subview);
                 this.off('change', action);
