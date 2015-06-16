@@ -293,6 +293,8 @@ var SuperheroRowView = PersonRowView.extend({
 });
 ```
 
+ampersand-view triggers a `'render'` event for your convenience, too, if you want to set listeners for it.  The `'render'` and `'remove'` events emitted by this module are merely convenience events, as you may listen solely to `change:rendered` in order to capture the render/remove events in just one listener.
+
 ### renderCollection `view.renderCollection(collection, ItemView, containerEl, [viewOptions])`
 
 * `collection` {Backbone Collection} The instantiated collection we wish to render.
@@ -477,7 +479,7 @@ Shortcut for registering a listener for a model and also triggering it right awa
 
 ### remove `view.remove()`
 
-Removes a view from the DOM, and calls `stopListening` to remove any bound events that the view has `listenTo`'d.  This method also triggers a `remove` event on the view, allowing for listeners (or the view itself) to listen to it and do some action, like cleanup some other resources being used.
+Removes a view from the DOM, and calls `stopListening` to remove any bound events that the view has `listenTo`'d.  This method also triggers a `remove` event on the view, allowing for listeners (or the view itself) to listen to it and do some action, like cleanup some other resources being used.  The view will trigger the `remove` event if `remove()` is overridden.
 
 ```javascript
 initialize : function() {
@@ -598,6 +600,7 @@ You usually don't need to use this, but may wish to if you have multiple views a
 
 ## Changelog
 
+- 8.0.0 Improve `rendered` property behavior.  `rendered` now set after calling render()/remove() fns, vs. old strategy which simply checked for `view.el`
 - 7.0.0 Replacing use of `role` in lieu of `data-hook` for [accessibility reasons discussed here](https://github.com/AmpersandJS/ampersand/issues/21)
 - [insert period of poor changelog management here], this will not happen again now that ampersand is public.
 - 1.6.3 [diff](https://github.com/HenrikJoreteg/ampersand-view/compare/v1.6.2...v1.6.3) - Move throw statment for too many root elements inside non `<body>` case.

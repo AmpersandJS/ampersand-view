@@ -39,6 +39,78 @@ function getView(bindings, model) {
     return view.renderWithTemplate();
 }
 
+test('event behavior with over-ridden `render` & `remove` fns', function (t) {
+    var renderCount = 0;
+    t.plan(4);
+    var ChildView = AmpersandView.extend({
+        render: function() {
+            AmpersandView.prototype.render.call(this);
+            t.ok(true, 'child view render called');
+        }
+    });
+    var GrandChildView = AmpersandView.extend({
+        render: function() {
+            ChildView.prototype.render.call(this);
+            t.ok(true, 'grand child view render called');
+        }
+    });
+    var detachedEl = document.createElement('div');
+    var view = new GrandChildView({
+        template: '<span></span>',
+        el: detachedEl
+    });
+    view.on('render', function(view, value) {
+        ++renderCount;
+        t.ok(true, 'view `render` event happened on `render()`');
+    });
+    view.render();
+    view.remove();
+    t.equal(1, renderCount, 'over-ridden `render` triggered render just once');
+    t.end();
+});
+
+
+test('standard `rendered` attr behavior', function (t) {
+    var caughtRenderEvt = false;
+    var detachedEl = document.createElement('div');
+    var view = new AmpersandView({
+        template: '<span></span>',
+        el: detachedEl
+    });
+    view.on('change:rendered', function() {
+        caughtRenderEvt = !caughtRenderEvt;
+    });
+    t.notOk(view.rendered, 'view not `rendered` prior to `render()` call');
+    view.render();
+    t.ok(view.rendered, 'view `rendered` post `render()` call');
+    t.ok(caughtRenderEvt, 'view `rendered` evt observed on `render()` call');
+    view.remove();
+    t.notOk(caughtRenderEvt, 'view `rendered` evt observed on `remove()` call');
+    t.notOk(view.rendered, 'view not `rendered` post `remove()` call');
+    t.end();
+});
+
+test('user over-ridden `render()` and `remove()` behavior', function (t) {
+    var view;
+    var RenderTestView = AmpersandView.extend({
+        template: '<span></span>',
+        render: function() {
+            t.ok(true, 'user defined `render()` executed');
+        },
+        remove: function() {
+            t.ok(true, 'user defined `remove()` executed');
+        }
+    });
+    t.plan(4);
+    view = new RenderTestView();
+    view.on('change:rendered', function() {
+        t.ok(true, '`rendered` triggered on custom render/remove');
+    });
+    view.render();
+    view.remove();
+    t.end();
+});
+
 test('registerSubview', function (t) {
     var removeCalled = 0;
     var SubView = AmpersandView.extend({
@@ -119,7 +191,7 @@ test('caching elements', function(t) {
     }
   });
   var instance = new View(),
-     rendered  = instance.render();
+     rendered = instance.render();
   t.equal(instance, rendered);
   t.equal(typeof rendered.span, 'object');
   t.end();
@@ -578,7 +650,7 @@ test('Should be able to re-render and maintain bindings', function (t) {
     t.end();
 });
 
-test('trigger `remove` when view is removed using on', function (t) {
+test('trigger `remove` event when view is removed', function (t) {
     var View = AmpersandView.extend({
         template: '<div></div>',
         autoRender: true
@@ -591,14 +663,13 @@ test('trigger `remove` when view is removed using on', function (t) {
     view.remove();
 });
 
-test('trigger `remove` when view is removed using listenTo', function(t){
-   
+test('trigger `remove` when view is removed using listenTo', function (t) {
     var View = AmpersandView.extend({
         template: '<div></div>',
         autoRender: true
     });
     var view = new View();
-    view.listenTo(view,'remove', function() {
+    view.listenTo(view, 'remove', function() {
         t.pass('remove fired');
         t.end();
     });

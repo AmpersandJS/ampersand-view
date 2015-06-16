@@ -17,7 +17,6 @@ var matches = require('matches-selector');
 var bindings = require('ampersand-dom-bindings');
 var getPath = require('get-object-path');
 
-
 function View(attrs) {
     this.cid = uniqueId('view');
     attrs || (attrs = {});
@@ -34,6 +33,7 @@ function View(attrs) {
     this.template = attrs.template || this.template;
     this.initialize.apply(this, arguments);
     this.set(pick(attrs, viewOptions));
+    this._rendered = this.rendered; // prep `rendered` derived cache immediately
     if (this.autoRender && this.template) {
         this.render();
     }
@@ -67,19 +67,27 @@ var BaseState = State.extend({
     props: {
         model: 'state',
         el: 'element',
-        collection: 'collection'
+        collection: 'collection',
+    },
+    session: {
+        _rendered: ['boolean', true, false]
     },
     derived: {
-        rendered: {
-            deps: ['el'],
-            fn: function () {
-                return !!this.el;
-            }
-        },
         hasData: {
             deps: ['model'],
             fn: function () {
                 return !!this.model;
+            }
+        },
+        rendered: {
+            deps: ['_rendered'],
+            fn: function() {
+                if (this._rendered) {
+                    this.trigger('render', this);
+                    return true;
+                }
+                this.trigger('remove', this);
+                return false;
             }
         }
     }
@@ -140,20 +148,21 @@ assign(View.prototype, {
     // initialization logic.
     initialize: function () {},
 
-    // **render** is the core function that your view can override, its job is
+    // **render** is the core function that your view can override. Its job is
     // to populate its element (`this.el`), with the appropriate HTML.
-    render: function () {
+    _render: function () {
         this.renderWithTemplate(this);
+        this._rendered = true;
         return this;
     },
 
-    // Remove this view by taking the element out of the DOM, and removing any
+    // Removes this view by taking the element out of the DOM, and removing any
     // applicable events listeners.
-    remove: function () {
+    _remove: function () {
         var parsedBindings = this._parsedBindings;
         if (this.el && this.el.parentNode) this.el.parentNode.removeChild(this.el);
+        this._rendered = false;
         if (this._subviews) invoke(flatten(this._subviews), 'remove');
-        this.trigger('remove', this);
         this.stopListening();
         // TODO: Not sure if this is actually necessary.
         // Just trying to de-reference this potentially large
@@ -375,8 +384,40 @@ assign(View.prototype, {
         var collectionView = new CollectionView(config);
         collectionView.render();
         return this.registerSubview(collectionView);
+    },
+
+    _setRender: function(obj) {
+        Object.defineProperty(obj, 'render', {
+            get: function() {
+                return this._render;
+            },
+            set: function(fn) {
+                this._render = function() {
+                    fn.apply(this, arguments);
+                    this._rendered = true;
+                    return this;
+                };
+            }
+        });
+    },
+
+    _setRemove: function(obj) {
+        Object.defineProperty(obj, 'remove', {
+            get: function() {
+                return this._remove;
+            },
+            set: function(fn) {
+                this._remove = function() {
+                    fn.apply(this, arguments);
+                    this._rendered = false;
+                    return this;
+                };
+            }
+        });
     }
 });
 
+View.prototype._setRender(View.prototype);
+View.prototype._setRemove(View.prototype);
 View.extend = BaseState.extend;
 module.exports = View;
