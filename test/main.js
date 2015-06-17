@@ -1,5 +1,6 @@
 var test = require('tape');
 var AmpersandModel = require('ampersand-model');
+var AmpersandCollection = require('ampersand-rest-collection');
 var AmpersandView = require('../ampersand-view');
 
 var contains = function (str1, str2) {
@@ -108,6 +109,22 @@ test('user over-ridden `render()` and `remove()` behavior', function (t) {
     });
     view.render();
     view.remove();
+    t.end();
+});
+
+test('Model, collection, and el become properties', function (t) {
+    var model = new Model();
+    var collection = new AmpersandCollection();
+    var el = document.createElement('div');
+    var view = new AmpersandView({
+        model: model,
+        collection: collection,
+        el: el
+    });
+
+    t.equal(view.model, model);
+    t.equal(view.collection, collection);
+    t.equal(view.el, el);
     t.end();
 });
 
