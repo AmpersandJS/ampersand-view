@@ -550,7 +550,7 @@ module.exports = AmpersandView.extend({
     template: '<div><div></div><ul data-hook="collection-container"></ul></div>',
     subviews: {
         myStuff: {
-            container: '[data-hook=collection-container]',
+            selector: '[data-hook=collection-container]',
             waitFor: 'model.stuffCollection',
             prepareView: function (el) {
                 return new CollectionRenderer({
@@ -560,7 +560,7 @@ module.exports = AmpersandView.extend({
             }
         },
         tab: {
-            container: '[data-hook=switcher]',
+            hook: 'switcher',
             constructor: ViewSwitcher
         }
     }
@@ -569,7 +569,7 @@ module.exports = AmpersandView.extend({
 
 subview declarations consist of:
 
-* container {String} Selector that describes the element within the view that should hold the subview.
+* selector {String} Selector that describes the element within the view that should hold the subview.
 * hook {String} Alternate method for specifying a container element using its `data-hook` attribute. Equivalent to `selector: '[data-hook=some-hook]'`.
 * constructor {ViewConstructor} Any [view conventions compliant](http://ampersandjs.com/learn/view-conventions) view constructor. It will be initialized with `{el: [Element grabbed from selector], parent: [reference to parent view instance]}`. So if you don't need to do any custom setup, you can just provide the constructor.
 * waitFor {String} String specifying they "key-path" (i.e. 'model.property') of the view that must be "truthy" before it should consider the subview ready.

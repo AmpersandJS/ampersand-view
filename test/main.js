@@ -703,6 +703,28 @@ test('declarative subViews basics', function (t) {
         autoRender: true,
         subviews: {
             sub1: {
+                selector: '.container',
+                constructor: Sub
+            }
+        }
+    });
+    var view = new View();
+
+    t.equal(view.el.innerHTML, '<span></span>');
+
+    t.end();
+});
+
+test('subViews declaraction can accept a CSS selector string via `container` property for backwards compatibility (#114)', function (t) {
+    var Sub = AmpersandView.extend({
+        template: '<span></span>'
+    });
+
+    var View = AmpersandView.extend({
+        template: '<div><div class="container"></div></div>',
+        autoRender: true,
+        subviews: {
+            sub1: {
                 container: '.container',
                 constructor: Sub
             }
@@ -751,7 +773,7 @@ test('make sure subviews dont fire until their `waitFor` is done', function (t) 
         subviews: {
             sub1: {
                 waitFor: 'model',
-                container: '.container',
+                selector: '.container',
                 constructor: Sub
             },
             sub2: {
