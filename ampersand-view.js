@@ -97,6 +97,8 @@ var delegateEventSplitter = /^(\S+)\s*(.*)$/;
 
 View.prototype = Object.create(BaseState.prototype);
 
+var queryNoElMsg = 'Query cannot be performed as this.el is not defined. Ensure that the view has been rendered.';
+
 // Set up all inheritable properties and methods.
 assign(View.prototype, {
     // ## query
@@ -106,6 +108,9 @@ assign(View.prototype, {
     // This lets us use `get` to handle cases where users
     // can pass a selector or an already selected element.
     query: function (selector) {
+        if (!this.el) {
+            throw new Error(queryNoElMsg);
+        }
         if (!selector) return this.el;
         if (typeof selector === 'string') {
             if (matches(this.el, selector)) return this.el;
@@ -119,9 +124,11 @@ assign(View.prototype, {
     // if you pass an empty string it return `this.el`. Also includes root
     // element.
     queryAll: function (selector) {
+        if (!this.el) {
+            throw new Error(queryNoElMsg);
+        }
+        if (!selector) return [this.el];
         var res = [];
-        if (!this.el) return res;
-        if (selector === '') return [this.el];
         if (matches(this.el, selector)) res.push(this.el);
         return res.concat(Array.prototype.slice.call(this.el.querySelectorAll(selector)));
     },

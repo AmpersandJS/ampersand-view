@@ -467,6 +467,71 @@ test('queryAll should include root element if matches', function (t) {
     t.end();
 });
 
+test('query should throw an error if view was not rendered', function (t) {
+    var View = AmpersandView.extend({
+        autoRender: false,
+        template: '<div class="test"><div class="test deep"><div class="test deep"></div></div></div>'
+    });
+    var view = new View();
+    t.throws((function () {
+        view.query('.test');
+    }), Error, 'Throws error on query with selector');
+
+    t.throws((function () {
+        view.query('');
+    }), Error, 'Throws error on query with empty selector');
+    t.end();
+});
+
+test('query should not throw an error if view was rendered', function (t) {
+    var View = AmpersandView.extend({
+        autoRender: false,
+        template: '<div class="test"><div class="test deep"><div class="test deep"></div></div></div>'
+    });
+    var view = new View();
+    view.render();
+    t.doesNotThrow((function () {
+        view.query('.test');
+    }), Error, 'Does not throws error on query');
+
+    t.doesNotThrow((function () {
+        view.query('');
+    }), Error, 'Does not throws error on empty selector');
+    t.end();
+});
+
+test('queryAll should throw an error if view was not rendered', function (t) {
+    var View = AmpersandView.extend({
+        autoRender: false,
+        template: '<div class="test"><div class="test deep"><div class="test deep"></div></div></div>'
+    });
+    var view = new View();
+    t.throws((function () {
+        view.queryAll('div');
+    }), Error, 'Throws error on queryAll');
+
+    t.throws((function () {
+        view.queryAll('');
+    }), Error, 'Throws error on queryAll with empty selector');
+    t.end();
+});
+
+test('queryAll should not throw an error if view was rendered', function (t) {
+    var View = AmpersandView.extend({
+        autoRender: false,
+        template: '<div class="test"><div class="test deep"><div class="test deep"></div></div></div>'
+    });
+    var view = new View();
+    view.render();
+    t.doesNotThrow((function () {
+        view.queryAll('div');
+    }), Error, 'Does not throw error on queryAll');
+
+    t.doesNotThrow((function () {
+        view.queryAll('');
+    }), Error, 'Does not throw error on queryAll with empty selector');
+    t.end();
+});
 
 //test('focus/blur events should work in events hash. Issue #8', function (t) {
 //    t.plan(2);
