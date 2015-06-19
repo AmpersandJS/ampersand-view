@@ -861,6 +861,37 @@ test('make sure subviews dont fire until their `waitFor` is done', function (t) 
     t.end();
 });
 
+test('make sure subviews are rendered when view instance is rendered more than once', function (t) {
+    var Sub = AmpersandView.extend({
+        template: '<span></span>'
+    });
+
+    var View = AmpersandView.extend({
+        template: '<div><div class="container"></div></div>',
+        autoRender: true,
+        subviews: {
+            sub1: {
+                selector: '.container',
+                constructor: Sub
+            }
+        }
+    });
+    var view = new View();
+
+    t.equal(view.el.innerHTML, '<span></span>');
+
+    view.remove();
+    view.render();
+
+    t.equal(view.el.innerHTML, '<span></span>');
+
+    view.render();
+
+    t.equal(view.el.innerHTML, '<span></span>');
+
+    t.end();
+});
+
 test('make sure template can return a dom node', function (t) {
     var Sub = AmpersandView.extend({
         template: function () {
