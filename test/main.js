@@ -73,7 +73,7 @@ test('event behavior with over-ridden `render` & `remove` fns', function (t) {
     t.equal(renderCount, 1, '`render` triggered exactly once, post- render()');
     view.remove();
     t.equal(removeCount, 1, '`remove` triggered exactly once, post- remove()');
-    t.equal(renderCount, 1, '`render` triggered exactly once, post- remove()');
+    t.equal(renderCount, 1, '`render` not triggered, post- remove()');
     t.end();
 });
 
