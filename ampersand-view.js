@@ -31,8 +31,8 @@ function View(attrs) {
     }
     this._initializeSubviews();
     this.template = attrs.template || this.template;
+    this._cache.rendered = false; // prep `rendered` derived cache immediately
     this.initialize.apply(this, arguments);
-    this._rendered = this.rendered; // prep `rendered` derived cache immediately
     if (this.autoRender && this.template) {
         this.render();
     }

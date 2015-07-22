@@ -42,7 +42,8 @@ function getView(bindings, model) {
 
 test('event behavior with over-ridden `render` & `remove` fns', function (t) {
     var renderCount = 0;
-    t.plan(4);
+    var removeCount = 0;
+    t.plan(7);
     var ChildView = AmpersandView.extend({
         render: function() {
             AmpersandView.prototype.render.call(this);
@@ -64,9 +65,15 @@ test('event behavior with over-ridden `render` & `remove` fns', function (t) {
         ++renderCount;
         t.ok(true, 'view `render` event happened on `render()`');
     });
+    view.on('remove', function(view, value) {
+        ++removeCount;
+    });
     view.render();
+    t.equal(removeCount, 0, '`remove` event not called, pre- or post- render()');
+    t.equal(renderCount, 1, '`render` triggered exactly once, post- render()');
     view.remove();
-    t.equal(1, renderCount, 'over-ridden `render` triggered render just once');
+    t.equal(removeCount, 1, '`remove` triggered exactly once, post- remove()');
+    t.equal(renderCount, 1, '`render` not triggered, post- remove()');
     t.end();
 });
 
