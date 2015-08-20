@@ -1,5 +1,7 @@
 # ampersand-view
 
+Lead Maintainer: [Christopher Dieringer](https://github.com/cdaringe)
+
 A set of common helpers and conventions for using as a base view for ampersand.js apps.
 
 What does it do?
