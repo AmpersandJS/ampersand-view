@@ -24,12 +24,7 @@ function View(attrs) {
     delete attrs.parent;
     BaseState.call(this, attrs, {init: false, parent: parent});
     this.on('change:el', this._handleElementChange, this);
-    this._parsedBindings = bindings(this.bindings, this);
-    this._initializeBindings();
-    if (attrs.el && !this.autoRender) {
-        this._handleElementChange();
-    }
-    this._initializeSubviews();
+    this._upsertBindings();
     this.template = attrs.template || this.template;
     this.initialize.apply(this, arguments);
     this._rendered = this.rendered; // prep `rendered` derived cache immediately
@@ -154,6 +149,7 @@ assign(View.prototype, {
     // **render** is the core function that your view can override. Its job is
     // to populate its element (`this.el`), with the appropriate HTML.
     _render: function () {
+        this._upsertBindings();
         this.renderWithTemplate(this);
         this._rendered = true;
         return this;
@@ -162,20 +158,9 @@ assign(View.prototype, {
     // Removes this view by taking the element out of the DOM, and removing any
     // applicable events listeners.
     _remove: function () {
-        var parsedBindings = this._parsedBindings;
         if (this.el && this.el.parentNode) this.el.parentNode.removeChild(this.el);
         this._rendered = false;
-        if (this._subviews) invoke(flatten(this._subviews), 'remove');
-        this.stopListening();
-        // TODO: Not sure if this is actually necessary.
-        // Just trying to de-reference this potentially large
-        // amount of generated functions to avoid memory leaks.
-        forEach(parsedBindings, function (properties, modelName) {
-            forEach(properties, function (value, key) {
-                delete parsedBindings[modelName][key];
-            });
-            delete parsedBindings[modelName];
-        });
+        this._downsertBindings();
         return this;
     },
 
@@ -420,6 +405,35 @@ assign(View.prototype, {
                 };
             }
         });
+    },
+
+    _downsertBindings: function() {
+        var parsedBindings = this._parsedBindings;
+        if (!this.bindingsSet) return;
+        if (this._subviews) invoke(flatten(this._subviews), 'remove');
+        this.stopListening();
+        // TODO: Not sure if this is actually necessary.
+        // Just trying to de-reference this potentially large
+        // amount of generated functions to avoid memory leaks.
+        forEach(parsedBindings, function (properties, modelName) {
+            forEach(properties, function (value, key) {
+                delete parsedBindings[modelName][key];
+            });
+            delete parsedBindings[modelName];
+        });
+        this.bindingsSet = true;
+    },
+
+    _upsertBindings: function(attrs) {
+        attrs = attrs || this;
+        if (this.bindingsSet) return;
+        this._parsedBindings = bindings(this.bindings, this);
+        this._initializeBindings();
+        if (attrs.el && !this.autoRender) {
+            this._handleElementChange();
+        }
+        this._initializeSubviews();
+        this.bindingsSet = true;
     }
 });
 
