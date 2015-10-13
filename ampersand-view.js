@@ -421,7 +421,7 @@ assign(View.prototype, {
             });
             delete parsedBindings[modelName];
         });
-        this.bindingsSet = true;
+        this.bindingsSet = false;
     },
 
     _upsertBindings: function(attrs) {
