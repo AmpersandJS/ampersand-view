@@ -272,9 +272,8 @@ assign(View.prototype, {
         var opts = {
             selector: subview.selector || '[data-hook="' + subview.hook + '"]',
             waitFor: subview.waitFor || '',
-            prepareView: subview.prepareView || function (el) {
+            prepareView: subview.prepareView || function () {
                 return new subview.constructor({
-                    el: el,
                     parent: self
                 });
             }
@@ -285,8 +284,12 @@ assign(View.prototype, {
             if (!this.el || !(el = this.query(opts.selector))) return;
             if (!opts.waitFor || getPath(this, opts.waitFor)) {
                 subview = this[name] = opts.prepareView.call(this, el);
-                subview.render();
-                this.registerSubview(subview);
+                if (!subview.el) {
+                    this.renderSubview(subview, el);
+                } else {
+                    subview.render();
+                    this.registerSubview(subview);
+                }
                 this.off('change', action);
             }
         }

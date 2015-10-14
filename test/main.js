@@ -782,6 +782,33 @@ test('declarative subViews basics', function (t) {
     });
     var view = new View();
 
+    t.equal(view.el.innerHTML, '<div class="container"><span></span></div>');
+
+    t.end();
+});
+
+test('declarative subViews basics (with prepareView which tests pre-issue#87 functionality)', function (t) {
+    var Sub = AmpersandView.extend({
+        template: '<span></span>'
+    });
+
+    var View = AmpersandView.extend({
+        template: '<div><div class="container"></div></div>',
+        autoRender: true,
+        subviews: {
+            sub1: {
+                selector: '.container',
+                constructor: Sub,
+                prepareView: function (el) {
+                    return new Sub({
+                        el: el
+                    });
+                }
+            }
+        }
+    });
+    var view = new View();
+
     t.equal(view.el.innerHTML, '<span></span>');
 
     t.end();
@@ -804,7 +831,7 @@ test('subViews declaraction can accept a CSS selector string via `container` pro
     });
     var view = new View();
 
-    t.equal(view.el.innerHTML, '<span></span>');
+    t.equal(view.el.innerHTML, '<div class="container"><span></span></div>');
 
     t.end();
 });
@@ -826,7 +853,7 @@ test('subview hook can include special characters', function (t) {
     });
     var view = new View();
 
-    t.equal(view.el.innerHTML, '<span></span>');
+    t.equal(view.el.innerHTML, '<div data-hook="test.hi-there"><span></span></div>');
 
     t.end();
 });
@@ -860,9 +887,9 @@ test('make sure subviews dont fire until their `waitFor` is done', function (t) 
     t.equal(view.el.outerHTML, '<div><span class="container"></span><span data-hook="sub"></span></div>');
     view.model = new Model();
     t.equal(view._events.change.length, 1);
-    t.equal(view.el.outerHTML, '<div><span>yes</span><span data-hook="sub"></span></div>');
+    t.equal(view.el.outerHTML, '<div><span class="container"><span>yes</span></span><span data-hook="sub"></span></div>');
     view.model2 = new Model();
-    t.equal(view.el.outerHTML, '<div><span>yes</span><span>yes</span></div>');
+    t.equal(view.el.outerHTML, '<div><span class="container"><span>yes</span></span><span data-hook="sub"><span>yes</span></span></div>');
     t.notOk(view._events.change);
 
     t.end();
