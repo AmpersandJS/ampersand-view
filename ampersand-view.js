@@ -225,9 +225,9 @@ assign(View.prototype, {
         if (typeof container === 'string') {
             container = this.query(container);
         }
+        if (!container) container = this.el;
         this.registerSubview(view);
-        view.render();
-        (container || this.el).appendChild(view.el);
+        container.appendChild(view.render().el);
         return view;
     },
 
