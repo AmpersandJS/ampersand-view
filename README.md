@@ -601,7 +601,7 @@ Clears all callbacks previously bound to the view with `delegateEvents`.
 You usually don't need to use this, but may wish to if you have multiple views attached to the same DOM element.
 
 ## Changelog
-
+- 9.0.0 support render-remove-render view instance lifecycle. previously bindings were trashed for good on remove()
 - 8.0.0 Improve `rendered` property behavior.  `rendered` now set after calling render()/remove() fns, vs. old strategy which simply checked for `view.el`
 - 7.0.0 Replacing use of `role` in lieu of `data-hook` for [accessibility reasons discussed here](https://github.com/AmpersandJS/ampersand/issues/21)
 - [insert period of poor changelog management here], this will not happen again now that ampersand is public.
