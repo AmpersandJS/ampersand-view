@@ -916,3 +916,37 @@ test('events are bound if there is an el in the constructor', function (t) {
     event.initMouseEvent('click');
     view.el.dispatchEvent(event);
 });
+
+test('render, remove, render yields consistent subview behavior', function (t) {
+    t.plan(1);
+    var event = document.createEvent("MouseEvent");
+    var parentEl = document.createElement('div');
+    var childContainerEl = document.createElement('div');
+    childContainerEl.id = 'child_container';
+    parentEl.appendChild(childContainerEl);
+    var Child = AmpersandView.extend({
+        template: function() { return document.createElement('div'); },
+        events: {
+            'click div': 'divClicked'
+        },
+        divClicked: function (e) {
+            t.ok(true, 'child view bindings withheld through parent render/remove/render cycle');
+            t.end();
+        }
+    });
+    var Parent = AmpersandView.extend({
+        template: function() { return parentEl; },
+        subviews: {
+            childv: {
+                selector: '#child_container',
+                constructor: Child
+            }
+        }
+    });
+    var parent = new Parent({ el: document.createElement('div') });
+    parent.render();
+    parent.remove();
+    parent.render();
+    event.initMouseEvent('click');
+    parent.childv.el.dispatchEvent(event);
+});
