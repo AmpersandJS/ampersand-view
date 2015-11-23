@@ -264,20 +264,12 @@ assign(View.prototype, {
     // helper for parsing out the subview declaration and registering
     // the `waitFor` if need be.
     _parseSubview: function (subview, name) {
-        var self = this;
         //backwards compatibility with older versions, when `container` was a valid property (#114)
         if (subview.container) {
             subview.selector = subview.container;
         }
-        var opts = {
-            selector: subview.selector || '[data-hook="' + subview.hook + '"]',
-            waitFor: subview.waitFor || '',
-            prepareView: subview.prepareView || function () {
-                return new subview.constructor({
-                    parent: self
-                });
-            }
-        };
+        var opts = this._parseSubviewOpts(subview);
+
         function action() {
             var el, subview;
             // if not rendered or we can't find our element, stop here.
@@ -295,6 +287,22 @@ assign(View.prototype, {
         }
         // we listen for main `change` items
         this.on('change', action, this);
+    },
+
+    // Parser the declarative subview definition.
+    // Overload this method to create your own declarative subview style
+    _parseSubviewOpts: function (subview, name) {
+        var self = this;
+        var opts = {
+            selector: subview.selector || '[data-hook="' + subview.hook + '"]',
+            waitFor: subview.waitFor || '',
+            prepareView: subview.prepareView || function () {
+                return new subview.constructor({
+                    parent: self
+                });
+            }
+        };
+        return opts;
     },
 
     // Shortcut for doing everything we need to do to
