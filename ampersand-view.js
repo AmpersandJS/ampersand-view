@@ -289,9 +289,15 @@ assign(View.prototype, {
         this.on('change', action, this);
     },
 
-    // Parser the declarative subview definition.
-    // Overload this method to create your own declarative subview style
-    _parseSubviewOpts: function (subview, name) {
+    // Parses the declarative subview definition.
+    // You may overload this method to create your own declarative subview style.
+    // You must return an object with members 'selector', 'waitFor' and 'prepareView'.
+    // waitFor is trigged on the view 'change' event and so one way to extend the deferred view
+    // construction is to add an additional property (props) to the view. Then setting this property
+    // will satisfy the waitFor condition. You can then extend the prepareView function to pass in
+    // additional data from the parent view. This can allow you to have multi-stage rendering of
+    // custom data formats and to declaratively define.
+    _parseSubviewOpts: function (subview) {
         var self = this;
         var opts = {
             selector: subview.selector || '[data-hook="' + subview.hook + '"]',
