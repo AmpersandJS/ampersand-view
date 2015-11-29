@@ -264,20 +264,12 @@ assign(View.prototype, {
     // helper for parsing out the subview declaration and registering
     // the `waitFor` if need be.
     _parseSubview: function (subview, name) {
-        var self = this;
         //backwards compatibility with older versions, when `container` was a valid property (#114)
         if (subview.container) {
             subview.selector = subview.container;
         }
-        var opts = {
-            selector: subview.selector || '[data-hook="' + subview.hook + '"]',
-            waitFor: subview.waitFor || '',
-            prepareView: subview.prepareView || function () {
-                return new subview.constructor({
-                    parent: self
-                });
-            }
-        };
+        var opts = this._parseSubviewOpts(subview);
+
         function action() {
             var el, subview;
             // if not rendered or we can't find our element, stop here.
@@ -295,6 +287,28 @@ assign(View.prototype, {
         }
         // we listen for main `change` items
         this.on('change', action, this);
+    },
+
+    // Parses the declarative subview definition.
+    // You may overload this method to create your own declarative subview style.
+    // You must return an object with members 'selector', 'waitFor' and 'prepareView'.
+    // waitFor is trigged on the view 'change' event and so one way to extend the deferred view
+    // construction is to add an additional property (props) to the view. Then setting this property
+    // will satisfy the waitFor condition. You can then extend the prepareView function to pass in
+    // additional data from the parent view. This can allow you to have multi-stage rendering of
+    // custom data formats and to declaratively define.
+    _parseSubviewOpts: function (subview) {
+        var self = this;
+        var opts = {
+            selector: subview.selector || '[data-hook="' + subview.hook + '"]',
+            waitFor: subview.waitFor || '',
+            prepareView: subview.prepareView || function () {
+                return new subview.constructor({
+                    parent: self
+                });
+            }
+        };
+        return opts;
     },
 
     // Shortcut for doing everything we need to do to
