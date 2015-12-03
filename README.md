@@ -498,7 +498,13 @@ cleanup : function(){
 
 ### registerSubview `view.registerSubview(viewInstance)`
 
-* viewInstance {Object} Any object with a "remove" method, typically an instantiated view. But doesn't have to be, it can be anything with a remove method. The remove method doesn't have to actually remove itself from the DOM (since the parent view is being removed anyway), it is generally just used for unregistering any handler that it set up.
+* viewInstance {Object} Any object with a "remove" method, typically an instantiated view. But doesn't have to be, it can be anything with a remove method. The remove method doesn't have to actually remove itself from the DOM (since the parent view is being removed anyway), it is generally just used for unregistering any handler that the subview sets up.
+
+This method will:
+
+1. store a reference to the subview for cleanup when `remove()` is called.
+2. sdd a reference to itself at `subview.parent`
+3. return the subview
 
 ### renderSubview `view.renderSubview(viewInstance, containerEl)`
 
@@ -510,9 +516,9 @@ This method is just sugar for the common use case of instantiating a view and pu
 It will:
 
 1. fetch your container (if you gave it a selector string)
-2. register your subview so it gets cleaned up if parent is removed and so `view.parent` will be available when your subview's `render` method gets called
+2. register your subview so it gets cleaned up if parent is removed and so `this.parent` will be available when your subview's `render` method gets called
 3. call the subview's `render()` method
-4. append it to the container
+4. append it to the container (or the parent view's el if no container given)
 5. return the subview
 
 ```javascript
