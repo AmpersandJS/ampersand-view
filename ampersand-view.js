@@ -15,7 +15,7 @@ var invoke = require("lodash.invoke");
 var events = require('events-mixin');
 var matches = require('matches-selector');
 var bindings = require('ampersand-dom-bindings');
-var getPath = require('get-object-path');
+var getPath = require('lodash.get');
 
 function View(attrs) {
     this.cid = uniqueId('view');
