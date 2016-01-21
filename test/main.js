@@ -265,8 +265,9 @@ test('src bindings', function (t) {
     });
     var img = view.query('img');
     t.equal(img.getAttribute('src'), '');
-    view.model.set('url', 'http://robohash.com/whammo');
-    t.equal(img.getAttribute('src'), 'http://robohash.com/whammo');
+    //Ampersand logo
+    view.model.set('url', 'data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjwhLS0gR2VuZXJhdG9yOiBBZG9iZSBJbGx1c3RyYXRvciAxNy4xLjAsIFNWRyBFeHBvcnQgUGx1Zy1JbiAuIFNWRyBWZXJzaW9uOiA2LjAwIEJ1aWxkIDApICAtLT4NCjwhRE9DVFlQRSBzdmcgUFVCTElDICItLy9XM0MvL0RURCBTVkcgMS4xLy9FTiIgImh0dHA6Ly93d3cudzMub3JnL0dyYXBoaWNzL1NWRy8xLjEvRFREL3N2ZzExLmR0ZCI+DQo8c3ZnIHZlcnNpb249IjEuMSIgaWQ9IkxheWVyXzEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4Ig0KCSB2aWV3Qm94PSIyMDEuMSAyNzQuMiAyMTYgMjUxLjciIGVuYWJsZS1iYWNrZ3JvdW5kPSJuZXcgMjAxLjEgMjc0LjIgMjE2IDI1MS43IiB4bWw6c3BhY2U9InByZXNlcnZlIj4NCjxnPg0KCTxnPg0KCQk8cGF0aCBmaWxsPSIjRUIzQjk1IiBkPSJNMzA2LjMsMzg1LjlsNDMuNiw1Mi43bDEuNS0xLjVjNC43LTUsOS4xLTEwLDEzLjMtMTVjNC4xLTUsMTUtMTYuNSwxOC45LTIxLjhsMTcuMSwzMS4yDQoJCQljLTIuOSw0LjEtNi44LDkuMS0xMS41LDE0LjdzLTEwLjMsMTIuMS0xNy4xLDE5LjJsNDUuMSw1NS43aC00NS43bC0yNC4yLTI5LjhjLTIyLjEsMjMtNDUuNCwzNC41LTY5LjIsMzQuNQ0KCQkJYy0yMS41LDAtMzkuOC02LjgtNTQuOC0yMC42Yy0xNC43LTEzLjgtMjIuMS0zMC45LTIyLjEtNTEuM2MwLTI0LjIsMTEuNS00NC41LDM1LjEtNjAuNGwxNS45LTEwLjljMC4zLDAsMC42LTAuMywxLjItMC45DQoJCQljMC42LTAuMywxLjItMC45LDIuMS0xLjhjLTE1LjktMTcuMS0yNC4yLTMzLjktMjQuMi01MC40czUuMy0yOS44LDE1LjktNDAuMWMxMC45LTEwLjMsMjUtMTUuMyw0Mi40LTE1LjNjMTYuOCwwLDMwLjQsNSw0MS4zLDE1DQoJCQlzMTYuNSwyMi43LDE2LjUsMzcuN2MwLDEwLjYtMi45LDIwLTguOCwyOC42QzMzMi4yLDM2My44LDMyMS42LDM3NC4xLDMwNi4zLDM4NS45eiBNMjc3LjEsNDA2LjVsLTIuMSwxLjUNCgkJCWMtMTUsMTAuMy0yNS4zLDE4LjktMzAuNiwyNXMtOCwxMy04LDIwYzAsMTAsNC4xLDE5LjQsMTIuMSwyNy43YzguMyw4LDE3LjcsMTIuMSwyNy43LDEyLjFjMTQuMSwwLDMwLjQtOS4xLDQ4LjktMjcuNw0KCQkJTDI3Ny4xLDQwNi41eiBNMjg1LjEsMzYwLjJsMi45LTIuNGM1LTMuOCw5LjQtNy40LDEyLjctMTBjMy4yLTIuOSw1LjktNS4zLDcuNC03LjRjMy4yLTMuOCw0LjctOC41LDQuNy0xNC40DQoJCQljMC02LjUtMi4xLTExLjUtNi41LTE1LjZzLTEwLTUuOS0xNy40LTUuOWMtNi41LDAtMTIuMSwyLjEtMTYuOCw2LjJjLTQuNCwzLjgtNi44LDguOC02LjgsMTVjMCw3LjEsMi45LDE0LjEsOC41LDIxLjJsOS4xLDEwLjkNCgkJCUMyODMuMywzNTguMiwyODMuOSwzNTksMjg1LjEsMzYwLjJ6Ii8+DQoJPC9nPg0KPC9nPg0KPC9zdmc+DQo=');
+    t.equal(img.getAttribute('src'), 'data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjwhLS0gR2VuZXJhdG9yOiBBZG9iZSBJbGx1c3RyYXRvciAxNy4xLjAsIFNWRyBFeHBvcnQgUGx1Zy1JbiAuIFNWRyBWZXJzaW9uOiA2LjAwIEJ1aWxkIDApICAtLT4NCjwhRE9DVFlQRSBzdmcgUFVCTElDICItLy9XM0MvL0RURCBTVkcgMS4xLy9FTiIgImh0dHA6Ly93d3cudzMub3JnL0dyYXBoaWNzL1NWRy8xLjEvRFREL3N2ZzExLmR0ZCI+DQo8c3ZnIHZlcnNpb249IjEuMSIgaWQ9IkxheWVyXzEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4Ig0KCSB2aWV3Qm94PSIyMDEuMSAyNzQuMiAyMTYgMjUxLjciIGVuYWJsZS1iYWNrZ3JvdW5kPSJuZXcgMjAxLjEgMjc0LjIgMjE2IDI1MS43IiB4bWw6c3BhY2U9InByZXNlcnZlIj4NCjxnPg0KCTxnPg0KCQk8cGF0aCBmaWxsPSIjRUIzQjk1IiBkPSJNMzA2LjMsMzg1LjlsNDMuNiw1Mi43bDEuNS0xLjVjNC43LTUsOS4xLTEwLDEzLjMtMTVjNC4xLTUsMTUtMTYuNSwxOC45LTIxLjhsMTcuMSwzMS4yDQoJCQljLTIuOSw0LjEtNi44LDkuMS0xMS41LDE0LjdzLTEwLjMsMTIuMS0xNy4xLDE5LjJsNDUuMSw1NS43aC00NS43bC0yNC4yLTI5LjhjLTIyLjEsMjMtNDUuNCwzNC41LTY5LjIsMzQuNQ0KCQkJYy0yMS41LDAtMzkuOC02LjgtNTQuOC0yMC42Yy0xNC43LTEzLjgtMjIuMS0zMC45LTIyLjEtNTEuM2MwLTI0LjIsMTEuNS00NC41LDM1LjEtNjAuNGwxNS45LTEwLjljMC4zLDAsMC42LTAuMywxLjItMC45DQoJCQljMC42LTAuMywxLjItMC45LDIuMS0xLjhjLTE1LjktMTcuMS0yNC4yLTMzLjktMjQuMi01MC40czUuMy0yOS44LDE1LjktNDAuMWMxMC45LTEwLjMsMjUtMTUuMyw0Mi40LTE1LjNjMTYuOCwwLDMwLjQsNSw0MS4zLDE1DQoJCQlzMTYuNSwyMi43LDE2LjUsMzcuN2MwLDEwLjYtMi45LDIwLTguOCwyOC42QzMzMi4yLDM2My44LDMyMS42LDM3NC4xLDMwNi4zLDM4NS45eiBNMjc3LjEsNDA2LjVsLTIuMSwxLjUNCgkJCWMtMTUsMTAuMy0yNS4zLDE4LjktMzAuNiwyNXMtOCwxMy04LDIwYzAsMTAsNC4xLDE5LjQsMTIuMSwyNy43YzguMyw4LDE3LjcsMTIuMSwyNy43LDEyLjFjMTQuMSwwLDMwLjQtOS4xLDQ4LjktMjcuNw0KCQkJTDI3Ny4xLDQwNi41eiBNMjg1LjEsMzYwLjJsMi45LTIuNGM1LTMuOCw5LjQtNy40LDEyLjctMTBjMy4yLTIuOSw1LjktNS4zLDcuNC03LjRjMy4yLTMuOCw0LjctOC41LDQuNy0xNC40DQoJCQljMC02LjUtMi4xLTExLjUtNi41LTE1LjZzLTEwLTUuOS0xNy40LTUuOWMtNi41LDAtMTIuMSwyLjEtMTYuOCw2LjJjLTQuNCwzLjgtNi44LDguOC02LjgsMTVjMCw3LjEsMi45LDE0LjEsOC41LDIxLjJsOS4xLDEwLjkNCgkJCUMyODMuMywzNTguMiwyODMuOSwzNTksMjg1LjEsMzYwLjJ6Ii8+DQoJPC9nPg0KPC9nPg0KPC9zdmc+DQo=');
     t.end();
 });
 
@@ -283,8 +284,8 @@ test('href bindings', function (t) {
     });
     var el = view.el;
     t.equal(el.getAttribute('href'), '');
-    view.model.set('url', 'http://robohash.com/whammo');
-    t.equal(el.getAttribute('href'), 'http://robohash.com/whammo');
+    view.model.set('url', 'http://ampersandjs.com');
+    t.equal(el.getAttribute('href'), 'http://ampersandjs.com');
     t.end();
 });
 
@@ -926,7 +927,15 @@ test('template can be passed as viewOption', function (t) {
 
 test('events are bound if there is an el in the constructor', function (t) {
     t.plan(1);
-    var event = document.createEvent("MouseEvent");
+    var event;
+    try {
+      // real browsers
+      event = new MouseEvent('click');
+    } catch (e) {
+      // phantomjs (https://github.com/ariya/phantomjs/issues/11289)
+      event = document.createEvent('MouseEvent');
+      event.initMouseEvent('click');
+    }
     var View = AmpersandView.extend({
         template: function () {
             return document.createElement('div');
@@ -940,13 +949,20 @@ test('events are bound if there is an el in the constructor', function (t) {
         }
     });
     var view = new View({el: document.createElement('div')});
-    event.initMouseEvent('click');
     view.el.dispatchEvent(event);
 });
 
 test('render, remove, render yields consistent subview behavior', function (t) {
     t.plan(1);
-    var event = document.createEvent("MouseEvent");
+    var event;
+    try {
+      // real browsers
+      event = new MouseEvent('click');
+    } catch (e) {
+      // phantomjs (https://github.com/ariya/phantomjs/issues/11289)
+      event = document.createEvent('MouseEvent');
+      event.initMouseEvent('click');
+    }
     var parentEl = document.createElement('div');
     var childContainerEl = document.createElement('div');
     childContainerEl.id = 'child_container';
@@ -974,6 +990,5 @@ test('render, remove, render yields consistent subview behavior', function (t) {
     parent.render();
     parent.remove();
     parent.render();
-    event.initMouseEvent('click');
     parent.childv.el.dispatchEvent(event);
 });
