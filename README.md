@@ -622,7 +622,7 @@ You usually don't need to use this, but may wish to if you have multiple views a
 Why yes! So glad you asked :)
 
 * Run `npm test` to run the tests in a headless phantom browser.
-* Run `npm start` to start a webserver with the test harness, and then visit http://localhost:3000 to open and run the tests in your browser of choice.
+* Run `npm start` to start a webserver with the test harness, and then visit the url it gives to open and run the tests in your browser of choice.
 
 ## Like this?
 
