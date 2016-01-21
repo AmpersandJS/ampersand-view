@@ -18,3 +18,5 @@ addons:
   sauce_connect: true
 env:
   global:
+  - secure: XL8sJZNvtFm68YpfN+Ni3RyLhtEdl/I17UJ0sq/3RI8+qhmlDGdD1o9hOCqIjePNQBKc7QGT4Z7Mj+SkKMEOdO6w1oMkXLhlhtS4eUVGsIRnn6uFjcLs8z2cd0pKOu5jILrWfnJm9BjPRValoIHuexoQ3yXtbxlLNY2PUE1/NJU=
+  - secure: Fwm2R3bXZ3iw6UjNey8mF9j0vAKWlpPMyG+0bmY7VUYwXnolN9givV4Sh3mzaMW5icHbAPfWOGCln8ftD0glCLOK2SNNgERt8H3+FHjkvpM5VVwjKJ80X/kL80EzL7nuv0mhap0a5y4O1WTnWwD4MzbZmq6wWlVBnSYRzXZ569Y=
