@@ -34,14 +34,11 @@
   "devDependencies": {
     "ampersand-model": "^5.0.1",
     "ampersand-rest-collection": "^3.0.0",
-    "browserify": "^9.0.4",
     "jsdom": "^4.1.0",
-    "phantomjs": "^1.9.7-15",
+    "phantomjs": "^1.9.19",
     "precommit-hook": "^2.0.1",
-    "run-browser": "^2.0.2",
-    "tap-spec": "^2.2.2",
-    "tape": "^3.5.0",
-    "tape-run": "^1.0.0"
+    "tape": "^4.4.0",
+    "zuul": "^3.9.0"
   },
   "homepage": "https://github.com/ampersandjs/ampersand-view",
   "keywords": [
@@ -57,28 +54,12 @@
     "url": "git://github.com/ampersandjs/ampersand-view.git"
   },
   "scripts": {
-    "validate": "jshint .",
-    "start": "run-browser test/index.js",
-    "test": "browserify test/index.js | tape-run | tap-spec",
+    "start": "zuul --local -- test/index.js",
+    "test": "zuul --phantom -- test/index.js",
+    "test-ci": "zuul -- test/index.js",
     "preversion": "git checkout master && git pull && npm ls",
     "publish-patch": "npm run preversion && npm version patch && git push origin master --tags && npm publish",
     "publish-minor": "npm run preversion && npm version minor && git push origin master --tags && npm publish",
     "publish-major": "npm run preversion && npm version major && git push origin master --tags && npm publish"
-  },
-  "testling": {
-    "files": "test/*.js",
-    "browsers": [
-      "ie/9..latest",
-      "firefox/17..latest",
-      "firefox/nightly",
-      "chrome/22..latest",
-      "chrome/canary",
-      "opera/12..latest",
-      "opera/next",
-      "safari/5.1..latest",
-      "ipad/6.0..latest",
-      "iphone/6.0..latest",
-      "android-browser/4.2..latest"
-    ]
   }
 }
