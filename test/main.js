@@ -928,13 +928,13 @@ test('template can be passed as viewOption', function (t) {
 test('events are bound if there is an el in the constructor', function (t) {
     t.plan(1);
     var event;
-    try {
-      // real browsers
+    if (typeof window.Event === 'function') {
+      //real browsers
       event = new MouseEvent('click');
-    } catch (e) {
+    } else {
       // phantomjs (https://github.com/ariya/phantomjs/issues/11289)
       event = document.createEvent('MouseEvent');
-      event.initMouseEvent('click');
+      event.initMouseEvent("click", true, true, "window", 0, 0, 0, 0, 0, false, false, false, false, 0, null);
     }
     var View = AmpersandView.extend({
         template: function () {
@@ -955,11 +955,15 @@ test('events are bound if there is an el in the constructor', function (t) {
 test('render, remove, render yields consistent subview behavior', function (t) {
     t.plan(1);
     var event;
-    try {
+    if (typeof window.Event === 'function') {
       // real browsers
       event = new MouseEvent('click');
-    } catch (e) {
+    } else {
       // phantomjs (https://github.com/ariya/phantomjs/issues/11289)
+      event = document.createEvent('MouseEvent');
+      event.initMouseEvent("click", true, true, "window", 0, 0, 0, 0, 0, false, false, false, false, 0, null);
+    }
+    if (!event) {
       event = document.createEvent('MouseEvent');
       event.initMouseEvent('click');
     }
