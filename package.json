@@ -26,7 +26,7 @@
     "lodash.invoke": "^3.1.0",
     "lodash.isstring": "^3.0.1",
     "lodash.last": "^3.0.0",
-    "lodash.pick": "^3.1.0",
+    "lodash.pick": "^4.2.0",
     "lodash.result": "^3.0.0",
     "lodash.uniqueid": "^3.0.0",
     "matches-selector": "^1.0.0"
