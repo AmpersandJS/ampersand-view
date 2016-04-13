@@ -13,7 +13,7 @@
   "dependencies": {
     "ampersand-collection-view": "^1.4.0",
     "ampersand-dom-bindings": "^3.5.0",
-    "ampersand-state": "^4.5.2",
+    "ampersand-state": "4.8.2",
     "ampersand-version": "^1.0.2",
     "component-classes": "^1.2.4",
     "domify": "^1.3.2",
