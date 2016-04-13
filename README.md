@@ -503,7 +503,7 @@ cleanup : function(){
 This method will:
 
 1. store a reference to the subview for cleanup when `remove()` is called.
-2. sdd a reference to itself at `subview.parent`
+2. add a reference to itself at `subview.parent`
 3. return the subview
 
 ### renderSubview `view.renderSubview(viewInstance, containerEl)`
