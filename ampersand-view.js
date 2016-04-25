@@ -2,20 +2,20 @@
 var State = require('ampersand-state');
 var CollectionView = require('ampersand-collection-view');
 var domify = require('domify');
-var uniqueId = require("lodash.uniqueid");
-var pick = require("lodash.pick");
-var assign = require("lodash.assign");
-var forEach = require("lodash.foreach");
-var result = require("lodash.result");
-var last = require("lodash.last");
-var isString = require("lodash.isstring");
-var bind = require("lodash.bind");
-var flatten = require("lodash.flatten");
-var invoke = require("lodash.invoke");
+var uniqueId = require("lodash/uniqueid");
+var pick = require("lodash/pick");
+var assign = require("lodash/assign");
+var forEach = require("lodash/foreach");
+var result = require("lodash/result");
+var last = require("lodash/last");
+var isString = require("lodash/isstring");
+var bind = require("lodash/bind");
+var flatten = require("lodash/flatten");
+var invokeMap = require("lodash/invokeMap");
 var events = require('events-mixin');
 var matches = require('matches-selector');
 var bindings = require('ampersand-dom-bindings');
-var getPath = require('lodash.get');
+var getPath = require('lodash/get');
 
 function View(attrs) {
     this.cid = uniqueId('view');
@@ -210,7 +210,7 @@ assign(View.prototype, {
     // Pass it a view. This can be anything with a `remove` method
     registerSubview: function (view) {
         // Storage for our subviews.
-        this._subviews || (this._subviews = []);
+        this._subviews = this._subviews || [];
         this._subviews.push(view);
         // set the parent reference if it has not been set
         if (!view.parent) view.parent = this;
@@ -427,7 +427,7 @@ assign(View.prototype, {
     _downsertBindings: function() {
         var parsedBindings = this._parsedBindings;
         if (!this.bindingsSet) return;
-        if (this._subviews) invoke(flatten(this._subviews), 'remove');
+        if (this._subviews) invokeMap(flatten(this._subviews), 'remove');
         this.stopListening();
         // TODO: Not sure if this is actually necessary.
         // Just trying to de-reference this potentially large
