@@ -16,7 +16,7 @@ What does it do?
 Part of the [Ampersand.js toolkit](http://ampersandjs.com) for building clientside applications.
 <!-- endhide -->
 
-## Install
+## install
 
 ```
 npm install ampersand-view
@@ -606,7 +606,10 @@ Will unbind existing events by calling `undelegateEvents` before binding new one
 Clears all callbacks previously bound to the view with `delegateEvents`.
 You usually don't need to use this, but may wish to if you have multiple views attached to the same DOM element.
 
-## Changelog
+## changelog
+- 10.0.0
+  - bump to `ampersand-state` 5.x
+  - reduce bundle size via `lodash` upgrade and require methodology
 - 9.0.0
   - support render-remove-render view instance lifecycle. previously bindings were trashed for good on remove()
   - subviews declared in the subviews hash by default append the subview-el into its target, vs replace its target
@@ -623,14 +626,14 @@ You usually don't need to use this, but may wish to if you have multiple views a
 
 <!---starthide-->
 
-## Test coverage?
+## test coverage?
 
 Why yes! So glad you asked :)
 
 * Run `npm test` to run the tests in a headless phantom browser.
 * Run `npm start` to start a webserver with the test harness, and then visit http://localhost:3000 to open and run the tests in your browser of choice.
 
-## Like this?
+## like this?
 
 Follow [@HenrikJoreteg](http://twitter.com/henrikjoreteg) on twitter and check out my recently released book: [human javascript](http://humanjavascript.com) which includes a full explanation of this as well as a whole bunch of other stuff for building awesome single page apps.
 
