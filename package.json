@@ -23,7 +23,7 @@
   },
   "devDependencies": {
     "ampersand-model": "^8.0.0",
-    "ampersand-rest-collection": "^3.0.0",
+    "ampersand-rest-collection": "^5.0.0",
     "browserify": "^13.0.1",
     "jsdom": "^9.0.0",
     "precommit-hook": "^2.0.1",
