@@ -22,7 +22,7 @@
     "matches-selector": "^1.0.0"
   },
   "devDependencies": {
-    "ampersand-model": "^5.0.1",
+    "ampersand-model": "^8.0.0",
     "ampersand-rest-collection": "^3.0.0",
     "browserify": "^13.0.1",
     "jsdom": "^9.0.0",
