@@ -144,6 +144,7 @@ test('sort', function (t) {
         return model.get('name');
     };
     view.collection.sort();
+    view.render();
     t.equal(view.numberRendered(), view.collection.length);
     var domIds = [];
     view.queryAll('li').forEach(function (el) {
