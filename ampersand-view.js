@@ -357,15 +357,6 @@ assign(View.prototype, {
         return this;
     },
 
-    // ## listenToAndRun
-    // Shortcut for registering a listener for a model
-    // and also triggering it right away.
-    listenToAndRun: function (object, events, handler) {
-        var bound = bind(handler, this);
-        this.listenTo(object, events, bound);
-        bound();
-    },
-
     // ## animateRemove
     // Placeholder for if you want to do something special when they're removed.
     // For example fade it out, etc.
