@@ -2,6 +2,8 @@
 
 Lead Maintainer: [Christopher Dieringer](https://github.com/cdaringe)
 
+**:point_right: Seeking volunteer for new lead maintainer**.  &-view is in great shape and very stable, however, I am currently doing the barebones to keep it afloat.  Please get in contact if you're interested in taking the reigns!  Thanks -[@cdaringe](http://www.twitter.com/cdaringe)
+
 A set of common helpers and conventions for using as a base view for ampersand.js apps.
 
 What does it do?
