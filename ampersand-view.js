@@ -390,6 +390,7 @@ assign(View.prototype, {
             },
             set: function(fn) {
                 this._render = function() {
+                    this._upsertBindings();
                     fn.apply(this, arguments);
                     this._rendered = true;
                     return this;
@@ -405,7 +406,6 @@ assign(View.prototype, {
             },
             set: function(fn) {
                 this._remove = function() {
-                    this._upsertBindings();
                     fn.apply(this, arguments);
                     this._rendered = false;
                     return this;
