@@ -399,7 +399,7 @@ var view = AmpersandView.extend({
 Runs a [`querySelector`](https://developer.mozilla.org/en-US/docs/Web/API/document.querySelector) scoped within the view's current element (`view.el`), returning the first matching element in the dom-tree.
 
 notes:
-- It will also match agains the root element.
+- It will also match against the root element.
 - It will return the root element if you pass `''` as the selector.
 - If no match is found it returns `undefined`
 
