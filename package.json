@@ -30,7 +30,7 @@
     "run-browser": "^2.0.2",
     "tap-spec": "^2.2.2",
     "tape": "^4.6.0",
-    "tape-run": "^2.1.4"
+    "tape-run": "^3.0.0"
   },
   "homepage": "https://github.com/ampersandjs/ampersand-view",
   "keywords": [
