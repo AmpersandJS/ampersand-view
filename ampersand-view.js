@@ -227,7 +227,8 @@ assign(View.prototype, {
         }
         if (!container) container = this.el;
         this.registerSubview(view);
-        container.appendChild(view.render().el);
+        view.render();
+        container.appendChild(view.el);
         return view;
     },
 
