@@ -87,9 +87,6 @@ var BaseState = State.extend({
     }
 });
 
-// Cached regex to split keys for `delegate`.
-var delegateEventSplitter = /^(\S+)\s*(.*)$/;
-
 View.prototype = Object.create(BaseState.prototype);
 
 var queryNoElMsg = 'Query cannot be performed as this.el is not defined. Ensure that the view has been rendered.';
