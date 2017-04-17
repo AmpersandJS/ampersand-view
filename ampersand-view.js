@@ -148,6 +148,9 @@ assign(View.prototype, {
     _render: function () {
         this._upsertBindings();
         this.renderWithTemplate(this);
+        if (this._rendered === true) {
+            this.trigger('change:rendered');
+        }
         this._rendered = true;
         return this;
     },
@@ -284,7 +287,7 @@ assign(View.prototype, {
             }
         }
         // we listen for main `change` items
-        this.on('change', action, this);
+        this.on('change change:rendered', action, this);
     },
 
     // Parses the declarative subview definition.
@@ -391,6 +394,9 @@ assign(View.prototype, {
             set: function(fn) {
                 this._render = function() {
                     fn.apply(this, arguments);
+                    if (this._rendered === true) {
+                        this.trigger('change:rendered');
+                    }
                     this._rendered = true;
                     return this;
                 };
