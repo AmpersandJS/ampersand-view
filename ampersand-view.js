@@ -320,6 +320,7 @@ assign(View.prototype, {
         var template = templateArg || this.template;
         if (!template) throw new Error('Template string or function needed.');
         var newDom = isString(template) ? template : template.call(this, context || this);
+        if (!newDom) throw new Error('Empty template');
         if (isString(newDom)) newDom = domify(newDom);
         var parent = this.el && this.el.parentNode;
         if (parent) parent.replaceChild(newDom, this.el);
