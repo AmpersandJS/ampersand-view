@@ -269,10 +269,11 @@ assign(View.prototype, {
         var opts = this._parseSubviewOpts(subview);
 
         function action() {
-            var el, subview;
+            var el, subview, waitFor;
             // if not rendered or we can't find our element, stop here.
             if (!this.el || !(el = this.query(opts.selector))) return;
-            if (!opts.waitFor || getPath(this, opts.waitFor)) {
+			waitFor = getPath(this, opts.waitFor);
+            if (!opts.waitFor || waitFor || (waitFor !== undefined && waitFor !== null)) {
                 subview = this[name] = opts.prepareView.call(this, el);
                 if (!subview.el) {
                     this.renderSubview(subview, el);
