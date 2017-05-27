@@ -24,7 +24,7 @@
   "devDependencies": {
     "ampersand-model": "^8.0.0",
     "ampersand-rest-collection": "^6.0.0",
-    "browserify": "^14.3.0",
+    "browserify": "^14.4.0",
     "jsdom": "^10.1.0",
     "precommit-hook": "^3.0.0",
     "run-browser": "^2.0.2",
