@@ -418,15 +418,6 @@ assign(View.prototype, {
         if (!this.bindingsSet) return;
         if (this._subviews) invokeMap(flatten(this._subviews), 'remove');
         this.stopListening();
-        // TODO: Not sure if this is actually necessary.
-        // Just trying to de-reference this potentially large
-        // amount of generated functions to avoid memory leaks.
-        forEach(parsedBindings, function (properties, modelName) {
-            forEach(properties, function (value, key) {
-                delete parsedBindings[modelName][key];
-            });
-            delete parsedBindings[modelName];
-        });
         this.bindingsSet = false;
     },
 
