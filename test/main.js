@@ -977,3 +977,22 @@ test('render, remove, render yields consistent subview behavior', function (t) {
     event.initMouseEvent('click');
     parent.childv.el.dispatchEvent(event);
 });
+
+test('the subviews array is empty after the parent view is removed', function(t){
+    t.plan(2);
+    var Child = AmpersandView.extend({
+        template: function() { return document.createElement('div'); }
+    });
+    var Parent = AmpersandView.extend({
+        template: function() { return document.createElement('div'); },
+        render: function(){
+            this.renderWithTemplate();
+            this.renderSubview(new Child(), this.el);
+        }
+    });
+    var parent = new Parent({ el: document.createElement('div') });
+    parent.render();
+    t.equal(parent._subviews.length, 1, 'adds child view to subviews array');
+    parent.remove();
+    t.equal(parent._subviews.length, 0, 'removes child view from subviews array');
+});
