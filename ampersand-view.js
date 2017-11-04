@@ -416,7 +416,10 @@ assign(View.prototype, {
     _downsertBindings: function() {
         var parsedBindings = this._parsedBindings;
         if (!this.bindingsSet) return;
-        if (this._subviews) invokeMap(flatten(this._subviews), 'remove');
+        if (this._subviews){
+          invokeMap(flatten(this._subviews), 'remove');
+          this._subviews = [];
+        }
         this.stopListening();
         this.bindingsSet = false;
     },
