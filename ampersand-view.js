@@ -408,6 +408,7 @@ assign(View.prototype, {
                 this._remove = function() {
                     fn.apply(this, arguments);
                     this._rendered = false;
+                    this._downsertBindings();
                     return this;
                 };
             }
