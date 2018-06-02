@@ -996,3 +996,23 @@ test('the subviews array is empty after the parent view is removed', function(t)
     parent.remove();
     t.equal(parent._subviews.length, 0, 'removes child view from subviews array');
 });
+
+test('custom render and remove functions should maintain bindings behavior ', function (t) {
+    t.plan(3);
+    var View = AmpersandView.extend({
+        render: function () {
+            this.renderWithTemplate(this);            
+        },
+        remove: function () {
+            if (this.el && this.el.parentNode) this.el.parentNode.removeChild(this.el);
+        },
+        template: function () { return document.createElement('div'); }
+    });
+    var view = new View({ el: document.createElement('div') });
+    view.render();
+    t.equal(view.bindingsSet, true, 'verify initial state, constructor and render calls _upsertBindings, bindingsSet should be true');        
+    view.remove();
+    t.equal(view.bindingsSet, false, 'custom remove calls _downsertBindings and bindingsSet is false');
+    view.render();
+    t.equal(view.bindingsSet, true, 'custom render calls _upsertBindings and bindingsSet is true');  
+});
