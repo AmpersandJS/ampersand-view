@@ -607,6 +607,7 @@ Clears all callbacks previously bound to the view with `delegateEvents`.
 You usually don't need to use this, but may wish to if you have multiple views attached to the same DOM element.
 
 ## changelog
+- 10.0.3 - memory leak in _subviews array, it was not being cleared in _downsertBindings (https://github.com/AmpersandJS/ampersand-view/issues/182)
 - 10.0.1 - bump deps
 - 10.0.0
   - bump to `ampersand-state` 5.x
