@@ -3,26 +3,24 @@ var State = require('ampersand-state');
 var CollectionView = require('ampersand-collection-view');
 var domify = require('domify');
 var uniqueId = require("lodash/uniqueId");
-var pick = require("lodash/pick");
 var assign = require("lodash/assign");
-var forEach = require("lodash/forEach");
 var result = require("lodash/result");
 var last = require("lodash/last");
 var isString = require("lodash/isString");
-var bind = require("lodash/bind");
 var flatten = require("lodash/flatten");
 var invokeMap = require("lodash/invokeMap");
 var events = require('events-mixin');
 var matches = require('matches-selector');
 var bindings = require('ampersand-dom-bindings');
 var getPath = require('lodash/get');
+var castArray = require('lodash/castArray');
 
 function View(attrs) {
     this.cid = uniqueId('view');
     attrs || (attrs = {});
     var parent = attrs.parent;
     delete attrs.parent;
-    BaseState.call(this, attrs, {init: false, parent: parent});
+    BaseState.call(this, attrs, { init: false, parent: parent });
     this.on('change:el', this._handleElementChange, this);
     this._upsertBindings();
     this.template = attrs.template || this.template;
@@ -75,7 +73,7 @@ var BaseState = State.extend({
         },
         rendered: {
             deps: ['_rendered'],
-            fn: function() {
+            fn: function () {
                 if (this._rendered) {
                     this.trigger('render', this);
                     return true;
@@ -141,7 +139,7 @@ assign(View.prototype, {
 
     // Initialize is an empty function by default. Override it with your own
     // initialization logic.
-    initialize: function () {},
+    initialize: function () { },
 
     // **render** is the core function that your view can override. Its job is
     // to populate its element (`this.el`), with the appropriate HTML.
@@ -267,12 +265,16 @@ assign(View.prototype, {
             subview.selector = subview.container;
         }
         var opts = this._parseSubviewOpts(subview);
+        var hasViewPath = function (path) {
+            return !!getPath(this, path);
+        };
+
 
         function action() {
             var el, subview;
             // if not rendered or we can't find our element, stop here.
             if (!this.el || !(el = this.query(opts.selector))) return;
-            if (!opts.waitFor || getPath(this, opts.waitFor)) {
+            if (!opts.waitFor.length || opts.waitFor.every(hasViewPath, this)) {
                 subview = this[name] = opts.prepareView.call(this, el);
                 if (!subview.el) {
                     this.renderSubview(subview, el);
@@ -299,7 +301,7 @@ assign(View.prototype, {
         var self = this;
         var opts = {
             selector: subview.selector || '[data-hook="' + subview.hook + '"]',
-            waitFor: subview.waitFor || '',
+            waitFor: subview.waitFor ? castArray(subview.waitFor) : [],
             prepareView: subview.prepareView || function () {
                 return new subview.constructor({
                     parent: self
@@ -383,13 +385,13 @@ assign(View.prototype, {
         return this.registerSubview(collectionView);
     },
 
-    _setRender: function(obj) {
+    _setRender: function (obj) {
         Object.defineProperty(obj, 'render', {
-            get: function() {
+            get: function () {
                 return this._render;
             },
-            set: function(fn) {
-                this._render = function() {
+            set: function (fn) {
+                this._render = function () {
                     this._upsertBindings();
                     fn.apply(this, arguments);
                     this._rendered = true;
@@ -399,13 +401,13 @@ assign(View.prototype, {
         });
     },
 
-    _setRemove: function(obj) {
+    _setRemove: function (obj) {
         Object.defineProperty(obj, 'remove', {
-            get: function() {
+            get: function () {
                 return this._remove;
             },
-            set: function(fn) {
-                this._remove = function() {
+            set: function (fn) {
+                this._remove = function () {
                     fn.apply(this, arguments);
                     this._rendered = false;
                     this._downsertBindings();
@@ -415,18 +417,18 @@ assign(View.prototype, {
         });
     },
 
-    _downsertBindings: function() {
+    _downsertBindings: function () {
         var parsedBindings = this._parsedBindings;
         if (!this.bindingsSet) return;
-        if (this._subviews){
-          invokeMap(flatten(this._subviews), 'remove');
-          this._subviews = [];
+        if (this._subviews) {
+            invokeMap(flatten(this._subviews), 'remove');
+            this._subviews = [];
         }
         this.stopListening();
         this.bindingsSet = false;
     },
 
-    _upsertBindings: function(attrs) {
+    _upsertBindings: function (attrs) {
         attrs = attrs || this;
         if (this.bindingsSet) return;
         this._parsedBindings = bindings(this.bindings, this);
