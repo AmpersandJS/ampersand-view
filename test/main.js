@@ -864,10 +864,11 @@ test('make sure subviews dont fire until their `waitFor` is done', function (t) 
     });
 
     var View = AmpersandView.extend({
-        template: '<div><span class="container"></span><span data-hook="sub"></span></div>',
+        template: '<div><span class="container"></span><span data-hook="sub"></span><span data-hook="subthree"></span></div>',
         autoRender: true,
         props: {
-            model2: 'state'
+            model2: 'state',
+            subThreeReady: 'boolean'
         },
         subviews: {
             sub1: {
@@ -879,21 +880,29 @@ test('make sure subviews dont fire until their `waitFor` is done', function (t) 
                 waitFor: 'model2',
                 hook: 'sub',
                 constructor: Sub
+            },
+            sub3: {
+                waitFor: ['model', 'model2','subThreeReady'],
+                hook: 'subthree',
+                constructor: Sub
             }
         }
     });
     var view = new View();
-    t.equal(view._events.change.length, 2);
-    t.equal(view.el.outerHTML, '<div><span class="container"></span><span data-hook="sub"></span></div>');
+    t.equal(view._events.change.length, 3, 'three change events change events on instantiation');
+    t.equal(view.el.outerHTML, '<div><span class="container"></span><span data-hook="sub"></span><span data-hook="subthree"></span></div>', 'the subviews should be empty');
     view.model = new Model();
-    t.equal(view._events.change.length, 1);
-    t.equal(view.el.outerHTML, '<div><span class="container"><span>yes</span></span><span data-hook="sub"></span></div>');
+    t.equal(view._events.change.length, 2, 'triggers change');
+    t.equal(view.el.outerHTML, '<div><span class="container"><span>yes</span></span><span data-hook="sub"></span><span data-hook="subthree"></span></div>', 'the subview sub1 should have rendered');
     view.model2 = new Model();
-    t.equal(view.el.outerHTML, '<div><span class="container"><span>yes</span></span><span data-hook="sub"><span>yes</span></span></div>');
+    t.equal(view.el.outerHTML, '<div><span class="container"><span>yes</span></span><span data-hook="sub"><span>yes</span></span><span data-hook="subthree"></span></div>','the subviews sub2 should have rendered');    
+    view.subThreeReady = true;
+    t.equal(view.el.outerHTML, '<div><span class="container"><span>yes</span></span><span data-hook="sub"><span>yes</span></span><span data-hook="subthree"><span>yes</span></span></div>','the subviews sub3 should have rendered');
     t.notOk(view._events.change);
 
     t.end();
 });
+
 
 test('make sure template can return a dom node', function (t) {
     var Sub = AmpersandView.extend({
